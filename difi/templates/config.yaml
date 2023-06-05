@@ -3,8 +3,10 @@ kind: ConfigMap
 metadata:
   name: {{ template "difi.fullname" . }}
 data:
-  difi.yaml: |+
-    {{- include "difi.config" . | nindent 4 }}
+  difi-api.yaml: |+
+    {{- include "difi.api.config" . | nindent 4 }}
+  difi-worker.yaml: |+
+    {{- include "difi.worker.config" . | nindent 4 }}
 
 {{- range $key, $value := .Values.extraConfigFiles }}
   {{ $key }}: |-

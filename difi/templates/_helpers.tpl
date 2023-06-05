@@ -27,7 +27,7 @@ If release name contains chart name it will be used as a full name.
 Create a default fully qualified api name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "difi.difi.fullname" -}}
+{{- define "difi.api.fullname" -}}
 {{ template "difi.fullname" . }}-api
 {{- end -}}
 
@@ -35,7 +35,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 Create a default fully qualified worker name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "difi.difi.fullname" -}}
+{{- define "difi.worker.fullname" -}}
 {{ template "difi.fullname" . }}-api
 {{- end -}}
 
@@ -44,7 +44,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 Create a default fully qualified nginx name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "difi.difi.fullname" -}}
+{{- define "difi.nginx.fullname" -}}
 {{ template "difi.fullname" . }}-proxy
 {{- end -}}
 

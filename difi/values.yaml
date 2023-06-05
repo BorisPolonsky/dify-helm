@@ -41,9 +41,10 @@ api:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  extraEnv:
-  - name: GODEBUG
-    value: "madvdontneed=1"
+  extraEnv: {}
+  # Apply your own Environment Variables if necessary
+  # - name: LANG
+  #   value: "C.UTF-8"
 
 worker:
   enabled: true
@@ -52,9 +53,10 @@ worker:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  extraEnv:
-  - name: GODEBUG
-    value: "madvdontneed=1"
+  extraEnv: {}
+  # Apply your own Environment Variables if necessary
+  # - name: LANG
+  #   value: "C.UTF-8"
 
 proxy:
   enabled: true
@@ -63,9 +65,94 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  extraEnv:
-  - name: GODEBUG
-    value: "madvdontneed=1"
+  extraEnv: {}
+  # Apply your own Environment Variables if necessary
+  # - name: LANG
+  #   value: "C.UTF-8"
+
+postgres:
+  enabled: true
+  name: postgresql
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: 15.3.0-debian-11-r7
+    digest: ""
+    ## Specify a imagePullPolicy
+    ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+    ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    ##
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## Example:
+    ## pullSecrets:
+    ##   - myRegistryKeySecretName
+    ##
+    pullSecrets: []
+    ## Set to true if you would like to see extra information on logs
+    ##
+    debug: false
+  ## Authentication parameters
+  ## ref: https://github.com/bitnami/containers/tree/main/bitnami/postgresql#setting-the-root-password-on-first-run
+  ## ref: https://github.com/bitnami/containers/tree/main/bitnami/postgresql#creating-a-database-on-first-run
+  ## ref: https://github.com/bitnami/containers/tree/main/bitnami/postgresql#creating-a-database-user-on-first-run
+  ##
+  auth:
+    ## @param auth.enablePostgresUser Assign a password to the "postgres" admin user. Otherwise, remote access will be blocked for this user
+    ##
+    enablePostgresUser: true
+    ## @param auth.postgresPassword Password for the "postgres" admin user. Ignored if `auth.existingSecret` is provided
+    ##
+    postgresPassword: "difyai123456"
+    ## @param auth.username Name for a custom user to create
+    ##
+    # TODO: align ENV & svc
+    username: "postgres"
+    ## @param auth.password Password for the custom user to create. Ignored if `auth.existingSecret` is provided
+    ##
+    password: ""
+    ## @param auth.database Name for a custom database to create
+    ##
+    database: "dify"
+    ## @param auth.replicationUsername Name of the replication user
+    ##
+    replicationUsername: repl_user
+    ## @param auth.replicationPassword Password for the replication user. Ignored if `auth.existingSecret` is provided
+    ##
+    replicationPassword: ""
+    ## @param auth.existingSecret Name of existing secret to use for PostgreSQL credentials. `auth.postgresPassword`, `auth.password`, and `auth.replicationPassword` will be ignored and picked up from this secret. The secret might also contains the key `ldap-password` if LDAP is enabled. `ldap.bind_password` will be ignored and picked from this secret in this case.
+    ##
+    existingSecret: ""
+    ## @param auth.secretKeys.adminPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+    ## @param auth.secretKeys.userPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+    ## @param auth.secretKeys.replicationPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+    ##
+    secretKeys:
+      adminPasswordKey: postgres-password
+      userPasswordKey: password
+      replicationPasswordKey: replication-password
+    ## @param auth.usePasswordFiles Mount credentials as a files instead of using an environment variable
+    ##
+    usePasswordFiles: false
+  ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
+  ##
+  architecture: standalone
+  ## Replication configuration
+  ## Ignored if `architecture` is `standalone`
+  ##
+  replication:
+    ## @param replication.synchronousCommit Set synchronous commit mode. Allowed values: `on`, `remote_apply`, `remote_write`, `local` and `off`
+    ## @param replication.numSynchronousReplicas Number of replicas that will have synchronous replication. Note: Cannot be greater than `readReplicas.replicaCount`.
+    ## ref: https://www.postgresql.org/docs/current/runtime-config-wal.html#GUC-SYNCHRONOUS-COMMIT
+    ##
+    synchronousCommit: "off"
+    numSynchronousReplicas: 0
+    ## @param replication.applicationName Cluster application name. Useful for advanced replication settings
+    ##
+    applicationName: my_application
+
 
 service:
   type: ClusterIP
@@ -114,3 +201,18 @@ tolerations: []
 # If set, this will apply to all difi components
 # Individual components can be set to a different affinity
 affinity: {}
+
+
+###################################
+# External postgres
+# - these configs are only used when `externalPostgres.enabled` is true
+###################################
+externalPostgres:
+  enabled: false
+  username: "postgres"
+  password: "difyai123456"
+  address: localhost
+  port: 5432
+  dbName: dify
+  maxOpenConns: 20
+  maxIdleConns: 5
