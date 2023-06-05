@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "difi.fullname" . }}
+data:
+  difi.yaml: |+
+    {{- include "difi.config" . | nindent 4 }}
+
+{{- range $key, $value := .Values.extraConfigFiles }}
+  {{ $key }}: |-
+{{ $value | indent 4 }}
+{{- end }}
