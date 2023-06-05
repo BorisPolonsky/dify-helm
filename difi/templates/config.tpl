@@ -4,21 +4,21 @@ MODE: api
 # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
 LOG_LEVEL: INFO
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-SECRET_KEY: sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U
+SECRET_KEY: {{ .Values.api.secretKey}}
 # The base URL of console application, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
-CONSOLE_URL: ''
+CONSOLE_URL: {{ .Values.api.url.console }}
 # The URL for Service API endpoints，refers to the base URL of the current API service if api domain is
 # different from console domain.
 # example: http://api.dify.ai
-API_URL: ''
+API_URL: {{ .Values.api.url.api }}
 # The URL for Web APP, refers to the Web App base URL of WEB service if web app domain is different from
 # console or api domain.
 # example: http://udify.app
-APP_URL: ''
+APP_URL: {{ .Values.api.url.app }}
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
-MIGRATION_ENABLED: 'true'
+MIGRATION_ENABLED: {{ .Values.api.migration }}
 
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
@@ -105,7 +105,7 @@ SENTRY_PROFILES_SAMPLE_RATE: 1.0
 LOG_LEVEL: INFO
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 # same as the API service
-SECRET_KEY: sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U
+SECRET_KEY: {{ .Values.api.secretKey }}
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
 {{- include "difi.db.config" .}}

@@ -45,6 +45,23 @@ api:
   # Apply your own Environment Variables if necessary
   # - name: LANG
   #   value: "C.UTF-8"
+  url:
+    # The base URL of console application, refers to the Console base URL of WEB service if console domain is
+    # different from api or web app domain.
+    # example: http://cloud.dify.ai
+    console: ''
+    # The URL for Service API endpoints，refers to the base URL of the current API service if api domain is
+    # different from console domain.
+    # example: http://api.dify.ai
+    api: ''
+    # The URL for Web APP, refers to the Web App base URL of WEB service if web app domain is different from
+    # console or api domain.
+    # example: http://udify.app
+    app: ''
+  # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
+  migration: true
+  # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
+  secretKey: 'sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U'
 
 worker:
   enabled: true
