@@ -4,7 +4,7 @@ MODE: api
 # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
 LOG_LEVEL: INFO
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-SECRET_KEY: {{ .Values.api.secretKey}}
+SECRET_KEY: {{ .Values.api.secretKey }}
 # The base URL of console application, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
@@ -22,7 +22,8 @@ MIGRATION_ENABLED: {{ .Values.api.migration }}
 
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
-{{- include "difi.db.config" .}}
+{{- include "difi.db.config" . }}
+
 # The configurations of redis connection.
 # It is consistent with the configuration in the 'redis' service below.
 REDIS_HOST: redis
@@ -63,17 +64,8 @@ CONSOLE_CORS_ALLOW_ORIGINS: '*'
 COOKIE_HTTPONLY: 'true'
 COOKIE_SAMESITE: 'Lax'
 COOKIE_SECURE: 'false'
-# The type of storage to use for storing user files. Supported values are `local` and `s3`, Default: `local`
-STORAGE_TYPE: local
-# The path to the local storage directory, the directory relative the root path of API service codes or absolute path. Default: `storage` or `/home/john/storage`.
-# only available when STORAGE_TYPE is `local`.
-STORAGE_LOCAL_PATH: storage
-# The S3 storage configurations, only available when STORAGE_TYPE is `s3`.
-S3_ENDPOINT: 'https://xxx.r2.cloudflarestorage.com'
-S3_BUCKET_NAME: 'difyai'
-S3_ACCESS_KEY: 'ak-difyai'
-S3_SECRET_KEY: 'sk-difyai'
-S3_REGION: 'us-east-1'
+
+{{- include "difi.storage.config" . }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`.
 VECTOR_STORE: weaviate
 # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
@@ -108,8 +100,7 @@ LOG_LEVEL: INFO
 SECRET_KEY: {{ .Values.api.secretKey }}
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
-{{- include "difi.db.config" .}}
-
+{{ include "difi.db.config" . }}
 
 # The configurations of redis cache connection.
 REDIS_HOST: redis
@@ -129,8 +120,7 @@ WEAVIATE_ENDPOINT: http://weaviate:8080
 WEAVIATE_API_KEY: WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih
 {{- end }}
 
-
-{{- define "difi.db.config" }}
+{{- define "difi.db.config" -}}
 {{- if .Values.externalPostgres.enabled }}
 DB_USERNAME: {{ .Values.externalPostgres.username }}
 DB_PASSWORD: {{ .Values.externalPostgres.password }}
@@ -155,5 +145,24 @@ DB_HOST: {{ .Release.Name }}-{{ .Values.postgres.name }}
 {{- end }}
 DB_PORT: 5432
 DB_DATABASE: {{ .Values.postgres.auth.database }}
+{{- end }}
+{{- end }}
+
+{{- define "difi.storage.config" -}}
+{{- if .Values.externalS3.enabled }}
+# The type of storage to use for storing user files. Supported values are `local` and `s3`, Default: `local`
+STORAGE_TYPE: s3
+# The S3 storage configurations, only available when STORAGE_TYPE is `s3`.
+S3_ENDPOINT: {{ .Values.externalS3.endpoint }}
+S3_BUCKET_NAME: {{ .Values.externalS3.bucketName }}
+S3_ACCESS_KEY: {{ .Values.externalS3.accessKey }}
+S3_SECRET_KEY: {{ .Values.externalS3.secretKey }}
+S3_REGION: 'us-east-1'
+{{- else }}
+# The type of storage to use for storing user files. Supported values are `local` and `s3`, Default: `local`
+STORAGE_TYPE: local
+# The path to the local storage directory, the directory relative the root path of API service codes or absolute path. Default: `storage` or `/home/john/storage`.
+# only available when STORAGE_TYPE is `local`.
+STORAGE_LOCAL_PATH: storage
 {{- end }}
 {{- end }}

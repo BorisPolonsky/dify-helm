@@ -225,7 +225,7 @@ affinity: {}
 # - these configs are only used when `externalPostgres.enabled` is true
 ###################################
 externalPostgres:
-  enabled: false
+  enabled: true
   username: "postgres"
   password: "difyai123456"
   address: localhost
@@ -233,3 +233,18 @@ externalPostgres:
   dbName: dify
   maxOpenConns: 20
   maxIdleConns: 5
+
+###################################
+# External S3
+# - these configs are only used when `externalS3.enabled` is true
+###################################
+externalS3:
+  enabled: true
+  endpoint: "https://xxx.r2.cloudflarestorage.com"
+  accessKey: "ak-difyai"
+  secretKey: "sk-difyai"
+  useSSL: false
+  bucketName: "difyai"
+  rootPath: ""
+  useIAM: false
+  iamEndpoint: ""
