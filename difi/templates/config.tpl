@@ -89,7 +89,7 @@ SENTRY_PROFILES_SAMPLE_RATE: 1.0
 # worker service
 # The Celery worker for processing the queue.
 # Startup mode, 'worker' starts the Celery worker for processing the queue.
-# MODE: worker
+MODE: worker
 
 # --- All the configurations below are the same as those in the 'api' service. ---
 
@@ -111,9 +111,7 @@ REDIS_DB: 0
 REDIS_USE_SSL: 'false'
 # The configurations of celery broker.
 CELERY_BROKER_URL: redis://:difyai123456@redis:6379/1
-# The type of storage to use for storing user files. Supported values are `local` and `s3`, Default: `local`
-STORAGE_TYPE: local
-STORAGE_LOCAL_PATH: storage
+{{- include "difi.storage.config" . }}
 # The Vector store configurations.
 VECTOR_STORE: weaviate
 WEAVIATE_ENDPOINT: http://weaviate:8080
