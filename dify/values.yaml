@@ -205,17 +205,17 @@ resources: {}
 
 
 # Global node selector
-# If set, this will apply to all difi components
+# If set, this will apply to all dify components
 # Individual components can be set to a different node selector
 nodeSelector: {}
 
 # Global tolerations
-# If set, this will apply to all difi components
+# If set, this will apply to all dify components
 # Individual components can be set to a different tolerations
 tolerations: []
 
 # Global affinity
-# If set, this will apply to all difi components
+# If set, this will apply to all dify components
 # Individual components can be set to a different affinity
 affinity: {}
 
