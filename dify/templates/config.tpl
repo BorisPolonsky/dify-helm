@@ -26,13 +26,7 @@ MIGRATION_ENABLED: {{ .Values.api.migration }}
 
 # The configurations of redis connection.
 # It is consistent with the configuration in the 'redis' service below.
-REDIS_HOST: redis
-REDIS_PORT: 6379
-REDIS_USERNAME: ''
-REDIS_PASSWORD: difyai123456
-REDIS_USE_SSL: 'false'
-# use redis db 0 for redis cache
-REDIS_DB: 0
+{{- include "dify.redis.config" . }}
 # The configurations of session, Supported values are `sqlalchemy`. `redis`
 SESSION_TYPE: redis
 SESSION_REDIS_HOST: redis
@@ -43,8 +37,7 @@ SESSION_REDIS_USE_SSL: 'false'
 # use redis db 2 for session store
 SESSION_REDIS_DB: 2
 # The configurations of celery broker.
-# Use redis as the broker, and redis db 1 for celery broker.
-CELERY_BROKER_URL: redis://:difyai123456@redis:6379/1
+{{- include "dify.celery.config" . }}
 # Specifies the allowed origins for cross-origin requests to the Web API, e.g. https://dify.app or * for all origins.
 WEB_API_CORS_ALLOW_ORIGINS: '*'
 # Specifies the allowed origins for cross-origin requests to the console API, e.g. https://cloud.dify.ai or * for all origins.
@@ -103,14 +96,10 @@ SECRET_KEY: {{ .Values.api.secretKey }}
 {{ include "dify.db.config" . }}
 
 # The configurations of redis cache connection.
-REDIS_HOST: redis
-REDIS_PORT: 6379
-REDIS_USERNAME: ''
-REDIS_PASSWORD: difyai123456
-REDIS_DB: 0
-REDIS_USE_SSL: 'false'
+{{- include "dify.redis.config" . }}
 # The configurations of celery broker.
-CELERY_BROKER_URL: redis://:difyai123456@redis:6379/1
+{{- include "dify.celery.config" . }}
+
 {{- include "dify.storage.config" . }}
 # The Vector store configurations.
 VECTOR_STORE: weaviate
@@ -162,5 +151,32 @@ STORAGE_TYPE: local
 # The path to the local storage directory, the directory relative the root path of API service codes or absolute path. Default: `storage` or `/home/john/storage`.
 # only available when STORAGE_TYPE is `local`.
 STORAGE_LOCAL_PATH: storage
+{{- end }}
+{{- end }}
+
+{{- define "dify.redis.config" -}}
+{{- if .Values.externalRedis.enabled }}
+  {{- with .Values.externalRedis }}
+REDIS_HOST: {{ .host | quote }}
+REDIS_PORT: {{ .port | toString | quote }}
+REDIS_USERNAME: {{ .username | quote }}
+REDIS_PASSWORD: {{ .password | quote }}
+REDIS_USE_SSL: {{ .useSSL | toString | quote }}
+# use redis db 0 for redis cache
+REDIS_DB: "0"
+  {{- end }}
+{{- else if .Values.redis.enabled }}
+# Still WIP
+{{- end }}
+{{- end }}
+
+{{- define "dify.celery.config" -}}
+# Use redis as the broker, and redis db 1 for celery broker.
+{{- if .Values.externalRedis.enabled }}
+  {{- with .Values.externalRedis }}
+CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .password .host .port }}
+  {{- end }}
+{{- else if .Values.redis.enabled }}
+# Still WIP
 {{- end }}
 {{- end }}

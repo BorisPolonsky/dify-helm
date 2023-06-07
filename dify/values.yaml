@@ -219,6 +219,8 @@ tolerations: []
 # Individual components can be set to a different affinity
 affinity: {}
 
+redis:
+  enabled: true
 
 ###################################
 # External postgres
@@ -248,3 +250,15 @@ externalS3:
   rootPath: ""
   useIAM: false
   iamEndpoint: ""
+
+###################################
+# External Redis
+# - these configs are only used when `externalS3.enabled` is true
+###################################
+externalRedis:
+  enabled: true
+  host: "https://xxx.r2.cloudflarestorage.com"
+  port: 6379
+  username: "sk-difyai"
+  password: ""
+  useSSL: false
