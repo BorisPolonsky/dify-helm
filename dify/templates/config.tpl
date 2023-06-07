@@ -27,15 +27,8 @@ MIGRATION_ENABLED: {{ .Values.api.migration }}
 # The configurations of redis connection.
 # It is consistent with the configuration in the 'redis' service below.
 {{- include "dify.redis.config" . }}
-# The configurations of session, Supported values are `sqlalchemy`. `redis`
-SESSION_TYPE: redis
-SESSION_REDIS_HOST: redis
-SESSION_REDIS_PORT: 6379
-SESSION_REDIS_USERNAME: ''
-SESSION_REDIS_PASSWORD: difyai123456
-SESSION_REDIS_USE_SSL: 'false'
-# use redis db 2 for session store
-SESSION_REDIS_DB: 2
+{{/* The configurations of session, Supported values are `sqlalchemy`. `redis`*/}}
+{{- define "dify.api.session.config" -}}
 # The configurations of celery broker.
 {{- include "dify.celery.config" . }}
 # Specifies the allowed origins for cross-origin requests to the Web API, e.g. https://dify.app or * for all origins.
@@ -179,4 +172,24 @@ CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .password .host .port }}
 {{- else if .Values.redis.enabled }}
 # Still WIP
 {{- end }}
+{{- end }}
+
+
+{{- define "dify.api.session.config" -}}
+{{/*No sqlalchemy support for now*/}}
+# The configurations of session, Supported values are `sqlalchemy`. `redis`
+SESSION_TYPE: redis
+{{- if .Values.externalRedis.enabled }}
+  {{- with .Values.externalRedis }}
+SESSION_REDIS_HOST: {{ .host | quote }}
+SESSION_REDIS_PORT: {{ .port | toString | quote }}
+SESSION_REDIS_USERNAME: ""
+SESSION_REDIS_PASSWORD: {{ .password | quote }}
+SESSION_REDIS_USE_SSL: {{ .useSSL | toString | quote }}
+  {{- end }}
+{{- else if .Values.redis.enabled }}
+# Still WIP
+{{- end }}
+# use redis db 2 for session store
+SESSION_REDIS_DB: 2
 {{- end }}
