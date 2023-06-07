@@ -1,4 +1,4 @@
-{{- define "difi.api.config" -}}
+{{- define "dify.api.config" -}}
 # Startup mode, 'api' starts the API server.
 MODE: api
 # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
@@ -22,7 +22,7 @@ MIGRATION_ENABLED: {{ .Values.api.migration }}
 
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
-{{- include "difi.db.config" . }}
+{{- include "dify.db.config" . }}
 
 # The configurations of redis connection.
 # It is consistent with the configuration in the 'redis' service below.
@@ -65,7 +65,7 @@ COOKIE_HTTPONLY: 'true'
 COOKIE_SAMESITE: 'Lax'
 COOKIE_SECURE: 'false'
 
-{{- include "difi.storage.config" . }}
+{{- include "dify.storage.config" . }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`.
 VECTOR_STORE: weaviate
 # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
@@ -85,7 +85,7 @@ SENTRY_PROFILES_SAMPLE_RATE: 1.0
 {{- end }}
 
 
-{{- define "difi.worker.config" -}}
+{{- define "dify.worker.config" -}}
 # worker service
 # The Celery worker for processing the queue.
 # Startup mode, 'worker' starts the Celery worker for processing the queue.
@@ -100,7 +100,7 @@ LOG_LEVEL: INFO
 SECRET_KEY: {{ .Values.api.secretKey }}
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
-{{ include "difi.db.config" . }}
+{{ include "dify.db.config" . }}
 
 # The configurations of redis cache connection.
 REDIS_HOST: redis
@@ -111,14 +111,14 @@ REDIS_DB: 0
 REDIS_USE_SSL: 'false'
 # The configurations of celery broker.
 CELERY_BROKER_URL: redis://:difyai123456@redis:6379/1
-{{- include "difi.storage.config" . }}
+{{- include "dify.storage.config" . }}
 # The Vector store configurations.
 VECTOR_STORE: weaviate
 WEAVIATE_ENDPOINT: http://weaviate:8080
 WEAVIATE_API_KEY: WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih
 {{- end }}
 
-{{- define "difi.db.config" -}}
+{{- define "dify.db.config" -}}
 {{- if .Values.externalPostgres.enabled }}
 DB_USERNAME: {{ .Values.externalPostgres.username }}
 DB_PASSWORD: {{ .Values.externalPostgres.password }}
@@ -146,7 +146,7 @@ DB_DATABASE: {{ .Values.postgres.auth.database }}
 {{- end }}
 {{- end }}
 
-{{- define "difi.storage.config" -}}
+{{- define "dify.storage.config" -}}
 {{- if .Values.externalS3.enabled }}
 # The type of storage to use for storing user files. Supported values are `local` and `s3`, Default: `local`
 STORAGE_TYPE: s3

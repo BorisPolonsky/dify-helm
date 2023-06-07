@@ -3,38 +3,38 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-{{ include "difi.ud.annotations" . | indent 4 }}
+{{ include "dify.ud.annotations" . | indent 4 }}
     descriptions: nginx proxy
   labels:
-{{- include "difi.labels" . | nindent 4 }}
+{{- include "dify.labels" . | nindent 4 }}
     component: nginx
-    # app: {{ template "difi.nginx.fullname" . }}
-{{ include "difi.ud.labels" . | indent 4 }}
-  name: {{ template "difi.nginx.fullname" . }}
+    # app: {{ template "dify.nginx.fullname" . }}
+{{ include "dify.ud.labels" . | indent 4 }}
+  name: {{ template "dify.nginx.fullname" . }}
 spec:
   replicas: {{ .Values.proxy.replicas }}
   selector:
     matchLabels:
-{{- include "difi.selectorLabels" . | nindent 6 }}
+{{- include "dify.selectorLabels" . | nindent 6 }}
       component: nginx
       {{/*
       # Required labels for istio
-      # app: {{ template "difi.nginx.fullname" . }}
+      # app: {{ template "dify.nginx.fullname" . }}
       # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
       */}}
   template:
     metadata:
       annotations:
-{{ include "difi.ud.annotations" . | indent 8 }}
+{{ include "dify.ud.annotations" . | indent 8 }}
       labels:
-{{- include "difi.selectorLabels" . | nindent 8 }}
+{{- include "dify.selectorLabels" . | nindent 8 }}
         component: nginx
         {{/*
         # Required labels for istio
-        # app: {{ template "difi.nginx.fullname" . }}
+        # app: {{ template "dify.nginx.fullname" . }}
         # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
         */}}
-{{ include "difi.ud.labels" . | indent 8 }}
+{{ include "dify.ud.labels" . | indent 8 }}
     spec:
       {{- if .Values.image.proxy.pullSecrets }}
       imagePullSecrets:
@@ -89,5 +89,5 @@ spec:
         - name: nginx
           configMap:
             defaultMode: 420
-            name: {{ template "difi.nginx.fullname" . }}
+            name: {{ template "dify.nginx.fullname" . }}
 {{- end }}

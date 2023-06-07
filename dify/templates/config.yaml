@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "dify.fullname" . }}
+data:
+  dify-api.yaml: |+
+    {{- include "dify.api.config" . | nindent 4 }}
+  dify-worker.yaml: |+
+    {{- include "dify.worker.config" . | nindent 4 }}
+
+{{- range $key, $value := .Values.extraConfigFiles }}
+  {{ $key }}: |-
+{{ $value | indent 4 }}
+{{- end }}

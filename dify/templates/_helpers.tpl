@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "difi.name" -}}
+{{- define "dify.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "difi.fullname" -}}
+{{- define "dify.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -27,16 +27,16 @@ If release name contains chart name it will be used as a full name.
 Create a default fully qualified api name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "difi.api.fullname" -}}
-{{ template "difi.fullname" . }}-api
+{{- define "dify.api.fullname" -}}
+{{ template "dify.fullname" . }}-api
 {{- end -}}
 
 {{/*
 Create a default fully qualified worker name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "difi.worker.fullname" -}}
-{{ template "difi.fullname" . }}-api
+{{- define "dify.worker.fullname" -}}
+{{ template "dify.fullname" . }}-api
 {{- end -}}
 
 
@@ -44,23 +44,23 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 Create a default fully qualified nginx name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
-{{- define "difi.nginx.fullname" -}}
-{{ template "difi.fullname" . }}-proxy
+{{- define "dify.nginx.fullname" -}}
+{{ template "dify.fullname" . }}-proxy
 {{- end -}}
 
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "difi.chart" -}}
+{{- define "dify.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "difi.labels" -}}
-helm.sh/chart: {{ include "difi.chart" . }}
-{{ include "difi.selectorLabels" . }}
+{{- define "dify.labels" -}}
+helm.sh/chart: {{ include "dify.chart" . }}
+{{ include "dify.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -68,14 +68,14 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/* labels defiend by user*/}}
-{{- define "difi.ud.labels" -}}
+{{- define "dify.ud.labels" -}}
 {{- if .Values.labels }}
 {{- toYaml .Values.labels }}
 {{- end -}}
 {{- end -}}
 
 {{/* annotations defiend by user*/}}
-{{- define "difi.ud.annotations" -}}
+{{- define "dify.ud.annotations" -}}
 {{- if .Values.annotations }}
 {{- toYaml .Values.annotations }}
 {{- end -}}
@@ -84,17 +84,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "difi.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "difi.name" . }}
+{{- define "dify.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "dify.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "difi.serviceAccountName" -}}
+{{- define "dify.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "difi.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "dify.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
