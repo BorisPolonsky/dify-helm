@@ -36,9 +36,16 @@ Create a default fully qualified worker name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "dify.worker.fullname" -}}
-{{ template "dify.fullname" . }}-api
+{{ template "dify.fullname" . }}-worker
 {{- end -}}
 
+{{/*
+Create a default fully qualified worker name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "dify.web.fullname" -}}
+{{ template "dify.fullname" . }}-web
+{{- end -}}
 
 {{/*
 Create a default fully qualified nginx name.

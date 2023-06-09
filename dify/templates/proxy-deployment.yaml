@@ -61,6 +61,14 @@ spec:
             mountPath: /etc/nginx/nginx.conf
             readOnly: true
             subPath: nginx.conf
+          - name: nginx
+            mountPath: /etc/nginx/proxy.conf
+            readOnly: true
+            subPath: proxy.conf
+          - name: nginx
+            mountPath: /etc/nginx/conf.d/default.conf
+            readOnly: true
+            subPath: default.conf
     {{- if and (.Values.nodeSelector) (not .Values.proxy.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}

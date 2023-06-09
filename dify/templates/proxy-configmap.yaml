@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "dify.nginx.fullname" . }}
+data:
+  proxy.conf: |-
+    {{- include "dify.nginx.config.proxy" . | indent 4 }}
+  nginx.conf: |-
+    {{- include "dify.nginx.config.nginx" . | indent 4 }}
+  default.conf: |-
+    {{- include "dify.nginx.config.default" . | indent 4 }}
+{{- range $key, $value := .Values.extraConfigFiles }}
+  {{ $key }}: |-
+{{ $value | indent 4 }}
+{{- end }}

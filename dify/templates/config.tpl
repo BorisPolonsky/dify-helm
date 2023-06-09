@@ -28,7 +28,7 @@ MIGRATION_ENABLED: {{ .Values.api.migration }}
 # It is consistent with the configuration in the 'redis' service below.
 {{- include "dify.redis.config" . }}
 {{/* The configurations of session, Supported values are `sqlalchemy`. `redis`*/}}
-{{- define "dify.api.session.config" -}}
+{{- include "dify.api.session.config" . }}
 # The configurations of celery broker.
 {{- include "dify.celery.config" . }}
 # Specifies the allowed origins for cross-origin requests to the Web API, e.g. https://dify.app or * for all origins.
@@ -192,4 +192,80 @@ SESSION_REDIS_USE_SSL: {{ .useSSL | toString | quote }}
 {{- end }}
 # use redis db 2 for session store
 SESSION_REDIS_DB: 2
+{{- end }}
+
+{{- define "dify.nginx.config.proxy" }}
+proxy_set_header Host $host;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_http_version 1.1;
+proxy_set_header Connection "";
+proxy_buffering off;
+proxy_read_timeout 3600s;
+proxy_send_timeout 3600s;
+{{- end }}
+
+{{- define "dify.nginx.config.nginx" }}
+user  nginx;
+worker_processes  auto;
+{{- if .Values.proxy.persistence.enabled }}
+error_log  /var/log/nginx/error.log notice;
+{{- end }}
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+{{- if .Values.proxy.persistence.enabled }}
+    access_log  /var/log/nginx/access.log  main;
+{{- end }}
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    #gzip  on;
+    client_max_body_size 15M;
+
+    include /etc/nginx/conf.d/*.conf;
+}
+{{- end }}
+
+{{- define "dify.nginx.config.default" }}
+server {
+    listen 80;
+    server_name _;
+
+    location /console/api {
+      proxy_pass http://{{ template "dify.api.fullname" .}}:5001;
+      include proxy.conf;
+    }
+
+    location /api {
+      proxy_pass http://{{ template "dify.api.fullname" .}}:5001;
+      include proxy.conf;
+    }
+
+    location /v1 {
+      proxy_pass http://{{ template "dify.api.fullname" .}}:5001;
+      include proxy.conf;
+    }
+
+    location / {
+      proxy_pass http://{{ template "dify.web.fullname" .}}:3000;
+      include proxy.conf;
+    }
+}
 {{- end }}
