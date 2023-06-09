@@ -249,7 +249,7 @@ server {
     server_name _;
 
     location /console/api {
-      proxy_pass http://{{ template "dify.api.fullname" .}}:5001;
+      proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
       include proxy.conf;
     }
 

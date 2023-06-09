@@ -1,0 +1,29 @@
+{{- if .Values.api.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "dify.api.fullname" . }}
+  labels:
+{{ include "dify.labels" . | indent 4 }}
+{{- if .Values.api.service.labels }}
+{{ toYaml .Values.api.service.labels | indent 4 }}
+{{- end }}
+    component: "api"
+{{- with .Values.api.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  type: ClusterIP
+  {{- if .Values.api.service.clusterIP }}
+  clusterIP: {{ .Values.api.service.clusterIP }}
+  {{- end }}
+  ports:
+    - name: api
+      port: {{ .Values.api.service.port }}
+      protocol: TCP
+      targetPort: api
+  selector:
+{{ include "dify.selectorLabels" . | indent 4 }}
+    component: "api"
+{{- end }}

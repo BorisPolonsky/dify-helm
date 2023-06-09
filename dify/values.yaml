@@ -5,7 +5,7 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: latest
+    tag: 0.3.1
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -15,7 +15,7 @@ image:
     #   - myRegistryKeySecretName
   web:    
     repository: langgenius/dify-web
-    tag: latest
+    tag: 0.3.1
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -45,6 +45,11 @@ api:
   # Apply your own Environment Variables if necessary
   # - name: LANG
   #   value: "C.UTF-8"
+  service:
+    port: 5001
+    annotations: {}
+    labels: {}
+    clusterIP: ""
   url:
     # The base URL of console application, refers to the Console base URL of WEB service if console domain is
     # different from api or web app domain.
@@ -107,6 +112,28 @@ proxy:
       accessModes: ReadWriteMany
       size: 1Gi
       subPath: ""
+  service:
+    port: 80
+    annotations: {}
+    labels: {}
+    clusterIP: ""
+
+web:
+  enabled: true
+  replicas: 1
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  extraEnv: {}
+  # Apply your own Environment Variables if necessary
+  # - name: LANG
+  #   value: "C.UTF-8"
+  service:
+    port: 3000
+    annotations: {}
+    labels: {}
+    clusterIP: ""
 
 postgres:
   enabled: true
