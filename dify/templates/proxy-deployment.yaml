@@ -7,7 +7,7 @@ metadata:
     descriptions: nginx proxy
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    component: nginx
+    component: proxy
     # app: {{ template "dify.nginx.fullname" . }}
 {{ include "dify.ud.labels" . | indent 4 }}
   name: {{ template "dify.nginx.fullname" . }}
@@ -16,7 +16,7 @@ spec:
   selector:
     matchLabels:
 {{- include "dify.selectorLabels" . | nindent 6 }}
-      component: nginx
+      component: proxy
       {{/*
       # Required labels for istio
       # app: {{ template "dify.nginx.fullname" . }}
@@ -28,7 +28,7 @@ spec:
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
-        component: nginx
+        component: proxy
         {{/*
         # Required labels for istio
         # app: {{ template "dify.nginx.fullname" . }}
@@ -51,7 +51,7 @@ spec:
           {{- toYaml .Values.proxy.extraEnv | nindent 8 }}
         {{- end }}
         ports:
-          - name: http
+          - name: dify
             containerPort: 80
             protocol: TCP
         resources:

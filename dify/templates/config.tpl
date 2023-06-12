@@ -254,17 +254,17 @@ server {
     }
 
     location /api {
-      proxy_pass http://{{ template "dify.api.fullname" .}}:5001;
+      proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
       include proxy.conf;
     }
 
     location /v1 {
-      proxy_pass http://{{ template "dify.api.fullname" .}}:5001;
+      proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
       include proxy.conf;
     }
 
     location / {
-      proxy_pass http://{{ template "dify.web.fullname" .}}:3000;
+      proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};
       include proxy.conf;
     }
 }
