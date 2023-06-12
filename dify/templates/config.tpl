@@ -18,7 +18,7 @@ API_URL: {{ .Values.api.url.api }}
 # example: http://udify.app
 APP_URL: {{ .Values.api.url.app }}
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
-MIGRATION_ENABLED: {{ .Values.api.migration }}
+MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
 
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
@@ -65,9 +65,9 @@ QDRANT_API_KEY: 'ak-difyai'
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
 SENTRY_DSN: ''
 # The sample rate for Sentry events. Default: `1.0`
-SENTRY_TRACES_SAMPLE_RATE: 1.0
+SENTRY_TRACES_SAMPLE_RATE: "1.0"
 # The sample rate for Sentry profiles. Default: `1.0`
-SENTRY_PROFILES_SAMPLE_RATE: 1.0
+SENTRY_PROFILES_SAMPLE_RATE: "1.0"
 {{- end }}
 
 
@@ -105,7 +105,7 @@ WEAVIATE_API_KEY: WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih
 DB_USERNAME: {{ .Values.externalPostgres.username }}
 DB_PASSWORD: {{ .Values.externalPostgres.password }}
 DB_HOST: {{ .Values.externalPostgres.address }}
-DB_PORT: {{ .Values.externalPostgres.port }}
+DB_PORT: {{ .Values.externalPostgres.port | toString | quote }}
 DB_DATABASE: {{ .Values.externalPostgres.dbName }}
 {{- else if .Values.postgres.enabled }}
 username: postgres
@@ -191,7 +191,7 @@ SESSION_REDIS_USE_SSL: {{ .useSSL | toString | quote }}
 # Still WIP
 {{- end }}
 # use redis db 2 for session store
-SESSION_REDIS_DB: 2
+SESSION_REDIS_DB: "2"
 {{- end }}
 
 {{- define "dify.nginx.config.proxy" }}
