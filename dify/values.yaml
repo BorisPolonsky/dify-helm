@@ -301,7 +301,7 @@ externalS3:
 
 ###################################
 # External Redis
-# - these configs are only used when `externalS3.enabled` is true
+# - these configs are only used when `externalRedis.enabled` is true
 ###################################
 externalRedis:
   enabled: true
@@ -310,3 +310,22 @@ externalRedis:
   username: "sk-difyai"
   password: ""
   useSSL: false
+
+###################################
+# External Weaviate
+# - these configs are only used when `externalWeaviate.enabled` is true
+###################################
+externalWeaviate:
+  enabled: true
+  endpoint: "http://weaviate:8080"
+  apiKey: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
+
+
+###################################
+# External Qdrant
+# - these configs are only used when `externalWeaviate.enabled` is false and `externalQdrant.enabled` is true
+###################################
+externalQdrant:
+  enabled: true
+  endpoint: "https://your-qdrant-cluster-url.qdrant.tech/"
+  apiKey: "ak-difyai"

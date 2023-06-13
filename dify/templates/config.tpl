@@ -52,16 +52,7 @@ COOKIE_SAMESITE: 'Lax'
 COOKIE_SECURE: 'false'
 
 {{- include "dify.storage.config" . }}
-# The type of vector store to use. Supported values are `weaviate`, `qdrant`.
-VECTOR_STORE: weaviate
-# The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
-WEAVIATE_ENDPOINT: http://weaviate:8080
-# The Weaviate API key.
-WEAVIATE_API_KEY: WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih
-# The Qdrant endpoint URL. Only available when VECTOR_STORE is `qdrant`.
-QDRANT_URL: 'https://your-qdrant-cluster-url.qdrant.tech/'
-# The Qdrant API key.
-QDRANT_API_KEY: 'ak-difyai'
+{{- include "dify.vectordb.config" . }}
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
 SENTRY_DSN: ''
 # The sample rate for Sentry events. Default: `1.0`
@@ -95,9 +86,7 @@ SECRET_KEY: {{ .Values.api.secretKey }}
 
 {{- include "dify.storage.config" . }}
 # The Vector store configurations.
-VECTOR_STORE: weaviate
-WEAVIATE_ENDPOINT: http://weaviate:8080
-WEAVIATE_API_KEY: WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih
+{{- include "dify.vectordb.config" . }}
 {{- end }}
 
 {{- define "dify.db.config" -}}
@@ -192,6 +181,24 @@ SESSION_REDIS_USE_SSL: {{ .useSSL | toString | quote }}
 {{- end }}
 # use redis db 2 for session store
 SESSION_REDIS_DB: "2"
+{{- end }}
+
+{{- define "dify.vectordb.config" }}
+{{- if .Values.externalWeaviate.enabled }}
+# The type of vector store to use. Supported values are `weaviate`, `qdrant`.
+VECTOR_STORE: weaviate
+# The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
+WEAVIATE_ENDPOINT: {{ .Values.externalWeaviate.endpoint | quote }}
+# The Weaviate API key.
+WEAVIATE_API_KEY: {{ .Values.externalWeaviate.apiKey }}
+{{- else if .Values.externalQdrant.enabled }}
+VECTOR_STORE: qdrant
+# The Qdrant endpoint URL. Only available when VECTOR_STORE is `qdrant`.
+QDRANT_URL: {{ .Values.externalQdrant.endpoint }}
+# The Qdrant API key.
+QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey }}
+# The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
+{{- end }}
 {{- end }}
 
 {{- define "dify.nginx.config.proxy" }}
