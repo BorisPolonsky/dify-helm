@@ -220,7 +220,7 @@ postgres:
 
 
 weaviate:
-  enabled: false
+  enabled: true
   image:
     # registry where weaviate image is stored
     registry: docker.io
@@ -312,12 +312,8 @@ weaviate:
   # weaviate only accessible within your cluster.
   service:
     name: weaviate
-    ports:
-      - name: http
-        protocol: TCP
-        port: 80
-        # Target port is going to be the same for every port
-    type: LoadBalancer
+    # type: LoadBalancer
+    type: ClusterIP
     loadBalancerSourceRanges: []
     # optionally set cluster IP if you want to set a static IP
     clusterIP:
@@ -359,25 +355,24 @@ weaviate:
   # configuration.
   authentication:
     anonymous_access:
-      enabled: true
+      enabled: false
     # This configuration allows to add API keys to Weaviate. This configuration allows only
     # plain text API Keys, if you want to store the API Keys in a Kubernetes secret you can
     # configure the same configuration with ENV Vars. Read the `env` section below on what
     # needs to be configured. If using ENV Vars over this make sure to comment out the whole
     # `apikey` section (as it is by default). ENV Vars has priority over this config.
-    # apikey:
-    #   enabled: false
-    #   # Any number of allowed API Keys as plain text
-    #   allowed_keys:
-    #     - readOnly-plainText-API-Key
-    #     - admin-plainText-API-Key
-    #   # You can either set a single user for all the listed Allowed API keys OR
-    #   # one user per API Key, i.e. length(apikey.allowed_keys) == length(apikey.users) OR
-    #   # length(apikey.users) == 1
-    #   # NOTE: Make sure the lister Users are added to the Authorization as well.
-    #   users:
-    #     - api-key-user-readOnly
-    #     - api-key-user-admin
+    apikey:
+      enabled: true
+      # Any number of allowed API Keys as plain text
+      allowed_keys:
+        - "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
+      # You can either set a single user for all the listed Allowed API keys OR
+      # one user per API Key, i.e. length(apikey.allowed_keys) == length(apikey.users) OR
+      # length(apikey.users) == 1
+      # Only the first user-key pair will be used by `dify.api` and `dify-worker`
+      # NOTE: Make sure the lister Users are added to the Authorization as well.
+      users:
+        - hello@dify.ai
     oidc:
       enabled: false
       # issuer: ''
@@ -387,12 +382,15 @@ weaviate:
 
   authorization:
     admin_list:
-      enabled: false
-      # users:
+      enabled: true
+      users:
+      # Examples
       # - admin_user1
       # - admin_user2
       # - api-key-user-admin
-      # read_only_users:
+      - hello@dify.ai
+      read_only_users:
+      # Examples
       # - readonly_user1
       # - readonly_user2
       # - api-key-user-readOnly
@@ -448,7 +446,11 @@ weaviate:
     # The User/s can be a simple name or an email, no matter if it exists or not.
     # NOTE: Make sure to add the users to the authorization above overwise they will not be allowed to interact with Weaviate.
     # AUTHENTICATION_APIKEY_USERS: 'jane@doe.com,ian-smith'
-
+    AUTHENTICATION_APIKEY_ENABLED: 'true'
+    AUTHENTICATION_APIKEY_ALLOWED_KEYS: 'WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih'
+    AUTHENTICATION_APIKEY_USERS: 'hello@dify.ai'
+    AUTHORIZATION_ADMINLIST_ENABLED: 'true'
+    AUTHORIZATION_ADMINLIST_USERS: 'hello@dify.ai'
   envSecrets:
     # create a Kubernetes secret with AUTHENTICATION_APIKEY_ALLOWED_KEYS key and its respective value
     # AUTHENTICATION_APIKEY_ALLOWED_KEYS: name-of-the-k8s-secret-containing-the-comma-separated-api-keys
@@ -580,697 +582,6 @@ weaviate:
   # An inference/vectorizer module is not required, you can also run without any
   # modules and import your own vectors.
   modules:
-
-    # The text2vec-contextionary module uses a fastText-based vector-space to
-    # derive vector embeddings for your objects. It is very efficient on CPUs,
-    # but in some situations it cannot reach the same level of accuracy as
-    # transformers-based models.
-    text2vec-contextionary:
-      # disable if you want to use transformers or import or own vectors
-      enabled: false
-
-      # The configuration below is ignored if enabled==false
-      fullnameOverride: contextionary
-      tag: en0.16.0-v1.0.2
-      repo: semitechnologies/contextionary
-      registry: docker.io
-      replicas: 1
-      imagePullPolicy: IfNotPresent
-      imagePullSecrets: []
-      envconfig:
-        occurrence_weight_linear_factor: 0.75
-        neighbor_occurrence_ignore_percentile: 5
-        enable_compound_splitting: false
-        extensions_storage_mode: weaviate
-      resources:
-        requests:
-          cpu: '500m'
-          memory: '500Mi'
-        limits:
-          cpu: '1000m'
-          memory: '5000Mi'
-
-      # It is possible to add a ServiceAccount to this module's Pods, it can be
-      # used in cases where the module is in a private registry and you want to
-      # give access to the registry only to this pod.
-      # NOTE: if not set the root `serviceAccountName` config will be used.
-      serviceAccountName:
-
-      # You can guide where the pods are scheduled on a per-module basis,
-      # as well as for Weaviate overall. Each module accepts nodeSelector,
-      # tolerations, and affinity configuration. If it is set on a per-
-      # module basis, this configuration overrides the global config.
-
-      nodeSelector:
-      tolerations:
-      affinity:
-
-    # The text2vec-transformers modules uses neural networks, such as BERT,
-    # DistilBERT, etc. to dynamically compute vector embeddings based on the
-    # sentence's context. It is very slow on CPUs and should run with
-    # CUDA-enabled GPUs for optimal performance.
-    text2vec-transformers:
-
-      # enable if you want to use transformers instead of the
-      # text2vec-contextionary module
-      enabled: false
-      # You can set directly an inference URL of this module without deploying it with this release.
-      # You can do so by setting a value for the `inferenceUrl` here AND by setting the `enable` to `false`
-      inferenceUrl: {}
-      # The configuration below is ignored if enabled==false
-
-      # replace with model of choice, see
-      # https://weaviate.io/developers/weaviate/modules/retriever-vectorizer-modules/text2vec-transformers
-      # for all supported models or build your own container.
-      tag: distilbert-base-uncased
-      repo: semitechnologies/transformers-inference
-      registry: docker.io
-      replicas: 1
-      imagePullPolicy: IfNotPresent
-      imagePullSecrets: []
-      fullnameOverride: transformers-inference
-      # Deprecated setting use initialDelaySeconds instead in each probe instead
-      # probeInitialDelaySeconds: 120
-      livenessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-        timeoutSeconds: 3
-      readinessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-      envconfig:
-        # enable for CUDA support. Your K8s cluster needs to be configured
-        # accordingly and you need to explicitly set GPU requests & limits below
-        enable_cuda: false
-
-        # only used when cuda is enabled
-        nvidia_visible_devices: all
-        nvidia_driver_capabilities: compute,utility
-
-        # only used when cuda is enabled
-        ld_library_path: /usr/local/nvidia/lib64
-
-      resources:
-        requests:
-          cpu: '1000m'
-          memory: '3000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-        limits:
-          cpu: '1000m'
-          memory: '5000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-      
-      # It is possible to add a ServiceAccount to this module's Pods, it can be
-      # used in cases where the module is in a private registry and you want to
-      # give access to the registry only to this pod.
-      # NOTE: if not set the root `serviceAccountName` config will be used.
-      serviceAccountName:
-
-      # You can guide where the pods are scheduled on a per-module basis,
-      # as well as for Weaviate overall. Each module accepts nodeSelector,
-      # tolerations, and affinity configuration. If it is set on a per-
-      # module basis, this configuration overrides the global config.
-
-      nodeSelector:
-      tolerations:
-      affinity:
-
-      passageQueryServices:
-        passage:
-          enabled: false
-          # You can set directly an inference URL of this module without deploying it with this release.
-          # You can do so by setting a value for the `inferenceUrl` here AND by setting the `enable` to `false`
-          inferenceUrl: {}
-
-          tag: facebook-dpr-ctx_encoder-single-nq-base
-          repo: semitechnologies/transformers-inference
-          registry: docker.io
-          imagePullSecrets: []
-          replicas: 1
-          fullnameOverride: transformers-inference-passage
-          livenessProbe:
-            initialDelaySeconds: 120
-            periodSeconds: 3
-            timeoutSeconds: 3
-          readinessProbe:
-            initialDelaySeconds: 120
-            periodSeconds: 3
-          envconfig:
-            # enable for CUDA support. Your K8s cluster needs to be configured
-            # accordingly and you need to explicitly set GPU requests & limits below
-            enable_cuda: false
-
-            # only used when cuda is enabled
-            nvidia_visible_devices: all
-            nvidia_driver_capabilities: compute,utility
-
-            # only used when cuda is enabled
-            ld_library_path: /usr/local/nvidia/lib64
-
-          resources:
-            requests:
-              cpu: '1000m'
-              memory: '3000Mi'
-
-              # enable if running with CUDA support
-              # nvidia.com/gpu: 1
-            limits:
-              cpu: '1000m'
-              memory: '5000Mi'
-
-              # enable if running with CUDA support
-              # nvidia.com/gpu: 1
-          
-          # You can guide where the pods are scheduled on a per-module basis,
-          # as well as for Weaviate overall. Each module accepts nodeSelector,
-          # tolerations, and affinity configuration. If it is set on a per-
-          # module basis, this configuration overrides the global config.
-
-          nodeSelector:
-          tolerations:
-          affinity:
-
-        query:
-          enabled: false
-          # You can set directly an inference URL of this module without deploying it with this release.
-          # You can do so by setting a value for the `inferenceUrl` here AND by setting the `enable` to `false`
-          inferenceUrl: {}
-
-          tag: facebook-dpr-question_encoder-single-nq-base
-          repo: semitechnologies/transformers-inference
-          registry: docker.io
-          imagePullSecrets: []
-          replicas: 1
-          fullnameOverride: transformers-inference-query
-          livenessProbe:
-            initialDelaySeconds: 120
-            periodSeconds: 3
-            timeoutSeconds: 3
-          readinessProbe:
-            initialDelaySeconds: 120
-            periodSeconds: 3
-          envconfig:
-            # enable for CUDA support. Your K8s cluster needs to be configured
-            # accordingly and you need to explicitly set GPU requests & limits below
-            enable_cuda: false
-
-            # only used when cuda is enabled
-            nvidia_visible_devices: all
-            nvidia_driver_capabilities: compute,utility
-
-            # only used when cuda is enabled
-            ld_library_path: /usr/local/nvidia/lib64
-
-          resources:
-            requests:
-              cpu: '1000m'
-              memory: '3000Mi'
-
-              # enable if running with CUDA support
-              # nvidia.com/gpu: 1
-            limits:
-              cpu: '1000m'
-              memory: '5000Mi'
-
-              # enable if running with CUDA support
-              # nvidia.com/gpu: 1
-          
-          # You can guide where the pods are scheduled on a per-module basis,
-          # as well as for Weaviate overall. Each module accepts nodeSelector,
-          # tolerations, and affinity configuration. If it is set on a per-
-          # module basis, this configuration overrides the global config.
-
-          nodeSelector:
-          tolerations:
-          affinity:
-
-    # The text2vec-openai module uses OpenAI Embeddings API
-    # to dynamically compute vector embeddings based on the
-    # sentence's context.
-    # More information about OpenAI Embeddings API can be found here:
-    # https://beta.openai.com/docs/guides/embeddings/what-are-embeddings
-    text2vec-openai:
-
-      # enable if you want to use OpenAI module
-      enabled: false
-
-      # Set your OpenAI API Key to be passed to Weaviate pod as
-      # an environment variable
-      apiKey: ''
-
-    # The text2vec-huggingface module uses HuggingFace API
-    # to dynamically compute vector embeddings based on the
-    # sentence's context.
-    # More information about HuggingFace API can be found here:
-    # https://huggingface.co/docs/api-inference/detailed_parameters#feature-extraction-task
-    text2vec-huggingface:
-
-      # enable if you want to use HuggingFace module
-      enabled: false
-
-      # Set your HuggingFace API Key to be passed to Weaviate pod as
-      # an environment variable
-      apiKey: ''
-
-    # The text2vec-cohere module uses Cohere API
-    # to dynamically compute vector embeddings based on the
-    # sentence's context.
-    # More information about Cohere API can be found here: https://docs.cohere.ai/
-    text2vec-cohere:
-
-      # enable if you want to use Cohere module
-      enabled: false
-
-      # Set your Cohere API Key to be passed to Weaviate pod as
-      # an environment variable
-      apiKey: ''
-
-    # The text2vec-palm module uses Google PaLM Embeddings API
-    # to dynamically compute vector embeddings based on the
-    # sentence's context.
-    # More information about Google PaLM Embeddings API can be found here:
-    # https://developers.generativeai.google/
-    text2vec-palm:
-
-      # enable if you want to use Google PaLM module
-      enabled: false
-
-      # Set your Google PaLM API Key to be passed to Weaviate pod as
-      # an environment variable
-      apiKey: ''
-
-    # The ref2vec-centroid module
-    ref2vec-centroid:
-
-      # enable if you want to use Centroid module
-      enabled: false
-
-    # The multi2vec-clip modules uses CLIP transformers to vectorize both images
-    # and text in the same vector space. It is typically slow(er) on CPUs and should
-    # run with CUDA-enabled GPUs for optimal performance.
-    multi2vec-clip:
-
-      # enable if you want to use transformers instead of the
-      # text2vec-contextionary module
-      enabled: false
-      # You can set directly an inference URL of this module without deploying it with this release.
-      # You can do so by setting a value for the `inferenceUrl` here AND by setting the `enable` to `false`
-      inferenceUrl: {}
-
-      # The configuration below is ignored if enabled==false
-
-      # replace with model of choice, see
-      # https://weaviate.io/developers/weaviate/modules/retriever-vectorizer-modules/multi2vec-clip
-      # for all supported models or build your own container.
-      tag: sentence-transformers-clip-ViT-B-32-multilingual-v1
-      repo: semitechnologies/multi2vec-clip
-      registry: docker.io
-      replicas: 1
-      imagePullPolicy: IfNotPresent
-      imagePullSecrets: []
-      fullnameOverride: clip-inference
-      livenessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-        timeoutSeconds: 3
-      readinessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-      envconfig:
-        # enable for CUDA support. Your K8s cluster needs to be configured
-        # accordingly and you need to explicitly set GPU requests & limits below
-        enable_cuda: false
-
-        # only used when cuda is enabled
-        nvidia_visible_devices: all
-        nvidia_driver_capabilities: compute,utility
-
-        # only used when cuda is enabled
-        ld_library_path: /usr/local/nvidia/lib64
-
-      resources:
-        requests:
-          cpu: '1000m'
-          memory: '3000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-        limits:
-          cpu: '1000m'
-          memory: '5000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-      annotations:
-      nodeSelector:
-      tolerations:
-
-    # The qna-transformers module uses neural networks, such as BERT,
-    # DistilBERT, to find an aswer in text to a given question
-    qna-transformers:
-      enabled: false
-      # You can set directly an inference URL of this module without deploying it with this release.
-      # You can do so by setting a value for the `inferenceUrl` here AND by setting the `enable` to `false`
-      inferenceUrl: {}
-      tag: bert-large-uncased-whole-word-masking-finetuned-squad-34d66b1
-      repo: semitechnologies/qna-transformers
-      registry: docker.io
-      replicas: 1
-      imagePullPolicy: IfNotPresent
-      imagePullSecrets: []
-      fullnameOverride: qna-transformers
-      livenessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-        timeoutSeconds: 3
-      readinessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-      envconfig:
-        # enable for CUDA support. Your K8s cluster needs to be configured
-        # accordingly and you need to explicitly set GPU requests & limits below
-        enable_cuda: false
-
-        # only used when cuda is enabled
-        nvidia_visible_devices: all
-        nvidia_driver_capabilities: compute,utility
-
-        # only used when cuda is enabled
-        ld_library_path: /usr/local/nvidia/lib64
-
-      resources:
-        requests:
-          cpu: '1000m'
-          memory: '3000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-        limits:
-          cpu: '1000m'
-          memory: '5000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-      
-      # It is possible to add a ServiceAccount to this module's Pods, it can be
-      # used in cases where the module is in a private registry and you want to
-      # give access to the registry only to this pod.
-      # NOTE: if not set the root `serviceAccountName` config will be used.
-      serviceAccountName:
-
-      # You can guide where the pods are scheduled on a per-module basis,
-      # as well as for Weaviate overall. Each module accepts nodeSelector,
-      # tolerations, and affinity configuration. If it is set on a per-
-      # module basis, this configuration overrides the global config.
-
-      nodeSelector:
-      tolerations:
-      affinity:
-
-    # The qna-openai module uses OpenAI Completions API
-    # to dynamically answer given questions.
-    # More information about OpenAI Completions API can be found here:
-    # https://beta.openai.com/docs/api-reference/completions
-    qna-openai:
-
-      # enable if you want to use OpenAI module
-      enabled: false
-
-      # Set your OpenAI API Key to be passed to Weaviate pod as
-      # an environment variable
-      apiKey: ''
-
-    # The generative-openai module uses OpenAI Completions API
-    # along with text-davinci-003 model to behave as ChatGPT.
-    # More information about OpenAI Completions API can be found here:
-    # https://beta.openai.com/docs/api-reference/completions
-    generative-openai:
-
-      # enable if you want to use OpenAI module
-      enabled: false
-
-      # Set your OpenAI API Key to be passed to Weaviate pod as
-      # an environment variable
-      apiKey: ''
-
-    # The generative-cohere module uses Cohere Generate API
-    # More information about Cohere's Generate API can be found here:
-    # https://docs.cohere.com/reference/generate
-    generative-cohere:
-
-      # enable if you want to use Cohere generative module
-      enabled: false
-
-      # Set your Cohere API Key to be passed to Weaviate pod as
-      # an environment variable
-      apiKey: ''
-
-    # The generative-palm module uses Google PaLM API.
-    # More information about Google PaLM API can be found here:
-    # https://developers.generativeai.google/
-    generative-palm:
-
-      # enable if you want to use Google PaLM module
-      enabled: false
-
-      # Set your Google PaLM API Key to be passed to Weaviate pod as
-      # an environment variable
-      apiKey: ''
-
-    # The img2vec-neural module uses neural networks, to generate
-    # a vector representation of the image
-    img2vec-neural:
-      enabled: false
-      # You can set directly an inference URL of this module without deploying it with this release.
-      # You can do so by setting a value for the `inferenceUrl` here AND by setting the `enable` to `false`
-      inferenceUrl: {}
-      tag: resnet50
-      repo: semitechnologies/img2vec-pytorch
-      registry: docker.io
-      replicas: 1
-      imagePullPolicy: IfNotPresent
-      imagePullSecrets: []
-      fullnameOverride: img2vec-neural
-      livenessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-        timeoutSeconds: 3
-      readinessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-      envconfig:
-        # enable for CUDA support. Your K8s cluster needs to be configured
-        # accordingly and you need to explicitly set GPU requests & limits below
-        enable_cuda: false
-
-        # only used when cuda is enabled
-        nvidia_visible_devices: all
-        nvidia_driver_capabilities: compute,utility
-
-        # only used when cuda is enabled
-        ld_library_path: /usr/local/nvidia/lib64
-
-      resources:
-        requests:
-          cpu: '1000m'
-          memory: '3000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-        limits:
-          cpu: '1000m'
-          memory: '5000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-      
-      # It is possible to add a ServiceAccount to this module's Pods, it can be
-      # used in cases where the module is in a private registry and you want to
-      # give access to the registry only to this pod.
-      # NOTE: if not set the root `serviceAccountName` config will be used.
-      serviceAccountName:
-
-      # You can guide where the pods are scheduled on a per-module basis,
-      # as well as for Weaviate overall. Each module accepts nodeSelector,
-      # tolerations, and affinity configuration. If it is set on a per-
-      # module basis, this configuration overrides the global config.
-
-      nodeSelector:
-      tolerations:
-      affinity:
-
-    # The text-spellcheck module uses spellchecker library to check
-    # misspellings in a given text
-    text-spellcheck:
-      enabled: false
-      # You can set directly an inference URL of this module without deploying it with this release.
-      # You can do so by setting a value for the `inferenceUrl` here AND by setting the `enable` to `false`
-      inferenceUrl: {}
-      tag: pyspellchecker-en
-      repo: semitechnologies/text-spellcheck-model
-      registry: docker.io
-      replicas: 1
-      imagePullPolicy: IfNotPresent
-      imagePullSecrets: []
-      fullnameOverride: text-spellcheck
-      livenessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-        timeoutSeconds: 3
-      readinessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-
-      resources:
-        requests:
-          cpu: '400m'
-          memory: '400Mi'
-        limits:
-          cpu: '500m'
-          memory: '500Mi'
-      
-      # It is possible to add a ServiceAccount to this module's Pods, it can be
-      # used in cases where the module is in a private registry and you want to
-      # give access to the registry only to this pod.
-      # NOTE: if not set the root `serviceAccountName` config will be used.
-      serviceAccountName:
-
-      # You can guide where the pods are scheduled on a per-module basis,
-      # as well as for Weaviate overall. Each module accepts nodeSelector,
-      # tolerations, and affinity configuration. If it is set on a per-
-      # module basis, this configuration overrides the global config.
-
-      nodeSelector:
-      tolerations:
-      affinity:
-
-    # The ner-transformers module uses spellchecker library to check
-    # misspellings in a given text
-    ner-transformers:
-      enabled: false
-      # You can set directly an inference URL of this module without deploying it with this release.
-      # You can do so by setting a value for the `inferenceUrl` here AND by setting the `enable` to `false`
-      inferenceUrl: {}
-      tag: dbmdz-bert-large-cased-finetuned-conll03-english-0.0.2
-      repo: semitechnologies/ner-transformers
-      registry: docker.io
-      replicas: 1
-      imagePullPolicy: IfNotPresent
-      imagePullSecrets: []
-      fullnameOverride: ner-transformers
-      livenessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-        timeoutSeconds: 3
-      readinessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-      envconfig:
-        # enable for CUDA support. Your K8s cluster needs to be configured
-        # accordingly and you need to explicitly set GPU requests & limits below
-        enable_cuda: false
-
-        # only used when cuda is enabled
-        nvidia_visible_devices: all
-        nvidia_driver_capabilities: compute,utility
-
-        # only used when cuda is enabled
-        ld_library_path: /usr/local/nvidia/lib64
-
-      resources:
-        requests:
-          cpu: '1000m'
-          memory: '3000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-        limits:
-          cpu: '1000m'
-          memory: '5000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-      
-      # It is possible to add a ServiceAccount to this module's Pods, it can be
-      # used in cases where the module is in a private registry and you want to
-      # give access to the registry only to this pod.
-      # NOTE: if not set the root `serviceAccountName` config will be used.
-      serviceAccountName:
-
-      # You can guide where the pods are scheduled on a per-module basis,
-      # as well as for Weaviate overall. Each module accepts nodeSelector,
-      # tolerations, and affinity configuration. If it is set on a per-
-      # module basis, this configuration overrides the global config.
-
-      nodeSelector:
-      tolerations:
-      affinity:
-
-    # The sum-transformers module makes result texts summarizations
-    sum-transformers:
-      enabled: false
-      # You can set directly an inference URL of this module without deploying it with this release.
-      # You can do so by setting a value for the `inferenceUrl` here AND by setting the `enable` to `false`
-      inferenceUrl: {}
-      tag: facebook-bart-large-cnn-1.0.0
-      repo: semitechnologies/sum-transformers
-      registry: docker.io
-      replicas: 1
-      imagePullPolicy: IfNotPresent
-      imagePullSecrets: []
-      fullnameOverride: sum-transformers
-      livenessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-        timeoutSeconds: 3
-      readinessProbe:
-        initialDelaySeconds: 120
-        periodSeconds: 3
-      envconfig:
-        # enable for CUDA support. Your K8s cluster needs to be configured
-        # accordingly and you need to explicitly set GPU requests & limits below
-        enable_cuda: false
-
-        # only used when cuda is enabled
-        nvidia_visible_devices: all
-        nvidia_driver_capabilities: compute,utility
-
-        # only used when cuda is enabled
-        ld_library_path: /usr/local/nvidia/lib64
-
-      resources:
-        requests:
-          cpu: '1000m'
-          memory: '3000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-        limits:
-          cpu: '1000m'
-          memory: '5000Mi'
-
-          # enable if running with CUDA support
-          # nvidia.com/gpu: 1
-      
-      # It is possible to add a ServiceAccount to this module's Pods, it can be
-      # used in cases where the module is in a private registry and you want to
-      # give access to the registry only to this pod.
-      # NOTE: if not set the root `serviceAccountName` config will be used.
-      serviceAccountName:
-
-      # You can guide where the pods are scheduled on a per-module basis,
-      # as well as for Weaviate overall. Each module accepts nodeSelector,
-      # tolerations, and affinity configuration. If it is set on a per-
-      # module basis, this configuration overrides the global config.
-
-      nodeSelector:
-      tolerations:
-      affinity:
-
     # by choosing the default vectorizer module, you can tell Weaviate to always
     # use this module as the vectorizer if nothing else is specified. Can be
     # overwritten on a per-class basis.
@@ -1303,6 +614,7 @@ weaviate:
                   operator: In
                   values:
                     - weaviate
+
 service:
   type: ClusterIP
   port: 80
@@ -1359,7 +671,7 @@ redis:
 # - these configs are only used when `externalPostgres.enabled` is true
 ###################################
 externalPostgres:
-  enabled: true
+  enabled: false
   username: "postgres"
   password: "difyai123456"
   address: localhost
@@ -1373,7 +685,7 @@ externalPostgres:
 # - these configs are only used when `externalS3.enabled` is true
 ###################################
 externalS3:
-  enabled: true
+  enabled: false
   endpoint: "https://xxx.r2.cloudflarestorage.com"
   accessKey: "ak-difyai"
   secretKey: "sk-difyai"
@@ -1388,7 +700,7 @@ externalS3:
 # - these configs are only used when `externalRedis.enabled` is true
 ###################################
 externalRedis:
-  enabled: true
+  enabled: false
   host: "https://xxx.r2.cloudflarestorage.com"
   port: 6379
   username: "sk-difyai"
@@ -1400,7 +712,7 @@ externalRedis:
 # - these configs are only used when `externalWeaviate.enabled` is true
 ###################################
 externalWeaviate:
-  enabled: true
+  enabled: false
   endpoint: "http://weaviate:8080"
   apiKey: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
 
@@ -1410,6 +722,6 @@ externalWeaviate:
 # - these configs are only used when `externalWeaviate.enabled` is false and `externalQdrant.enabled` is true
 ###################################
 externalQdrant:
-  enabled: true
+  enabled: false
   endpoint: "https://your-qdrant-cluster-url.qdrant.tech/"
   apiKey: "ak-difyai"

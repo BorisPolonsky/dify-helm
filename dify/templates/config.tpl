@@ -198,6 +198,19 @@ QDRANT_URL: {{ .Values.externalQdrant.endpoint }}
 # The Qdrant API key.
 QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey }}
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
+{{- else if .Values.weaviate.enabled }}
+# The type of vector store to use. Supported values are `weaviate`, `qdrant`.
+VECTOR_STORE: weaviate
+{{- with .Values.weaviate.service }}
+{{- if and (eq .type "ClusterIP") (not (eq .clusterIP "None"))}}
+# The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
+WEAVIATE_ENDPOINT: {{ .name | quote }}
+{{- end }}
+{{- end }}
+# The Weaviate API key.
+{{- if .Values.weaviate.authentication.apikey }}
+WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys }}
+{{- end }}
 {{- end }}
 {{- end }}
 
