@@ -131,7 +131,7 @@ S3_REGION: 'us-east-1'
 STORAGE_TYPE: local
 # The path to the local storage directory, the directory relative the root path of API service codes or absolute path. Default: `storage` or `/home/john/storage`.
 # only available when STORAGE_TYPE is `local`.
-STORAGE_LOCAL_PATH: storage
+STORAGE_LOCAL_PATH: {{ .Values.api.persistence.mountPath }}
 {{- end }}
 {{- end }}
 
