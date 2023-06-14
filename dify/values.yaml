@@ -91,27 +91,28 @@ proxy:
   # Apply your own Environment Variables if necessary
   # - name: LANG
   #   value: "C.UTF-8"
-  persistence:
-    mountPath: "/var/log/nginx"
-    ## If true, create/use a Persistent Volume Claim for log
-    ## If false, flush logs to stdout & stderr
-    ##
-    enabled: false
-    annotations:
-      helm.sh/resource-policy: keep
-    persistentVolumeClaim:
-      existingClaim: ""
-      ## Nginx Logs Persistent Volume Storage Class
-      ## If defined, storageClassName: <storageClass>
-      ## If set to "-", storageClassName: "", which disables dynamic provisioning
-      ## If undefined (the default) or set to null, no storageClassName spec is
-      ##   set, choosing the default provisioner.
-      ## ReadWriteMany access mode required for nginx
+  log:
+    persistence:
+      ## If true, create/use a Persistent Volume Claim for log
+      ## If false, flush logs to stdout & stderr
       ##
-      storageClass:
-      accessModes: ReadWriteMany
-      size: 1Gi
-      subPath: ""
+      enabled: false
+      mountPath: "/var/log/nginx"
+      annotations:
+        helm.sh/resource-policy: keep
+      persistentVolumeClaim:
+        existingClaim: ""
+        ## Nginx Logs Persistent Volume Storage Class
+        ## If defined, storageClassName: <storageClass>
+        ## If set to "-", storageClassName: "", which disables dynamic provisioning
+        ## If undefined (the default) or set to null, no storageClassName spec is
+        ##   set, choosing the default provisioner.
+        ## ReadWriteMany access mode required for nginx
+        ##
+        storageClass:
+        accessModes: ReadWriteMany
+        size: 1Gi
+        subPath: ""
   service:
     port: 80
     annotations: {}

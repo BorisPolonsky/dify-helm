@@ -250,8 +250,8 @@ proxy_send_timeout 3600s;
 {{- define "dify.nginx.config.nginx" }}
 user  nginx;
 worker_processes  auto;
-{{- if .Values.proxy.persistence.enabled }}
-error_log  /var/log/nginx/error.log notice;
+{{- if .Values.proxy.log.persistence.enabled }}
+error_log  {{ .Values.proxy.log.persistence.mountPath }}/error.log notice;
 {{- end }}
 pid        /var/run/nginx.pid;
 
@@ -269,8 +269,8 @@ http {
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
 
-{{- if .Values.proxy.persistence.enabled }}
-    access_log  /var/log/nginx/access.log  main;
+{{- if .Values.proxy.log.persistence.enabled }}
+    access_log  {{ .Values.proxy.log.persistence.mountPath }}/access.log  main;
 {{- end }}
 
     sendfile        on;

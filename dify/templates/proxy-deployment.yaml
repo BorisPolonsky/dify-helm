@@ -57,18 +57,23 @@ spec:
         resources:
           {{- toYaml .Values.proxy.resources | nindent 12 }}
         volumeMounts:
-          - name: nginx
-            mountPath: /etc/nginx/nginx.conf
-            readOnly: true
-            subPath: nginx.conf
-          - name: nginx
-            mountPath: /etc/nginx/proxy.conf
-            readOnly: true
-            subPath: proxy.conf
-          - name: nginx
-            mountPath: /etc/nginx/conf.d/default.conf
-            readOnly: true
-            subPath: default.conf
+        - name: nginx
+          mountPath: /etc/nginx/nginx.conf
+          readOnly: true
+          subPath: nginx.conf
+        - name: nginx
+          mountPath: /etc/nginx/proxy.conf
+          readOnly: true
+          subPath: proxy.conf
+        - name: nginx
+          mountPath: /etc/nginx/conf.d/default.conf
+          readOnly: true
+          subPath: default.conf
+        {{- if .Values.proxy.log.persistence.enabled }}
+        - name: nginx-logs-disk
+          mountPath: {{ .Values.proxy.log.persistence.mountPath | quote }}
+          subPath: {{ .Values.proxy.log.persistence.persistentVolumeClaim.subPath | default "" }}
+        {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.proxy.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
@@ -94,8 +99,13 @@ spec:
 {{ toYaml .Values.proxy.tolerations | indent 8 }}
     {{- end }}
       volumes:
-        - name: nginx
-          configMap:
-            defaultMode: 420
-            name: {{ template "dify.nginx.fullname" . }}
+      - name: nginx
+        configMap:
+          defaultMode: 420
+          name: {{ template "dify.nginx.fullname" . }}
+      {{- if .Values.proxy.log.persistence.enabled }}
+      - name: nginx-logs-disk
+        persistentVolumeClaim:
+          claimName: {{ .Values.proxy.log.persistence.persistentVolumeClaim.existingClaim | default (printf "%s-logs" (include "dify.nginx.fullname" . | trunc 58)) }}
+      {{- end }}
 {{- end }}
