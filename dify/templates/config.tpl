@@ -148,7 +148,16 @@ REDIS_USE_SSL: {{ .useSSL | toString | quote }}
 REDIS_DB: "0"
   {{- end }}
 {{- else if .Values.redis.enabled }}
-# Still WIP
+{{- $redisHost := printf "%s-redis-master" .Release.Name -}}
+  {{- with .Values.redis }}
+REDIS_HOST: {{ $redisHost }}
+REDIS_PORT: {{ .master.service.ports.redis | toString | quote }}
+REDIS_USERNAME: ""
+REDIS_PASSWORD: {{ .auth.password | quote }}
+REDIS_USE_SSL: {{ .tls.enabled | toString | quote }}
+# use redis db 0 for redis cache
+REDIS_DB: "0"
+  {{- end }}
 {{- end }}
 {{- end }}
 
@@ -159,7 +168,10 @@ REDIS_DB: "0"
 CELERY_BROKER_URL: {{ printf "redis://%s:%s@%s:%v/1" .username .password .host .port }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
-# Still WIP
+{{- $redisHost := printf "%s-redis-master" .Release.Name -}}
+  {{- with .Values.redis }}
+CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost .master.service.ports.redis }}
+  {{- end }}
 {{- end }}
 {{- end }}
 
@@ -177,10 +189,17 @@ SESSION_REDIS_PASSWORD: {{ .password | quote }}
 SESSION_REDIS_USE_SSL: {{ .useSSL | toString | quote }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
-# Still WIP
-{{- end }}
+  {{- $redisHost := printf "%s-redis-master" .Release.Name -}}
+  {{- with .Values.redis }}
+SESSION_REDIS_HOST: {{ $redisHost }}
+SESSION_REDIS_PORT: {{ .master.service.ports.redis | toString | quote }}
+SESSION_REDIS_USERNAME: ""
+SESSION_REDIS_PASSWORD: {{ .auth.password | quote }}
+SESSION_REDIS_USE_SSL: {{ .tls.enabled | toString | quote }}
+  {{- end }}
 # use redis db 2 for session store
 SESSION_REDIS_DB: "2"
+{{- end }}
 {{- end }}
 
 {{- define "dify.vectordb.config" }}
@@ -204,7 +223,11 @@ VECTOR_STORE: weaviate
 {{- with .Values.weaviate.service }}
 {{- if and (eq .type "ClusterIP") (not (eq .clusterIP "None"))}}
 # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
-WEAVIATE_ENDPOINT: {{ .name | quote }}
+{{/*
+Pitfall: scheme (i.e.) must be supecified, or weviate client won't function as
+it depends on `hostname` from urllib.parse.urlparse will be empty if schema is not specified.
+*/}}
+WEAVIATE_ENDPOINT: {{ printf "http://%s" .name | quote }}
 {{- end }}
 {{- end }}
 # The Weaviate API key.
