@@ -125,10 +125,20 @@ web:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  extraEnv: {}
+  extraEnv:
   # Apply your own Environment Variables if necessary
-  # - name: LANG
-  #   value: "C.UTF-8"
+  - name: EDITION
+    value: "SELF_HOSTED"
+    # The base URL of console application, refers to the Console base URL of WEB service if console domain is
+    # different from api or web app domain.
+    # example: http://cloud.dify.ai
+  - name: CONSOLE_URL
+    value: ''
+    # The URL for Web APP, refers to the Web App base URL of WEB service if web app domain is different from
+    # console or api domain.
+    # example: http://udify.app
+  - name: APP_URL
+    value: ''
   service:
     port: 3000
     annotations: {}
