@@ -96,30 +96,24 @@ DB_PASSWORD: {{ .Values.externalPostgres.password }}
 DB_HOST: {{ .Values.externalPostgres.address }}
 DB_PORT: {{ .Values.externalPostgres.port | toString | quote }}
 DB_DATABASE: {{ .Values.externalPostgres.dbName }}
-{{- else if .Values.postgres.enabled }}
-{{- if empty .Values.postgres.auth.username }}
+{{- else if .Values.postgresql.enabled }}
+  {{ with .Values.postgresql.global.postgresql.auth }}
+  {{- if empty .username }}
 DB_USERNAME: postgres
-DB_PASSWORD: {{ .Values.postgres.auth.postgresPassword }}
-{{- else }}
-DB_USERNAME: {{ .Values.postgres.auth.username }}
-DB_PASSWORD: {{ .Values.postgres.auth.password }}
-{{- end }}
-{{- if contains .Values.postgres.name .Release.Name }}
-  {{- if eq .Values.postgres.architecture "replication" }}
-DB_HOST: {{ .Release.Name }}-primary
+DB_PASSWORD: {{ .postgresPassword }}
   {{- else }}
-DB_HOST: {{ .Release.Name }}
+DB_USERNAME: {{ .username }}
+DB_PASSWORD: {{ .password }}
   {{- end }}
-{{- else }}
-  {{- if eq .Values.postgres.architecture "replication" }}
-DB_HOST: {{ .Release.Name }}-{{ .Values.postgres.name }}-primary
+  {{- end }}
+  {{- if eq .Values.postgresql.architecture "replication" }}
+DB_HOST: {{ .Release.Name }}-postgresql-primary
   {{- else }}
-DB_HOST: {{ .Release.Name }}-{{ .Values.postgres.name }}
+DB_HOST: {{ .Release.Name }}-postgresql
   {{- end }}
 {{- end }}
 DB_PORT: "5432"
-DB_DATABASE: {{ .Values.postgres.auth.database }}
-{{- end }}
+DB_DATABASE: {{ .Values.postgresql.global.postgresql.auth.database }}
 {{- end }}
 
 {{- define "dify.storage.config" -}}
