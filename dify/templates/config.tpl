@@ -97,8 +97,13 @@ DB_HOST: {{ .Values.externalPostgres.address }}
 DB_PORT: {{ .Values.externalPostgres.port | toString | quote }}
 DB_DATABASE: {{ .Values.externalPostgres.dbName }}
 {{- else if .Values.postgres.enabled }}
-username: postgres
-password: {{ .Values.postgres.auth.postgresPassword }}
+{{- if empty .Values.postgres.auth.username }}
+DB_USERNAME: postgres
+DB_PASSWORD: {{ .Values.postgres.auth.postgresPassword }}
+{{- else }}
+DB_USERNAME: {{ .Values.postgres.auth.username }}
+DB_PASSWORD: {{ .Values.postgres.auth.password }}
+{{- end }}
 {{- if contains .Values.postgres.name .Release.Name }}
   {{- if eq .Values.postgres.architecture "replication" }}
 DB_HOST: {{ .Release.Name }}-primary

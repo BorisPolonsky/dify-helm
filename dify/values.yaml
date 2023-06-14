@@ -174,7 +174,7 @@ postgres:
     ## @param auth.username Name for a custom user to create
     ##
     # TODO: align ENV & svc
-    username: "postgres"
+    username: ""
     ## @param auth.password Password for the custom user to create. Ignored if `auth.existingSecret` is provided
     ##
     password: ""
@@ -794,7 +794,7 @@ redis:
     ## @param auth.password Redis&reg; password
     ## Defaults to a random 10-character alphanumeric string if not set
     ##
-    password: ""
+    password: "difyai123456"
     ## @param auth.existingSecret The name of an existing secret with Redis&reg; credentials
     ## NOTE: When it's set, the previous `auth.password` parameter is ignored
     ##
