@@ -701,10 +701,10 @@ externalS3:
 ###################################
 externalRedis:
   enabled: false
-  host: "https://xxx.r2.cloudflarestorage.com"
+  host: "redis.example"
   port: 6379
-  username: "sk-difyai"
-  password: ""
+  username: ""
+  password: "difyai123456"
   useSSL: false
 
 ###################################
