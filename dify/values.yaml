@@ -41,10 +41,15 @@ api:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  extraEnv: {}
+  # extraEnv: {}
+  extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
   #   value: "C.UTF-8"
+  - name: CHECK_UPDATE_URL
+  # Won't check for update if left empty
+  #   value: https://updates.dify.ai
+    value: ""
   service:
     port: 5001
     annotations: {}
