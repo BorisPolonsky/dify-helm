@@ -190,7 +190,7 @@ postgresql:
     pullPolicy: IfNotPresent
   ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
   ##
-  architecture: standalone
+  architecture: replication
   ## Replication configuration
   ## Ignored if `architecture` is `standalone`
   ##
@@ -627,15 +627,23 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
+    # nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    # nginx.ingress.kubernetes.io/listen-ports-ssl: '[19530]'
+    # nginx.ingress.kubernetes.io/proxy-body-size: 4m
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts:
-    - host: chart-example.local
+    - host: dify-example.local
       paths:
         - path: /
           pathType: ImplementationSpecific
+    # - host: dify-example2.local
+    #   paths:
+    #     - path: /
+    #       pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
-  #      - chart-example.local
+  #      - dify-example.local
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
