@@ -1,0 +1,111 @@
+{{- if and .Values.proxy.enabled}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+{{ include "dify.ud.annotations" . | indent 4 }}
+    descriptions: nginx proxy
+  labels:
+{{- include "dify.labels" . | nindent 4 }}
+    component: proxy
+    # app: {{ template "dify.nginx.fullname" . }}
+{{ include "dify.ud.labels" . | indent 4 }}
+  name: {{ template "dify.nginx.fullname" . }}
+spec:
+  replicas: {{ .Values.proxy.replicas }}
+  selector:
+    matchLabels:
+{{- include "dify.selectorLabels" . | nindent 6 }}
+      component: proxy
+      {{/*
+      # Required labels for istio
+      # app: {{ template "dify.nginx.fullname" . }}
+      # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+      */}}
+  template:
+    metadata:
+      annotations:
+{{ include "dify.ud.annotations" . | indent 8 }}
+      labels:
+{{- include "dify.selectorLabels" . | nindent 8 }}
+        component: proxy
+        {{/*
+        # Required labels for istio
+        # app: {{ template "dify.nginx.fullname" . }}
+        # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+        */}}
+{{ include "dify.ud.labels" . | indent 8 }}
+    spec:
+      {{- if .Values.image.proxy.pullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.proxy.pullSecrets }}
+        - name: {{ . }}
+      {{- end }}
+      {{- end }}
+      containers:
+      - image: "{{ .Values.image.proxy.repository }}:{{ .Values.image.proxy.tag }}"
+        imagePullPolicy: "{{ .Values.image.proxy.pullPolicy }}"
+        name: nginx
+        env:
+        {{- if .Values.proxy.extraEnv }}
+          {{- toYaml .Values.proxy.extraEnv | nindent 8 }}
+        {{- end }}
+        ports:
+          - name: dify
+            containerPort: 80
+            protocol: TCP
+        resources:
+          {{- toYaml .Values.proxy.resources | nindent 12 }}
+        volumeMounts:
+        - name: nginx
+          mountPath: /etc/nginx/nginx.conf
+          readOnly: true
+          subPath: nginx.conf
+        - name: nginx
+          mountPath: /etc/nginx/proxy.conf
+          readOnly: true
+          subPath: proxy.conf
+        - name: nginx
+          mountPath: /etc/nginx/conf.d/default.conf
+          readOnly: true
+          subPath: default.conf
+        {{- if .Values.proxy.log.persistence.enabled }}
+        - name: nginx-logs-disk
+          mountPath: {{ .Values.proxy.log.persistence.mountPath | quote }}
+          subPath: {{ .Values.proxy.log.persistence.persistentVolumeClaim.subPath | default "" }}
+        {{- end }}
+    {{- if and (.Values.nodeSelector) (not .Values.proxy.nodeSelector) }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if .Values.proxy.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.proxy.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.affinity) (not .Values.proxy.affinity) }}
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+    {{- end }}
+    {{- if .Values.proxy.affinity }}
+      affinity:
+{{ toYaml .Values.proxy.affinity | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.tolerations) (not .Values.proxy.tolerations) }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+    {{- end }}
+    {{- if .Values.proxy.tolerations }}
+      tolerations:
+{{ toYaml .Values.proxy.tolerations | indent 8 }}
+    {{- end }}
+      volumes:
+      - name: nginx
+        configMap:
+          defaultMode: 420
+          name: {{ template "dify.nginx.fullname" . }}
+      {{- if .Values.proxy.log.persistence.enabled }}
+      - name: nginx-logs-disk
+        persistentVolumeClaim:
+          claimName: {{ .Values.proxy.log.persistence.persistentVolumeClaim.existingClaim | default (printf "%s-logs" (include "dify.nginx.fullname" . | trunc 58)) }}
+      {{- end }}
+{{- end }}

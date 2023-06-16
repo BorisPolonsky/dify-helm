@@ -1,0 +1,94 @@
+{{- if and .Values.worker.enabled}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+{{ include "dify.ud.annotations" . | indent 4 }}
+    descriptions: worker
+  labels:
+{{- include "dify.labels" . | nindent 4 }}
+    component: api
+    # app: {{ template "dify.worker.fullname" . }}
+{{ include "dify.ud.labels" . | indent 4 }}
+  name: {{ template "dify.worker.fullname" . }}
+spec:
+  replicas: {{ .Values.worker.replicas }}
+  selector:
+    matchLabels:
+{{- include "dify.selectorLabels" . | nindent 6 }}
+      component: api
+      {{/*
+      # Required labels for istio
+      # app: {{ template "dify.worker.fullname" . }}
+      # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+      */}}
+  template:
+    metadata:
+      annotations:
+{{ include "dify.ud.annotations" . | indent 8 }}
+      labels:
+{{- include "dify.selectorLabels" . | nindent 8 }}
+        component: api
+        {{/*
+        # Required labels for istio
+        # app: {{ template "dify.worker.fullname" . }}
+        # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+        */}}
+{{ include "dify.ud.labels" . | indent 8 }}
+    spec:
+      {{- if .Values.image.api.pullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.api.pullSecrets }}
+        - name: {{ . }}
+      {{- end }}
+      {{- end }}
+      containers:
+      - image: "{{ .Values.image.api.repository }}:{{ .Values.image.api.tag }}"
+        imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
+        name: worker
+        env:
+        {{- if .Values.worker.extraEnv }}
+          {{- toYaml .Values.worker.extraEnv | nindent 8 }}
+        {{- end }}
+        envFrom:
+          - configMapRef:
+              name: {{ template "dify.worker.fullname" . }}
+        resources:
+          {{- toYaml .Values.worker.resources | nindent 12 }}
+        volumeMounts:
+        {{- if not .Values.externalS3.enabled }}
+        - name: app-data
+          mountPath: {{ .Values.api.persistence.mountPath | quote }}
+          subPath: {{ .Values.api.persistence.persistentVolumeClaim.subPath | default "" }}
+        {{- end }}
+    {{- if and (.Values.nodeSelector) (not .Values.worker.nodeSelector) }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if .Values.worker.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.worker.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.affinity) (not .Values.worker.affinity) }}
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+    {{- end }}
+    {{- if .Values.worker.affinity }}
+      affinity:
+{{ toYaml .Values.worker.affinity | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.tolerations) (not .Values.worker.tolerations) }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+    {{- end }}
+    {{- if .Values.worker.tolerations }}
+      tolerations:
+{{ toYaml .Values.worker.tolerations | indent 8 }}
+    {{- end }}
+      volumes:
+      {{- if not .Values.externalS3.enabled }}
+      - name: app-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.api.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.fullname" . | trunc 58)) }}
+      {{- end }}
+{{- end }}
