@@ -105,7 +105,6 @@ worker:
   # Apply your own Environment Variables if necessary
   # - name: LANG
   #   value: "C.UTF-8"
-
 proxy:
   enabled: true
   replicas: 1
@@ -628,8 +627,7 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
     # nginx.ingress.kubernetes.io/backend-protocol: HTTP
-    # nginx.ingress.kubernetes.io/listen-ports-ssl: '[19530]'
-    # nginx.ingress.kubernetes.io/proxy-body-size: 4m
+    # nginx.ingress.kubernetes.io/proxy-body-size: 15m
     # nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts:
     - host: dify-example.local

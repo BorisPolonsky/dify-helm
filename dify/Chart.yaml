@@ -1,6 +1,6 @@
 apiVersion: v2
 name: dify
-description: Instant deployment for https://github.com/langgenius/dify
+description: Instant cloud deployment for https://github.com/langgenius/dify.
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -15,7 +15,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.14.0-dev
+version: 0.14.0-rc1
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -26,14 +26,12 @@ appVersion: "0.3.1"
 dependencies:
 - name: postgresql
   version: 12.5.6
-  # repository: oci://registry-1.docker.io/bitnamicharts/postgresql
   repository: https://charts.bitnami.com/bitnami
   condition: postgresql.enabled
   tags:
     - postgres
 - name: redis
   version: 16.13.2
-  # repository: oci://registry-1.docker.io/bitnamicharts/redis
   repository: https://charts.bitnami.com/bitnami
   condition: redis.enabled
   tags:
