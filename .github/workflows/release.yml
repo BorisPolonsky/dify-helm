@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - master
-      - debug-action
+
+permissions:
+  contents: write
 
 jobs:
   release:
