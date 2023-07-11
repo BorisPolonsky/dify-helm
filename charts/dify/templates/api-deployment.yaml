@@ -36,6 +36,13 @@ spec:
         */}}
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
+      {{- if eq .Release.Name "dify"}}
+      {{/*
+      Disable service environment variables,
+      otherwise they will clash with `DIFY_PORT` which is needed in entrypoint.sh
+      */}}
+      enableServiceLinks: false
+      {{- end }}
       {{- if .Values.image.api.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.api.pullSecrets }}
