@@ -5,18 +5,26 @@ MODE: api
 LOG_LEVEL: INFO
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 SECRET_KEY: {{ .Values.api.secretKey }}
-# The base URL of console application, refers to the Console base URL of WEB service if console domain is
+# The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
-CONSOLE_URL: {{ .Values.api.url.console }}
+CONSOLE_WEB_URL: {{ .Values.api.url.console | quote }}
+# The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
+# different from api or web app domain.
+# example: http://cloud.dify.ai
+CONSOLE_API_URL: {{ .Values.api.url.console | quote }}
 # The URL for Service API endpoints，refers to the base URL of the current API service if api domain is
 # different from console domain.
 # example: http://api.dify.ai
-API_URL: {{ .Values.api.url.api }}
-# The URL for Web APP, refers to the Web App base URL of WEB service if web app domain is different from
+SERVICE_API_URL: {{ .Values.api.url.api | quote }}
+# The URL for Web APP api server, refers to the Web App base URL of WEB service if web app domain is different from
 # console or api domain.
 # example: http://udify.app
-APP_URL: {{ .Values.api.url.app }}
+APP_API_URL: {{ .Values.api.url.app | quote }}
+# The URL for Web APP frontend, refers to the Web App base URL of WEB service if web app domain is different from
+# console or api domain.
+# example: http://udify.app
+APP_WEB_URL: {{ .Values.api.url.app | quote }}
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
 MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
 
