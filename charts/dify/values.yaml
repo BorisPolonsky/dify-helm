@@ -5,7 +5,7 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: 0.3.1
+    tag: 0.3.8
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -15,7 +15,7 @@ image:
     #   - myRegistryKeySecretName
   web:    
     repository: langgenius/dify-web
-    tag: 0.3.1
+    tag: 0.3.8
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -155,15 +155,15 @@ web:
   # Apply your own Environment Variables if necessary
   - name: EDITION
     value: "SELF_HOSTED"
-    # The base URL of console application, refers to the Console base URL of WEB service if console domain is
+    # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
     # different from api or web app domain.
     # example: http://cloud.dify.ai
-  - name: CONSOLE_URL
+  - name: CONSOLE_API_URL
     value: ''
-    # The URL for Web APP, refers to the Web App base URL of WEB service if web app domain is different from
+    # The URL for Web APP api server, refers to the Web App base URL of WEB service if web app domain is different from
     # console or api domain.
     # example: http://udify.app
-  - name: APP_URL
+  - name: APP_API_URL
     value: ''
   service:
     port: 3000
