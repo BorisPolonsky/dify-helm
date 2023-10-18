@@ -620,6 +620,12 @@ service:
   type: ClusterIP
   port: 80
 
+# If enabled, add additional labels from core components as istio recommends
+# https://istio.io/latest/docs/ops/deployment/requirements/
+istioServiceMesh:
+  enabled: false
+  version: 1
+
 ingress:
   enabled: false
   className: ""
