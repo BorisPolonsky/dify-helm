@@ -119,9 +119,9 @@ DB_HOST: {{ .Release.Name }}-postgresql-primary
   {{- else }}
 DB_HOST: {{ .Release.Name }}-postgresql
   {{- end }}
-{{- end }}
 DB_PORT: "5432"
 DB_DATABASE: {{ .Values.postgresql.global.postgresql.auth.database }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.storage.config" -}}
