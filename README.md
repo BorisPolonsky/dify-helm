@@ -1,5 +1,5 @@
 # dify-helm
-Deploy [langgenius/dify](https://github.com/langgenius/dify), a LLM based chat bot app on kubernetes with helm chart.
+Deploy [langgenius/dify](https://github.com/langgenius/dify), an LLM based chat bot app on kubernetes with helm chart.
 
 ## Installation
 ```
