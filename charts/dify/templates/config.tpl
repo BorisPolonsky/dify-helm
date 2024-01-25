@@ -17,11 +17,7 @@ CONSOLE_API_URL: {{ .Values.api.url.console | quote }}
 # different from console domain.
 # example: http://api.dify.ai
 SERVICE_API_URL: {{ .Values.api.url.api | quote }}
-# The URL for Web APP api server, refers to the Web App base URL of WEB service if web app domain is different from
-# console or api domain.
-# example: http://udify.app
-APP_API_URL: {{ .Values.api.url.app | quote }}
-# The URL for Web APP frontend, refers to the Web App base URL of WEB service if web app domain is different from
+# The URL prefix for Web APP frontend, refers to the Web App base URL of WEB service if web app domain is different from
 # console or api domain.
 # example: http://udify.app
 APP_WEB_URL: {{ .Values.api.url.app | quote }}
@@ -39,8 +35,7 @@ MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
 # The configurations of redis connection.
 # It is consistent with the configuration in the 'redis' service below.
 {{- include "dify.redis.config" . }}
-{{/* The configurations of session, Supported values are `sqlalchemy`. `redis`*/}}
-{{- include "dify.api.session.config" . }}
+
 # The configurations of celery broker.
 {{- include "dify.celery.config" . }}
 # Specifies the allowed origins for cross-origin requests to the Web API, e.g. https://dify.app or * for all origins.
@@ -58,10 +53,6 @@ CONSOLE_CORS_ALLOW_ORIGINS: '*'
 # If you want to enable cross-origin support,
 # you must use the HTTPS protocol and set the configuration to `SameSite=None, Secure=true, HttpOnly=true`.
 #
-# For **production** purposes, please set `SameSite=Lax, Secure=true, HttpOnly=true`.
-COOKIE_HTTPONLY: 'true'
-COOKIE_SAMESITE: 'Lax'
-COOKIE_SECURE: 'false'
 
 {{- include "dify.storage.config" . }}
 {{- include "dify.vectordb.config" . }}
@@ -72,16 +63,6 @@ SENTRY_DSN: ''
 SENTRY_TRACES_SAMPLE_RATE: "1.0"
 # The sample rate for Sentry profiles. Default: `1.0`
 SENTRY_PROFILES_SAMPLE_RATE: "1.0"
-{{- end }}
-
-{{- define "dify.mail.config" -}}
-# Mail configuration, support: resend
-MAIL_TYPE: ''
-# default send from email address, if not specified
-MAIL_DEFAULT_SEND_FROM: 'YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)'
-# the api-key for resend (https://resend.com)
-RESEND_API_KEY: ''
-RESEND_API_URL: https://api.resend.com
 {{- end }}
 
 {{- define "dify.worker.config" -}}
@@ -197,33 +178,6 @@ CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost .ma
 {{- end }}
 {{- end }}
 
-
-{{- define "dify.api.session.config" -}}
-{{/*No sqlalchemy support for now*/}}
-# The configurations of session, Supported values are `sqlalchemy`. `redis`
-SESSION_TYPE: redis
-{{- if .Values.externalRedis.enabled }}
-  {{- with .Values.externalRedis }}
-SESSION_REDIS_HOST: {{ .host | quote }}
-SESSION_REDIS_PORT: {{ .port | toString | quote }}
-SESSION_REDIS_USERNAME: ""
-SESSION_REDIS_PASSWORD: {{ .password | quote }}
-SESSION_REDIS_USE_SSL: {{ .useSSL | toString | quote }}
-  {{- end }}
-{{- else if .Values.redis.enabled }}
-  {{- $redisHost := printf "%s-redis-master" .Release.Name -}}
-  {{- with .Values.redis }}
-SESSION_REDIS_HOST: {{ $redisHost }}
-SESSION_REDIS_PORT: {{ .master.service.ports.redis | toString | quote }}
-SESSION_REDIS_USERNAME: ""
-SESSION_REDIS_PASSWORD: {{ .auth.password | quote }}
-SESSION_REDIS_USE_SSL: {{ .tls.enabled | toString | quote }}
-  {{- end }}
-# use redis db 2 for session store
-SESSION_REDIS_DB: "2"
-{{- end }}
-{{- end }}
-
 {{- define "dify.vectordb.config" }}
 {{- if .Values.externalWeaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
@@ -271,6 +225,16 @@ WEAVIATE_ENDPOINT: {{ printf "http://%s" .name | quote }}
 WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys }}
 {{- end }}
 {{- end }}
+{{- end }}
+
+{{- define "dify.mail.config" -}}
+# Mail configuration, support: resend
+MAIL_TYPE: ''
+# default send from email address, if not specified
+MAIL_DEFAULT_SEND_FROM: 'YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)'
+# the api-key for resend (https://resend.com)
+RESEND_API_KEY: ''
+RESEND_API_URL: https://api.resend.com
 {{- end }}
 
 {{- define "dify.nginx.config.proxy" }}
