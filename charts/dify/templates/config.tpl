@@ -54,9 +54,9 @@ CONSOLE_CORS_ALLOW_ORIGINS: '*'
 # you must use the HTTPS protocol and set the configuration to `SameSite=None, Secure=true, HttpOnly=true`.
 #
 
-{{- include "dify.storage.config" . }}
-{{- include "dify.vectordb.config" . }}
-{{- include "dify.mail.config" . }}
+{{ include "dify.storage.config" . }}
+{{ include "dify.vectordb.config" . }}
+{{ include "dify.mail.config" . }}
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
 SENTRY_DSN: ''
 # The sample rate for Sentry events. Default: `1.0`
@@ -83,14 +83,14 @@ SECRET_KEY: {{ .Values.api.secretKey }}
 {{ include "dify.db.config" . }}
 
 # The configurations of redis cache connection.
-{{- include "dify.redis.config" . }}
+{{ include "dify.redis.config" . }}
 # The configurations of celery broker.
-{{- include "dify.celery.config" . }}
+{{ include "dify.celery.config" . }}
 
-{{- include "dify.storage.config" . }}
+{{ include "dify.storage.config" . }}
 # The Vector store configurations.
-{{- include "dify.vectordb.config" . }}
-{{- include "dify.mail.config" . }}
+{{ include "dify.vectordb.config" . }}
+{{ include "dify.mail.config" . }}
 {{- end }}
 
 {{- define "dify.db.config" -}}
@@ -178,7 +178,7 @@ CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost .ma
 {{- end }}
 {{- end }}
 
-{{- define "dify.vectordb.config" }}
+{{- define "dify.vectordb.config" -}}
 {{- if .Values.externalWeaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
@@ -197,33 +197,34 @@ QDRANT_CLIENT_TIMEOUT: 20
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
 {{- else if .Values.externalMilvus.enabled}}
 # Milvus configuration Only available when VECTOR_STORE is `milvus`.
+VECTOR_STORE: milvus
 # The milvus host.
-MILVUS_HOST: 127.0.0.1
+MILVUS_HOST: {{ .Values.externalMilvus.host }}
 # The milvus host.
-MILVUS_PORT: 19530
+MILVUS_PORT: {{ .Values.externalMilvus.port | toString }}
 # The milvus username.
-MILVUS_USER: root
+MILVUS_USER: {{ .Values.externalMilvus.user }}
 # The milvus password.
-MILVUS_PASSWORD: Milvus
+MILVUS_PASSWORD: {{ .Values.externalMilvus.password }}
 # The milvus tls switch.
-MILVUS_SECURE: 'false'
+MILVUS_SECURE: {{ .Values.externalMilvus.useTLS | toString }}
 {{- else if .Values.weaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
-{{- with .Values.weaviate.service }}
-{{- if and (eq .type "ClusterIP") (not (eq .clusterIP "None"))}}
+  {{- with .Values.weaviate.service }}
+    {{- if and (eq .type "ClusterIP") (not (eq .clusterIP "None"))}}
 # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
 {{/*
 Pitfall: scheme (i.e.) must be supecified, or weviate client won't function as
 it depends on `hostname` from urllib.parse.urlparse will be empty if schema is not specified.
 */}}
 WEAVIATE_ENDPOINT: {{ printf "http://%s" .name | quote }}
-{{- end }}
-{{- end }}
+    {{- end }}
+  {{- end }}
 # The Weaviate API key.
-{{- if .Values.weaviate.authentication.apikey }}
+  {{- if .Values.weaviate.authentication.apikey }}
 WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys }}
-{{- end }}
+  {{- end }}
 {{- end }}
 {{- end }}
 
