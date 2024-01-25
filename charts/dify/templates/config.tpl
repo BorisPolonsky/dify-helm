@@ -24,7 +24,7 @@ APP_WEB_URL: {{ .Values.api.url.appWeb | quote }}
 # File preview or download Url prefix.
 # used to display File preview or download Url to the front-end or as Multi-model inputs;
 # Url is signed and has expiration time.
-FILES_URL: {{ .Values.api.url.files }}
+FILES_URL: {{ .Values.api.url.files | quote }}
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
 MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
 
@@ -219,7 +219,7 @@ MILVUS_USER: {{ .Values.externalMilvus.user }}
 # The milvus password.
 MILVUS_PASSWORD: {{ .Values.externalMilvus.password }}
 # The milvus tls switch.
-MILVUS_SECURE: {{ .Values.externalMilvus.useTLS | toString }}
+MILVUS_SECURE: {{ .Values.externalMilvus.useTLS | toString | quote }}
 {{- else if .Values.weaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
