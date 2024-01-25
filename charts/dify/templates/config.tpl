@@ -8,23 +8,23 @@ SECRET_KEY: {{ .Values.api.secretKey }}
 # The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
-CONSOLE_WEB_URL: {{ .Values.api.url.console | quote }}
+CONSOLE_WEB_URL: {{ .Values.api.url.consoleWeb | quote }}
 # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
-CONSOLE_API_URL: {{ .Values.api.url.console | quote }}
+CONSOLE_API_URL: {{ .Values.api.url.consoleApi | quote }}
 # The URL prefix for Service API endpoints, refers to the base URL of the current API service if api domain is
 # different from console domain.
 # example: http://api.dify.ai
-SERVICE_API_URL: {{ .Values.api.url.api | quote }}
+SERVICE_API_URL: {{ .Values.api.url.serviceApi | quote }}
 # The URL prefix for Web APP frontend, refers to the Web App base URL of WEB service if web app domain is different from
 # console or api domain.
 # example: http://udify.app
-APP_WEB_URL: {{ .Values.api.url.app | quote }}
+APP_WEB_URL: {{ .Values.api.url.appWeb | quote }}
 # File preview or download Url prefix.
 # used to display File preview or download Url to the front-end or as Multi-model inputs;
 # Url is signed and has expiration time.
-FILES_URL: ''
+FILES_URL: {{ .Values.api.url.files }}
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
 MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
 
@@ -91,6 +91,18 @@ SECRET_KEY: {{ .Values.api.secretKey }}
 # The Vector store configurations.
 {{ include "dify.vectordb.config" . }}
 {{ include "dify.mail.config" . }}
+{{- end }}
+
+{{- define "dify.web.config" -}}
+# The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
+# different from api or web app domain.
+# example: http://cloud.dify.ai
+CONSOLE_API_URL: {{ .Values.api.url.consoleApi}}
+# The URL for Web APP api server, refers to the Web App base URL of WEB service if web app domain is different from
+# console or api domain.
+# example: http://udify.app
+APP_API_URL: {{ .Values.api.url.appApi }}
+# The DSN for Sentry
 {{- end }}
 
 {{- define "dify.db.config" -}}
