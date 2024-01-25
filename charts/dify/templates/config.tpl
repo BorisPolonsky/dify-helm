@@ -13,7 +13,7 @@ CONSOLE_WEB_URL: {{ .Values.api.url.console | quote }}
 # different from api or web app domain.
 # example: http://cloud.dify.ai
 CONSOLE_API_URL: {{ .Values.api.url.console | quote }}
-# The URL for Service API endpoints，refers to the base URL of the current API service if api domain is
+# The URL prefix for Service API endpoints, refers to the base URL of the current API service if api domain is
 # different from console domain.
 # example: http://api.dify.ai
 SERVICE_API_URL: {{ .Values.api.url.api | quote }}
@@ -25,6 +25,10 @@ APP_API_URL: {{ .Values.api.url.app | quote }}
 # console or api domain.
 # example: http://udify.app
 APP_WEB_URL: {{ .Values.api.url.app | quote }}
+# File preview or download Url prefix.
+# used to display File preview or download Url to the front-end or as Multi-model inputs;
+# Url is signed and has expiration time.
+FILES_URL: ''
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
 MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
 
@@ -61,6 +65,7 @@ COOKIE_SECURE: 'false'
 
 {{- include "dify.storage.config" . }}
 {{- include "dify.vectordb.config" . }}
+{{- include "dify.mail.config" . }}
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
 SENTRY_DSN: ''
 # The sample rate for Sentry events. Default: `1.0`
@@ -69,6 +74,15 @@ SENTRY_TRACES_SAMPLE_RATE: "1.0"
 SENTRY_PROFILES_SAMPLE_RATE: "1.0"
 {{- end }}
 
+{{- define "dify.mail.config" -}}
+# Mail configuration, support: resend
+MAIL_TYPE: ''
+# default send from email address, if not specified
+MAIL_DEFAULT_SEND_FROM: 'YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)'
+# the api-key for resend (https://resend.com)
+RESEND_API_KEY: ''
+RESEND_API_URL: https://api.resend.com
+{{- end }}
 
 {{- define "dify.worker.config" -}}
 # worker service
@@ -95,6 +109,7 @@ SECRET_KEY: {{ .Values.api.secretKey }}
 {{- include "dify.storage.config" . }}
 # The Vector store configurations.
 {{- include "dify.vectordb.config" . }}
+{{- include "dify.mail.config" . }}
 {{- end }}
 
 {{- define "dify.db.config" -}}
@@ -211,7 +226,7 @@ SESSION_REDIS_DB: "2"
 
 {{- define "dify.vectordb.config" }}
 {{- if .Values.externalWeaviate.enabled }}
-# The type of vector store to use. Supported values are `weaviate`, `qdrant`.
+# The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
 # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
 WEAVIATE_ENDPOINT: {{ .Values.externalWeaviate.endpoint | quote }}
@@ -223,9 +238,23 @@ VECTOR_STORE: qdrant
 QDRANT_URL: {{ .Values.externalQdrant.endpoint }}
 # The Qdrant API key.
 QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey }}
+# The Qdrant clinet timeout setting.
+QDRANT_CLIENT_TIMEOUT: 20
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
+{{- else if .Values.externalMilvus.enabled}}
+# Milvus configuration Only available when VECTOR_STORE is `milvus`.
+# The milvus host.
+MILVUS_HOST: 127.0.0.1
+# The milvus host.
+MILVUS_PORT: 19530
+# The milvus username.
+MILVUS_USER: root
+# The milvus password.
+MILVUS_PASSWORD: Milvus
+# The milvus tls switch.
+MILVUS_SECURE: 'false'
 {{- else if .Values.weaviate.enabled }}
-# The type of vector store to use. Supported values are `weaviate`, `qdrant`.
+# The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
 {{- with .Values.weaviate.service }}
 {{- if and (eq .type "ClusterIP") (not (eq .clusterIP "None"))}}
