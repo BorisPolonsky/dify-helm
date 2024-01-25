@@ -242,12 +242,12 @@ WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys }
 
 {{- define "dify.mail.config" -}}
 # Mail configuration, support: resend
-MAIL_TYPE: ''
+MAIL_TYPE: {{ .Values.api.mail.type | quote }}
 # default send from email address, if not specified
-MAIL_DEFAULT_SEND_FROM: 'YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)'
+MAIL_DEFAULT_SEND_FROM: {{ .Values.api.mail.defaultSender | quote }}
 # the api-key for resend (https://resend.com)
-RESEND_API_KEY: ''
-RESEND_API_URL: https://api.resend.com
+RESEND_API_KEY: {{ .Values.api.mail.resendApiKey | quote }}
+RESEND_API_URL: {{ .Values.api.mail.resendApiUrl | quote }}
 {{- end }}
 
 {{- define "dify.nginx.config.proxy" }}
