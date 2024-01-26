@@ -168,16 +168,6 @@ web:
   # Apply your own Environment Variables if necessary
   - name: EDITION
     value: "SELF_HOSTED"
-    # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
-    # different from api or web app domain.
-    # example: http://cloud.dify.ai
-  - name: CONSOLE_API_URL
-    value: ''
-    # The URL for Web APP api server, refers to the Web App base URL of WEB service if web app domain is different from
-    # console or api domain.
-    # example: http://udify.app
-  - name: APP_API_URL
-    value: ''
   service:
     port: 3000
     annotations: {}
