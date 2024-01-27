@@ -8,23 +8,23 @@ SECRET_KEY: {{ .Values.api.secretKey }}
 # The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
-CONSOLE_WEB_URL: {{ .Values.api.url.console | quote }}
+CONSOLE_WEB_URL: {{ .Values.api.url.consoleWeb | quote }}
 # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
-CONSOLE_API_URL: {{ .Values.api.url.console | quote }}
-# The URL for Service API endpoints，refers to the base URL of the current API service if api domain is
+CONSOLE_API_URL: {{ .Values.api.url.consoleApi | quote }}
+# The URL prefix for Service API endpoints, refers to the base URL of the current API service if api domain is
 # different from console domain.
 # example: http://api.dify.ai
-SERVICE_API_URL: {{ .Values.api.url.api | quote }}
-# The URL for Web APP api server, refers to the Web App base URL of WEB service if web app domain is different from
+SERVICE_API_URL: {{ .Values.api.url.serviceApi | quote }}
+# The URL prefix for Web APP frontend, refers to the Web App base URL of WEB service if web app domain is different from
 # console or api domain.
 # example: http://udify.app
-APP_API_URL: {{ .Values.api.url.app | quote }}
-# The URL for Web APP frontend, refers to the Web App base URL of WEB service if web app domain is different from
-# console or api domain.
-# example: http://udify.app
-APP_WEB_URL: {{ .Values.api.url.app | quote }}
+APP_WEB_URL: {{ .Values.api.url.appWeb | quote }}
+# File preview or download Url prefix.
+# used to display File preview or download Url to the front-end or as Multi-model inputs;
+# Url is signed and has expiration time.
+FILES_URL: {{ .Values.api.url.files | quote }}
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
 MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
 
@@ -35,8 +35,7 @@ MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
 # The configurations of redis connection.
 # It is consistent with the configuration in the 'redis' service below.
 {{- include "dify.redis.config" . }}
-{{/* The configurations of session, Supported values are `sqlalchemy`. `redis`*/}}
-{{- include "dify.api.session.config" . }}
+
 # The configurations of celery broker.
 {{- include "dify.celery.config" . }}
 # Specifies the allowed origins for cross-origin requests to the Web API, e.g. https://dify.app or * for all origins.
@@ -54,13 +53,10 @@ CONSOLE_CORS_ALLOW_ORIGINS: '*'
 # If you want to enable cross-origin support,
 # you must use the HTTPS protocol and set the configuration to `SameSite=None, Secure=true, HttpOnly=true`.
 #
-# For **production** purposes, please set `SameSite=Lax, Secure=true, HttpOnly=true`.
-COOKIE_HTTPONLY: 'true'
-COOKIE_SAMESITE: 'Lax'
-COOKIE_SECURE: 'false'
 
-{{- include "dify.storage.config" . }}
-{{- include "dify.vectordb.config" . }}
+{{ include "dify.storage.config" . }}
+{{ include "dify.vectordb.config" . }}
+{{ include "dify.mail.config" . }}
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
 SENTRY_DSN: ''
 # The sample rate for Sentry events. Default: `1.0`
@@ -68,7 +64,6 @@ SENTRY_TRACES_SAMPLE_RATE: "1.0"
 # The sample rate for Sentry profiles. Default: `1.0`
 SENTRY_PROFILES_SAMPLE_RATE: "1.0"
 {{- end }}
-
 
 {{- define "dify.worker.config" -}}
 # worker service
@@ -88,13 +83,26 @@ SECRET_KEY: {{ .Values.api.secretKey }}
 {{ include "dify.db.config" . }}
 
 # The configurations of redis cache connection.
-{{- include "dify.redis.config" . }}
+{{ include "dify.redis.config" . }}
 # The configurations of celery broker.
-{{- include "dify.celery.config" . }}
+{{ include "dify.celery.config" . }}
 
-{{- include "dify.storage.config" . }}
+{{ include "dify.storage.config" . }}
 # The Vector store configurations.
-{{- include "dify.vectordb.config" . }}
+{{ include "dify.vectordb.config" . }}
+{{ include "dify.mail.config" . }}
+{{- end }}
+
+{{- define "dify.web.config" -}}
+# The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
+# different from api or web app domain.
+# example: http://cloud.dify.ai
+CONSOLE_API_URL: {{ .Values.api.url.consoleApi }}
+# The URL for Web APP api server, refers to the Web App base URL of WEB service if web app domain is different from
+# console or api domain.
+# example: http://udify.app
+APP_API_URL: {{ .Values.api.url.appApi }}
+# The DSN for Sentry
 {{- end }}
 
 {{- define "dify.db.config" -}}
@@ -182,36 +190,9 @@ CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost .ma
 {{- end }}
 {{- end }}
 
-
-{{- define "dify.api.session.config" -}}
-{{/*No sqlalchemy support for now*/}}
-# The configurations of session, Supported values are `sqlalchemy`. `redis`
-SESSION_TYPE: redis
-{{- if .Values.externalRedis.enabled }}
-  {{- with .Values.externalRedis }}
-SESSION_REDIS_HOST: {{ .host | quote }}
-SESSION_REDIS_PORT: {{ .port | toString | quote }}
-SESSION_REDIS_USERNAME: ""
-SESSION_REDIS_PASSWORD: {{ .password | quote }}
-SESSION_REDIS_USE_SSL: {{ .useSSL | toString | quote }}
-  {{- end }}
-{{- else if .Values.redis.enabled }}
-  {{- $redisHost := printf "%s-redis-master" .Release.Name -}}
-  {{- with .Values.redis }}
-SESSION_REDIS_HOST: {{ $redisHost }}
-SESSION_REDIS_PORT: {{ .master.service.ports.redis | toString | quote }}
-SESSION_REDIS_USERNAME: ""
-SESSION_REDIS_PASSWORD: {{ .auth.password | quote }}
-SESSION_REDIS_USE_SSL: {{ .tls.enabled | toString | quote }}
-  {{- end }}
-# use redis db 2 for session store
-SESSION_REDIS_DB: "2"
-{{- end }}
-{{- end }}
-
-{{- define "dify.vectordb.config" }}
+{{- define "dify.vectordb.config" -}}
 {{- if .Values.externalWeaviate.enabled }}
-# The type of vector store to use. Supported values are `weaviate`, `qdrant`.
+# The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
 # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
 WEAVIATE_ENDPOINT: {{ .Values.externalWeaviate.endpoint | quote }}
@@ -223,25 +204,50 @@ VECTOR_STORE: qdrant
 QDRANT_URL: {{ .Values.externalQdrant.endpoint }}
 # The Qdrant API key.
 QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey }}
+# The Qdrant clinet timeout setting.
+QDRANT_CLIENT_TIMEOUT: 20
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
+{{- else if .Values.externalMilvus.enabled}}
+# Milvus configuration Only available when VECTOR_STORE is `milvus`.
+VECTOR_STORE: milvus
+# The milvus host.
+MILVUS_HOST: {{ .Values.externalMilvus.host }}
+# The milvus host.
+MILVUS_PORT: {{ .Values.externalMilvus.port | toString }}
+# The milvus username.
+MILVUS_USER: {{ .Values.externalMilvus.user }}
+# The milvus password.
+MILVUS_PASSWORD: {{ .Values.externalMilvus.password }}
+# The milvus tls switch.
+MILVUS_SECURE: {{ .Values.externalMilvus.useTLS | toString | quote }}
 {{- else if .Values.weaviate.enabled }}
-# The type of vector store to use. Supported values are `weaviate`, `qdrant`.
+# The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
-{{- with .Values.weaviate.service }}
-{{- if and (eq .type "ClusterIP") (not (eq .clusterIP "None"))}}
+  {{- with .Values.weaviate.service }}
+    {{- if and (eq .type "ClusterIP") (not (eq .clusterIP "None"))}}
 # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
 {{/*
 Pitfall: scheme (i.e.) must be supecified, or weviate client won't function as
 it depends on `hostname` from urllib.parse.urlparse will be empty if schema is not specified.
 */}}
 WEAVIATE_ENDPOINT: {{ printf "http://%s" .name | quote }}
-{{- end }}
-{{- end }}
+    {{- end }}
+  {{- end }}
 # The Weaviate API key.
-{{- if .Values.weaviate.authentication.apikey }}
+  {{- if .Values.weaviate.authentication.apikey }}
 WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys }}
+  {{- end }}
 {{- end }}
 {{- end }}
+
+{{- define "dify.mail.config" -}}
+# Mail configuration, support: resend
+MAIL_TYPE: {{ .Values.api.mail.type | quote }}
+# default send from email address, if not specified
+MAIL_DEFAULT_SEND_FROM: {{ .Values.api.mail.defaultSender | quote }}
+# the api-key for resend (https://resend.com)
+RESEND_API_KEY: {{ .Values.api.mail.resendApiKey | quote }}
+RESEND_API_URL: {{ .Values.api.mail.resendApiUrl | quote }}
 {{- end }}
 
 {{- define "dify.nginx.config.proxy" }}
@@ -309,6 +315,10 @@ server {
     }
 
     location /v1 {
+      proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
+      include proxy.conf;
+    }
+    location /files {
       proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
       include proxy.conf;
     }

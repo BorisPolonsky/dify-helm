@@ -5,7 +5,7 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: 0.3.8
+    tag: 0.4.9
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -15,7 +15,7 @@ image:
     #   - myRegistryKeySecretName
   web:    
     repository: langgenius/dify-web
-    tag: 0.3.8
+    tag: 0.4.9
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -56,18 +56,31 @@ api:
     labels: {}
     clusterIP: ""
   url:
-    # The base URL of console application, refers to the Console base URL of WEB service if console domain is
-    # different from api or web app domain.
-    # example: http://cloud.dify.ai
-    console: ''
-    # The URL for Service API endpoints，refers to the base URL of the current API service if api domain is
-    # different from console domain.
-    # example: http://api.dify.ai
-    api: ''
-    # The URL for Web APP, refers to the Web App base URL of WEB service if web app domain is different from
-    # console or api domain.
-    # example: http://udify.app
-    app: ''
+    # The backend URL of the console API, used to concatenate the authorization callback.
+    # If empty, it is the same domain. Example: https://api.console.dify.ai
+    consoleApi: ""
+    # The front-end URL of the console web, used to concatenate some front-end addresses and for CORS configuration use.
+    # If empty, it is the same domain. Example: https://console.dify.ai
+    consoleWeb: ""
+    # Service API Url, used to display Service API Base Url to the front-end.
+    # If empty, it is the same domain. Example: https://api.dify.ai
+    serviceApi: ""
+    # WebApp API backend Url, used to declare the back-end URL for the front-end API.
+    # If empty, it is the same domain. Example: https://app.dify.ai
+    appApi: ""
+    # WebApp Url, used to display WebAPP API Base Url to the front-end. If empty, it is the same domain. Example: https://api.app.dify.ai
+    appWeb: ""
+    # File preview or download URL prefix, used to display the file preview
+    # or download URL to the front-end or as a multi-modal model input;
+    # In order to prevent others from forging, the image preview URL is signed and has a 5-minute expiration time.
+    files: ""
+  mail:
+    type: ''
+    # default enail sender from email address, if not not given specific address
+    defaultSender: 'YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)'
+    # the api-key for resend (https://resend.com)
+    resendApiKey: ''
+    resendApiUrl: https://api.resend.com
   # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
   migration: true
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
@@ -155,16 +168,6 @@ web:
   # Apply your own Environment Variables if necessary
   - name: EDITION
     value: "SELF_HOSTED"
-    # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
-    # different from api or web app domain.
-    # example: http://cloud.dify.ai
-  - name: CONSOLE_API_URL
-    value: ''
-    # The URL for Web APP api server, refers to the Web App base URL of WEB service if web app domain is different from
-    # console or api domain.
-    # example: http://udify.app
-  - name: APP_API_URL
-    value: ''
   service:
     port: 3000
     annotations: {}
@@ -2519,3 +2522,15 @@ externalQdrant:
   enabled: false
   endpoint: "https://your-qdrant-cluster-url.qdrant.tech/"
   apiKey: "ak-difyai"
+
+###################################
+# External Milvus
+# - these configs are only used when `externalWeaviate.enabled` is false and `externalQdrant.enabled` is true
+###################################
+externalMilvus:
+  enabled: false
+  host: "your-milvus.domain"
+  port: 19530
+  user: "user"
+  password: "Milvus"
+  useTLS: false
