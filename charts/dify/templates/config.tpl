@@ -318,6 +318,15 @@ server {
       proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
       include proxy.conf;
     }
+    location /files {
+      proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
+      include proxy.conf;
+    }
+
+    location /files {
+      proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
+      include proxy.conf;
+    }
 
     location /files {
       proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
