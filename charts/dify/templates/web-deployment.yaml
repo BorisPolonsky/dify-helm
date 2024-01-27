@@ -50,6 +50,9 @@ spec:
         {{- if .Values.web.extraEnv }}
           {{- toYaml .Values.web.extraEnv | nindent 8 }}
         {{- end }}
+        envFrom:
+          - configMapRef:
+              name: {{ template "dify.web.fullname" . }}
         ports:
           - name: web
             containerPort: 3000
