@@ -27,3 +27,9 @@ helm install my-release dify/dify
 - [x] weaviate
 - [x] qdrant
 - [X] milvus
+
+## Contributors
+<a href="https://github.com/borispolonsky/dify-helm/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=borispolonsky/dify-helm" />
+</a>
+
