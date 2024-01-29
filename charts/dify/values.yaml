@@ -2506,7 +2506,7 @@ externalRedis:
 
 ###################################
 # External Weaviate
-# - these configs take effect `externalWeaviate.enabled` is true
+# - these configs take effect when `externalWeaviate.enabled` is true
 ###################################
 externalWeaviate:
   enabled: false
