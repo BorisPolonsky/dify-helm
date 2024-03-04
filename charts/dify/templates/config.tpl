@@ -211,13 +211,13 @@ QDRANT_CLIENT_TIMEOUT: 20
 # Milvus configuration Only available when VECTOR_STORE is `milvus`.
 VECTOR_STORE: milvus
 # The milvus host.
-MILVUS_HOST: {{ .Values.externalMilvus.host }}
+MILVUS_HOST: {{ .Values.externalMilvus.host | quote }}
 # The milvus host.
-MILVUS_PORT: {{ .Values.externalMilvus.port | toString }}
+MILVUS_PORT: {{ .Values.externalMilvus.port | toString | quote }}
 # The milvus username.
-MILVUS_USER: {{ .Values.externalMilvus.user }}
+MILVUS_USER: {{ .Values.externalMilvus.user | quote }}
 # The milvus password.
-MILVUS_PASSWORD: {{ .Values.externalMilvus.password }}
+MILVUS_PASSWORD: {{ .Values.externalMilvus.password | quote }}
 # The milvus tls switch.
 MILVUS_SECURE: {{ .Values.externalMilvus.useTLS | toString | quote }}
 {{- else if .Values.weaviate.enabled }}
