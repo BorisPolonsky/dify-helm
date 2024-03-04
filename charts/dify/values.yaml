@@ -2506,7 +2506,7 @@ externalRedis:
 
 ###################################
 # External Weaviate
-# - these configs are only used when `externalWeaviate.enabled` is true
+# - these configs take effect when `externalWeaviate.enabled` is true
 ###################################
 externalWeaviate:
   enabled: false
@@ -2516,7 +2516,7 @@ externalWeaviate:
 
 ###################################
 # External Qdrant
-# - these configs are only used when `externalWeaviate.enabled` is false and `externalQdrant.enabled` is true
+# - these configs take effect only if `externalWeaviate.enabled` is `false` and `externalQdrant.enabled` is `true`
 ###################################
 externalQdrant:
   enabled: false
@@ -2525,7 +2525,7 @@ externalQdrant:
 
 ###################################
 # External Milvus
-# - these configs are only used when `externalWeaviate.enabled` is false and `externalQdrant.enabled` is true
+# - these configs take effect only if both `externalWeaviate.enabled` and `externalQdrant.enabled` are set as `false` and `externalMilvus.enabled` is `true`
 ###################################
 externalMilvus:
   enabled: false
