@@ -41,7 +41,6 @@ api:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  # extraEnv: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
@@ -114,7 +113,7 @@ worker:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  extraEnv: {}
+  extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
   #   value: "C.UTF-8"
@@ -125,7 +124,7 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  extraEnv: {}
+  extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
   #   value: "C.UTF-8"
