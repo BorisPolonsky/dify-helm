@@ -97,11 +97,11 @@ SECRET_KEY: {{ .Values.api.secretKey }}
 # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
-CONSOLE_API_URL: {{ .Values.api.url.consoleApi }}
+CONSOLE_API_URL: {{ .Values.api.url.consoleApi | quote }}
 # The URL for Web APP api server, refers to the Web App base URL of WEB service if web app domain is different from
 # console or api domain.
 # example: http://udify.app
-APP_API_URL: {{ .Values.api.url.appApi }}
+APP_API_URL: {{ .Values.api.url.appApi | quote }}
 # The DSN for Sentry
 {{- end }}
 
