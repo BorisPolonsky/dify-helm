@@ -205,7 +205,7 @@ QDRANT_URL: {{ .Values.externalQdrant.endpoint }}
 # The Qdrant API key.
 QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey }}
 # The Qdrant clinet timeout setting.
-QDRANT_CLIENT_TIMEOUT: 20
+QDRANT_CLIENT_TIMEOUT: "20"
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
 {{- else if .Values.externalMilvus.enabled}}
 # Milvus configuration Only available when VECTOR_STORE is `milvus`.
