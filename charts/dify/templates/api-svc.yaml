@@ -19,7 +19,7 @@ spec:
   clusterIP: {{ .Values.api.service.clusterIP }}
   {{- end }}
   ports:
-    - name: api
+    - name: http-api
       port: {{ .Values.api.service.port }}
       protocol: TCP
       targetPort: api

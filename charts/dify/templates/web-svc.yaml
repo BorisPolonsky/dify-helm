@@ -19,7 +19,7 @@ spec:
   clusterIP: {{ .Values.web.service.clusterIP }}
   {{- end }}
   ports:
-    - name: web
+    - name: http-web
       port: {{ .Values.web.service.port }}
       protocol: TCP
       targetPort: web
