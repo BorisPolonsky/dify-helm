@@ -98,7 +98,7 @@ api:
       ## If set to "-", storageClassName: "", which disables dynamic provisioning
       ## If undefined (the default) or set to null, no storageClassName spec is
       ##   set, choosing the default provisioner.
-      ## ReadWriteMany access mode required for nginx
+      ## ReadWriteMany access mode required for `api` and `worker`
       ##
       storageClass:
       accessModes: ReadWriteMany
