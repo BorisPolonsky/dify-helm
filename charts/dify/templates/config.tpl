@@ -139,10 +139,8 @@ STORAGE_TYPE: s3
 # The S3 storage configurations, only available when STORAGE_TYPE is `s3`.
 S3_ENDPOINT: {{ .Values.externalS3.endpoint }}
 S3_BUCKET_NAME: {{ .Values.externalS3.bucketName }}
-{{ if not .Values.externalS3.existingSecret }}
-S3_ACCESS_KEY: {{ .Values.externalS3.accessKey | quote }}
-S3_SECRET_KEY: {{ .Values.externalS3.secretKey | quote }}
-{{- end }}
+S3_ACCESS_KEY: {{ .Values.externalS3.accessKey }}
+S3_SECRET_KEY: {{ .Values.externalS3.secretKey }}
 S3_REGION: 'us-east-1'
 {{- else }}
 # The type of storage to use for storing user files. Supported values are `local` and `s3`, Default: `local`

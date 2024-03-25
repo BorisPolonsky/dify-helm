@@ -57,18 +57,6 @@ spec:
         {{- if .Values.api.extraEnv }}
           {{- toYaml .Values.api.extraEnv | nindent 8 }}
         {{- end }}
-        {{- if and .Values.externalS3.enabled .Values.externalS3.existingSecret }}
-          S3_ACCESS_KEY:
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.externalS3.secretName }}
-                key: {{ .Values.externalS3.accessKeyKey }}
-          S3_SECRET_KEY:
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.externalS3.secretName }}
-                key: {{ .Values.externalS3.secretKeyKey }}
-        {{- end }}
         envFrom:
           - configMapRef:
               name: {{ template "dify.api.fullname" . }}

@@ -2485,11 +2485,8 @@ externalPostgres:
 externalS3:
   enabled: false
   endpoint: "https://xxx.r2.cloudflarestorage.com"
-  existingSecret: "secretname"
-  existingSecretAccessKey: "access-key" # if existingSecret is defined
-  existingSecretSecretKey: "secret-key" # if existingSecret is defined
-  accessKey: "access-key" # if existingSecret is not defined
-  secretKey: "secret-key" # if existingSecret is not defined
+  accessKey: "ak-difyai"
+  secretKey: "sk-difyai"
   useSSL: false
   bucketName: "difyai"
   rootPath: ""
