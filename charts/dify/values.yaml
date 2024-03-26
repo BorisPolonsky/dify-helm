@@ -54,6 +54,8 @@ api:
     annotations: {}
     labels: {}
     clusterIP: ""
+  # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+  logLevel: INFO
   url:
     # The backend URL of the console API, used to concatenate the authorization callback.
     # If empty, it is the same domain. Example: https://api.console.dify.ai
