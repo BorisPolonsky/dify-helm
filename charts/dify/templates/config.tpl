@@ -255,7 +255,7 @@ SMTP_SERVER: {{ .Values.api.mail.smtp.server | quote }}
 SMTP_PORT: {{ .Values.api.mail.smtp.port | quote }}
 SMTP_USERNAME: {{ .Values.api.mail.smtp.username | quote }}
 SMTP_PASSWORD: {{ .Values.api.mail.smtp.password | quote }}
-SMTP_USE_TLS: {{ .Values.api.mail.smtp.useTLS | quote }}
+SMTP_USE_TLS: {{ .Values.api.mail.smtp.useTLS | toString | quote }}
 {{- end }}
 {{- end }}
 
