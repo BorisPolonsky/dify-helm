@@ -245,17 +245,17 @@ WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys }
 # Mail configuration for resend
 MAIL_TYPE: {{ .Values.api.mail.type | quote }}
 MAIL_DEFAULT_SEND_FROM: {{ .Values.api.mail.defaultSender | quote }}
-RESEND_API_KEY: {{ .Values.api.mail.resendApiKey | quote }}
-RESEND_API_URL: {{ .Values.api.mail.resendApiUrl | quote }}
+RESEND_API_KEY: {{ .Values.api.mail.resend.apiKey | quote }}
+RESEND_API_URL: {{ .Values.api.mail.resend.apiUrl | quote }}
 {{- else if eq .Values.api.mail.type "smtp" }}
 # Mail configuration for SMTP
 MAIL_TYPE: {{ .Values.api.mail.type | quote }}
 MAIL_DEFAULT_SEND_FROM: {{ .Values.api.mail.defaultSender | quote }}
-SMTP_SERVER: {{ .Values.api.mail.smtpServer | quote }}
-SMTP_PORT: {{ .Values.api.mail.smtpPort | quote }}
-SMTP_USERNAME: {{ .Values.api.mail.smtpUsername | quote }}
-SMTP_PASSWORD: {{ .Values.api.mail.smtpPassword | quote }}
-SMTP_USE_TLS: {{ .Values.api.mail.smtpUseTLS | quote }}
+SMTP_SERVER: {{ .Values.api.mail.smtp.server | quote }}
+SMTP_PORT: {{ .Values.api.mail.smtp.port | quote }}
+SMTP_USERNAME: {{ .Values.api.mail.smtp.username | quote }}
+SMTP_PASSWORD: {{ .Values.api.mail.smtp.password | quote }}
+SMTP_USE_TLS: {{ .Values.api.mail.smtp.useTLS | quote }}
 {{- end }}
 {{- end }}
 
