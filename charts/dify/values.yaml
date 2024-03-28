@@ -76,12 +76,22 @@ api:
     # In order to prevent others from forging, the image preview URL is signed and has a 5-minute expiration time.
     files: ""
   mail:
-    type: ''
-    # default enail sender from email address, if not not given specific address
+    # default email sender from email address, if not not given specific address
     defaultSender: 'YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)'
-    # the api-key for resend (https://resend.com)
-    resendApiKey: ''
-    resendApiUrl: https://api.resend.com
+    # Mail type, supported values are `smtp`, `resend` https://docs.dify.ai/getting-started/install-self-hosted/environments#mail-related-configuration
+    type: "resend"
+    resend:
+      # Resend API Key
+      apiKey: "xxxx"
+      # Resend API URL
+      apiUrl: https://api.resend.com
+    # SMTP Configuration
+    smtp:
+      server: "smtp.server.com"
+      port: 587
+      username: "YOUR EMAIL"
+      password: "YOUR EMAIL PASSWORD"
+      useTLS: true
   # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
   migration: true
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
