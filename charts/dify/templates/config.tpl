@@ -94,6 +94,10 @@ SECRET_KEY: {{ .Values.api.secretKey }}
 {{- end }}
 
 {{- define "dify.web.config" -}}
+# The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
+# different from api or web app domain.
+# example: http://cloud.dify.ai
+CONSOLE_WEB_URL: {{ .Values.api.url.consoleWeb | quote }}
 # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
