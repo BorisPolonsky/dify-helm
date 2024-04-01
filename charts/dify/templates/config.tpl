@@ -71,6 +71,10 @@ SENTRY_PROFILES_SAMPLE_RATE: "1.0"
 # Startup mode, 'worker' starts the Celery worker for processing the queue.
 MODE: worker
 
+# The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
+# different from api or web app domain.
+# example: http://cloud.dify.ai
+CONSOLE_WEB_URL: {{ .Values.api.url.consoleWeb | quote }}
 # --- All the configurations below are the same as those in the 'api' service. ---
 
 # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
