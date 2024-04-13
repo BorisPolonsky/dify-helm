@@ -147,6 +147,7 @@ worker:
   #      secretKeyRef:
   #        name: my-secret
   #        key: DB_PASSWORD
+  logLevel: INFO
 
 proxy:
   enabled: true

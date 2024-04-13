@@ -78,7 +78,7 @@ CONSOLE_WEB_URL: {{ .Values.api.url.consoleWeb | quote }}
 # --- All the configurations below are the same as those in the 'api' service. ---
 
 # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
-LOG_LEVEL: INFO
+LOG_LEVEL: {{ .Values.worker.logLevel | quote }}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 # same as the API service
 SECRET_KEY: {{ .Values.api.secretKey }}
