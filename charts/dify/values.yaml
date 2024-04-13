@@ -42,9 +42,18 @@ api:
   affinity: {}
   tolerations: []
   extraEnv:
-  # Apply your own Environment Variables if necessary
+  # Apply your own Environment Variables if necessary.
+  # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
+  # The direct approach
   # - name: LANG
   #   value: "C.UTF-8"
+  #   - name: SECRET_KEY
+  # Use existing k8s secrets
+  #  - name: DB_PASSWORD
+  #    valueFrom:
+  #      secretKeyRef:
+  #        name: my-secret
+  #        key: DB_PASSWORD
   - name: CHECK_UPDATE_URL
   # Won't check for update if left empty
   #   value: https://updates.dify.ai
@@ -126,9 +135,20 @@ worker:
   affinity: {}
   tolerations: []
   extraEnv:
-  # Apply your own Environment Variables if necessary
+  # Apply your own Environment Variables if necessary.
+  # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
+  # The direct approach
   # - name: LANG
   #   value: "C.UTF-8"
+  #   - name: SECRET_KEY
+  # Use existing k8s secrets
+  #  - name: DB_PASSWORD
+  #    valueFrom:
+  #      secretKeyRef:
+  #        name: my-secret
+  #        key: DB_PASSWORD
+  logLevel: INFO
+
 proxy:
   enabled: true
   replicas: 1
