@@ -5,7 +5,7 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: 0.4.9
+    tag: 0.5.11-fix1
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -15,7 +15,7 @@ image:
     #   - myRegistryKeySecretName
   web:    
     repository: langgenius/dify-web
-    tag: 0.4.9
+    tag: 0.5.11-fix1
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -110,7 +110,7 @@ api:
       ## If set to "-", storageClassName: "", which disables dynamic provisioning
       ## If undefined (the default) or set to null, no storageClassName spec is
       ##   set, choosing the default provisioner.
-      ## ReadWriteMany access mode required for nginx
+      ## ReadWriteMany access mode required for `api` and `worker`
       ##
       storageClass:
       accessModes: ReadWriteMany
@@ -2502,6 +2502,18 @@ externalS3:
   rootPath: ""
   useIAM: false
   iamEndpoint: ""
+
+
+###################################
+# External Azure Blob Storage
+# - these configs are only used when `externalS3.enabled` is false and `externalAzureBlobStorage.enabled` is true
+###################################
+externalAzureBlobStorage:
+  enabled: false
+  url: 'https://<your_account_name>.blob.core.windows.net'
+  account: "https://xxx.r2.cloudflarestorage.com"
+  key: "difyai"
+  container: "difyai-container"
 
 ###################################
 # External Redis
