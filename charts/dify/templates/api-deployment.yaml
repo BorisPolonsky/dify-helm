@@ -97,7 +97,7 @@ spec:
 {{ toYaml .Values.api.tolerations | indent 8 }}
     {{- end }}
       volumes:
-      {{- if not .Values.externalS3.enabled }}
+      {{- if not (or .Values.externalS3.enabled .Values.externalAzureBlobStorage.enabled) }}
       - name: app-data
         persistentVolumeClaim:
           claimName: {{ .Values.api.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.fullname" . | trunc 58)) }}
