@@ -2,7 +2,7 @@
 # Startup mode, 'api' starts the API server.
 MODE: api
 # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
-LOG_LEVEL: INFO
+LOG_LEVEL: {{ .Values.api.logLevel }}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 SECRET_KEY: {{ .Values.api.secretKey }}
 # The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
@@ -71,6 +71,10 @@ SENTRY_PROFILES_SAMPLE_RATE: "1.0"
 # Startup mode, 'worker' starts the Celery worker for processing the queue.
 MODE: worker
 
+# The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
+# different from api or web app domain.
+# example: http://cloud.dify.ai
+CONSOLE_WEB_URL: {{ .Values.api.url.consoleWeb | quote }}
 # --- All the configurations below are the same as those in the 'api' service. ---
 
 # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
@@ -241,13 +245,22 @@ WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys }
 {{- end }}
 
 {{- define "dify.mail.config" -}}
-# Mail configuration, support: resend
+{{- if eq .Values.api.mail.type "resend" }}
+# Mail configuration for resend
 MAIL_TYPE: {{ .Values.api.mail.type | quote }}
-# default send from email address, if not specified
 MAIL_DEFAULT_SEND_FROM: {{ .Values.api.mail.defaultSender | quote }}
-# the api-key for resend (https://resend.com)
-RESEND_API_KEY: {{ .Values.api.mail.resendApiKey | quote }}
-RESEND_API_URL: {{ .Values.api.mail.resendApiUrl | quote }}
+RESEND_API_KEY: {{ .Values.api.mail.resend.apiKey | quote }}
+RESEND_API_URL: {{ .Values.api.mail.resend.apiUrl | quote }}
+{{- else if eq .Values.api.mail.type "smtp" }}
+# Mail configuration for SMTP
+MAIL_TYPE: {{ .Values.api.mail.type | quote }}
+MAIL_DEFAULT_SEND_FROM: {{ .Values.api.mail.defaultSender | quote }}
+SMTP_SERVER: {{ .Values.api.mail.smtp.server | quote }}
+SMTP_PORT: {{ .Values.api.mail.smtp.port | quote }}
+SMTP_USERNAME: {{ .Values.api.mail.smtp.username | quote }}
+SMTP_PASSWORD: {{ .Values.api.mail.smtp.password | quote }}
+SMTP_USE_TLS: {{ .Values.api.mail.smtp.useTLS | toString | quote }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.nginx.config.proxy" }}
