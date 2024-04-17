@@ -3,6 +3,36 @@ entries:
   dify:
   - apiVersion: v2
     appVersion: 0.5.11-fix1
+    created: "2024-04-17T14:11:10.754433494Z"
+    dependencies:
+    - condition: postgresql.enabled
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - postgres
+      version: 12.5.6
+    - condition: redis.enabled
+      name: redis
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - redis
+      version: 16.13.2
+    - condition: weaviate.enabled
+      name: weaviate
+      repository: https://weaviate.github.io/weaviate-helm
+      tags:
+      - vector
+      - search
+      version: 16.1.0
+    description: Instant cloud deployment for https://github.com/langgenius/dify.
+    digest: ed93a3be4652730758cb1aebaea298c81545ece00ce5931a0d6dd65c7bcd0a92
+    name: dify
+    type: application
+    urls:
+    - https://github.com/BorisPolonsky/dify-helm/releases/download/dify-0.19.0/dify-0.19.0.tgz
+    version: 0.19.0
+  - apiVersion: v2
+    appVersion: 0.5.11-fix1
     created: "2024-04-13T07:46:40.703938016Z"
     dependencies:
     - condition: postgresql.enabled
@@ -361,4 +391,4 @@ entries:
     urls:
     - https://github.com/BorisPolonsky/dify-helm/releases/download/dify-0.14.0-rc1/dify-0.14.0-rc1.tgz
     version: 0.14.0-rc1
-generated: "2024-04-13T07:46:40.704006534Z"
+generated: "2024-04-17T14:11:10.754538567Z"
