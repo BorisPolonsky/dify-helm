@@ -23,7 +23,7 @@ image:
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
-  sandbox:    
+  sandbox:
     repository: langgenius/dify-sandbox
     tag: "latest"
     pullPolicy: IfNotPresent
@@ -251,15 +251,6 @@ sandbox:
     clusterIP: ""
   auth:
     apiKey: "dify-sandbox"
-    ## @param auth.existingSecret The name of an existing secret with sandbox; credentials
-    ## NOTE: When it's set, the previous `auth.key` parameter is ignored
-    ##
-    existingSecret: ""
-    ## @param auth.existingSecretAuthKey key to be retrieved from existing secret for `API_KEY`
-    ## NOTE: ignored unless `auth.existingSecret` parameter is set
-    ##
-    existingSecretAuthKey: ""
-  # Disable previlge escalation if set as `false`
   previledged:
     false
 
