@@ -47,18 +47,15 @@ spec:
         imagePullPolicy: "{{ .Values.image.sandbox.pullPolicy }}"
         name: sandbox
         env:
-        {{ if .Values.sandbox.auth.key }}
-        
-        {{- end }}
         {{- if .Values.sandbox.extraEnv }}
           {{- toYaml .Values.sandbox.extraEnv | nindent 8 }}
         {{- end }}
         envFrom:
-        - configMapRef:
+        - secretRef:
             name: {{ template "dify.sandbox.fullname" . }}
         ports:
           - name: sandbox
-            containerPort: 5001
+            containerPort: 8194
             protocol: TCP
         resources:
           {{- toYaml .Values.sandbox.resources | nindent 12 }}
