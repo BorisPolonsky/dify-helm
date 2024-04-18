@@ -117,5 +117,15 @@ SMTP_PASSWORD: {{ .Values.api.mail.smtp.password | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.sandbox.credentials" -}}
-CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.key | b64enc | quote }}
+CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{- end }}
+
+{{- define "dify.sandbox.secretPasswordKey" -}}
+{{- if and .Values.sandbox.enabled .Values.sandbox.auth.existingSecret }}
+    {{- .Values.sandbox.auth.existingSecretAuthKey | printf "%s" }}
+{{- else if and (not .Values.sandbox.enabled) .Values.externalSandbox.existingSecret }}
+    {{- .Values.externalSandbox.existingSecretAuthKey | printf "%s" }}
+{{- else -}}
+    {{- printf "CODE_EXECUTION_API_KEY" }}
+{{- end -}}
+{{- end -}}
