@@ -59,6 +59,8 @@ spec:
             protocol: TCP
         resources:
           {{- toYaml .Values.sandbox.resources | nindent 12 }}
+        securityContext:
+          allowPrivilegeEscalation: {{ .Values.sandbox.privileged }}
     {{- if and (.Values.nodeSelector) (not .Values.sandbox.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
@@ -83,6 +85,4 @@ spec:
       tolerations:
 {{ toYaml .Values.sandbox.tolerations | indent 8 }}
     {{- end }}
-        securityContext:
-          allowPrivilegeEscalation: {{ .Values.sandbox.previledged }}
 {{- end }}
