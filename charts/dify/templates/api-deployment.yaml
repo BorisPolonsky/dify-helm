@@ -60,6 +60,8 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "dify.api.fullname" . }}
+        - secretRef:
+            name: {{ template "dify.api.fullname" . }}
         ports:
           - name: api
             containerPort: 5001
