@@ -274,13 +274,6 @@ SMTP_USE_TLS: {{ .Values.api.mail.smtp.useTLS | toString | quote }}
 
 {{- define "dify.sandbox.config" -}}
 CODE_EXECUTION_ENDPOINT: http://{{ template "dify.sandbox.fullname" .}}:{{ .Values.sandbox.service.port }}
-CODE_MAX_NUMBER: "9223372036854775807"
-CODE_MIN_NUMBER: "-9223372036854775808"
-CODE_MAX_STRING_LENGTH: "80000"
-TEMPLATE_TRANSFORM_MAX_LENGTH: "80000"
-CODE_MAX_STRING_ARRAY_LENGTH: "30"
-CODE_MAX_OBJECT_ARRAY_LENGTH: "30"
-CODE_MAX_NUMBER_ARRAY_LENGTH: "1000"
 {{- end }}
 
 {{- define "dify.nginx.config.proxy" }}
