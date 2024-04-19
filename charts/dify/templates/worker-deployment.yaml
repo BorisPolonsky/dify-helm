@@ -51,8 +51,10 @@ spec:
           {{- toYaml .Values.worker.extraEnv | nindent 8 }}
         {{- end }}
         envFrom:
-          - configMapRef:
-              name: {{ template "dify.worker.fullname" . }}
+        - configMapRef:
+            name: {{ template "dify.worker.fullname" . }}
+        - secretRef:
+            name: {{ template "dify.worker.fullname" . }}
         resources:
           {{- toYaml .Values.worker.resources | nindent 12 }}
         volumeMounts:

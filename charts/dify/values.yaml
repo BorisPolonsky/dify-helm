@@ -5,7 +5,7 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: 0.5.11-fix1
+    tag: "0.6.3"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -15,7 +15,17 @@ image:
     #   - myRegistryKeySecretName
   web:    
     repository: langgenius/dify-web
-    tag: 0.5.11-fix1
+    tag: "0.6.3"
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ##
+    # pullSecrets:
+    #   - myRegistryKeySecretName
+  sandbox:
+    repository: langgenius/dify-sandbox
+    tag: "latest"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -58,6 +68,20 @@ api:
   # Won't check for update if left empty
   #   value: https://updates.dify.ai
     value: ""
+  - name: CODE_MAX_NUMBER
+    value: "9223372036854775807"
+  - name: CODE_MIN_NUMBER
+    value: "-9223372036854775808"
+  - name: CODE_MAX_STRING_LENGTH
+    value: "80000"
+  - name: TEMPLATE_TRANSFORM_MAX_LENGTH
+    value: "80000"
+  - name: CODE_MAX_STRING_ARRAY_LENGTH
+    value: "30"
+  - name: CODE_MAX_OBJECT_ARRAY_LENGTH
+    value: "30"
+  - name: CODE_MAX_NUMBER_ARRAY_LENGTH
+    value: "1000"
   service:
     port: 5001
     annotations: {}
@@ -204,6 +228,31 @@ web:
     annotations: {}
     labels: {}
     clusterIP: ""
+
+sandbox:
+  enabled: true
+  replicas: 1
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  extraEnv:
+  # Apply your own Environment Variables if necessary
+  # - name: LANG
+  #   value: "C.UTF-8"
+  - name: GIN_MODE
+    value: release
+  - name: WORKER_TIMEOUT
+    value: "15"
+  service:
+    port: 8194
+    annotations: {}
+    labels: {}
+    clusterIP: ""
+  auth:
+    apiKey: "dify-sandbox"
+  previledged:
+    false
 
 postgresql:
   enabled: true

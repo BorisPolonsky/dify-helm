@@ -1,0 +1,88 @@
+{{- if and .Values.sandbox.enabled}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+{{ include "dify.ud.annotations" . | indent 4 }}
+    descriptions: sandbox
+  labels:
+{{- include "dify.labels" . | nindent 4 }}
+    component: sandbox
+    # app: {{ template "dify.sandbox.fullname" . }}
+{{ include "dify.ud.labels" . | indent 4 }}
+  name: {{ template "dify.sandbox.fullname" . }}
+spec:
+  replicas: {{ .Values.sandbox.replicas }}
+  selector:
+    matchLabels:
+{{- include "dify.selectorLabels" . | nindent 6 }}
+      component: sandbox
+      {{/*
+      # Required labels for istio
+      # app: {{ template "dify.sandbox.fullname" . }}
+      # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+      */}}
+  template:
+    metadata:
+      annotations:
+{{ include "dify.ud.annotations" . | indent 8 }}
+      labels:
+{{- include "dify.selectorLabels" . | nindent 8 }}
+        component: sandbox
+        {{/*
+        # Required labels for istio
+        # app: {{ template "dify.sandbox.fullname" . }}
+        # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+        */}}
+{{ include "dify.ud.labels" . | indent 8 }}
+    spec:
+      {{- if .Values.image.sandbox.pullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.sandbox.pullSecrets }}
+        - name: {{ . }}
+      {{- end }}
+      {{- end }}
+      containers:
+      - image: "{{ .Values.image.sandbox.repository }}:{{ .Values.image.sandbox.tag }}"
+        imagePullPolicy: "{{ .Values.image.sandbox.pullPolicy }}"
+        name: sandbox
+        env:
+        {{- if .Values.sandbox.extraEnv }}
+          {{- toYaml .Values.sandbox.extraEnv | nindent 8 }}
+        {{- end }}
+        envFrom:
+        - secretRef:
+            name: {{ template "dify.sandbox.fullname" . }}
+        ports:
+          - name: sandbox
+            containerPort: 8194
+            protocol: TCP
+        resources:
+          {{- toYaml .Values.sandbox.resources | nindent 12 }}
+    {{- if and (.Values.nodeSelector) (not .Values.sandbox.nodeSelector) }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if .Values.sandbox.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.sandbox.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.affinity) (not .Values.sandbox.affinity) }}
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+    {{- end }}
+    {{- if .Values.sandbox.affinity }}
+      affinity:
+{{ toYaml .Values.sandbox.affinity | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.tolerations) (not .Values.sandbox.tolerations) }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+    {{- end }}
+    {{- if .Values.sandbox.tolerations }}
+      tolerations:
+{{ toYaml .Values.sandbox.tolerations | indent 8 }}
+    {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: {{ .Values.sandbox.previledged }}
+{{- end }}

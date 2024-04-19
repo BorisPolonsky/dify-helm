@@ -58,8 +58,10 @@ spec:
           {{- toYaml .Values.api.extraEnv | nindent 8 }}
         {{- end }}
         envFrom:
-          - configMapRef:
-              name: {{ template "dify.api.fullname" . }}
+        - configMapRef:
+            name: {{ template "dify.api.fullname" . }}
+        - secretRef:
+            name: {{ template "dify.api.fullname" . }}
         ports:
           - name: api
             containerPort: 5001

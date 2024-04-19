@@ -1,0 +1,29 @@
+{{- if .Values.sandbox.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "dify.sandbox.fullname" . }}
+  labels:
+{{ include "dify.labels" . | indent 4 }}
+{{- if .Values.sandbox.service.labels }}
+{{ toYaml .Values.sandbox.service.labels | indent 4 }}
+{{- end }}
+    component: "sandbox"
+{{- with .Values.sandbox.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  type: ClusterIP
+  {{- if .Values.sandbox.service.clusterIP }}
+  clusterIP: {{ .Values.sandbox.service.clusterIP }}
+  {{- end }}
+  ports:
+    - name: http-sandbox
+      port: {{ .Values.sandbox.service.port }}
+      protocol: TCP
+      targetPort: sandbox
+  selector:
+{{ include "dify.selectorLabels" . | indent 4 }}
+    component: "sandbox"
+{{- end }}
