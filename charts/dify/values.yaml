@@ -251,7 +251,7 @@ sandbox:
     clusterIP: ""
   auth:
     apiKey: "dify-sandbox"
-  priviledged:
+  privileged:
     false
 
 postgresql:

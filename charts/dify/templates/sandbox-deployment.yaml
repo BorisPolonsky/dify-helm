@@ -60,7 +60,7 @@ spec:
         resources:
           {{- toYaml .Values.sandbox.resources | nindent 12 }}
         securityContext:
-          allowPrivilegeEscalation: {{ .Values.sandbox.priviledged }}
+          allowPrivilegeEscalation: {{ .Values.sandbox.privileged }}
     {{- if and (.Values.nodeSelector) (not .Values.sandbox.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
