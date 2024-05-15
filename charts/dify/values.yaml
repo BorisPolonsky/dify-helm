@@ -5,7 +5,7 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "0.6.3"
+    tag: "0.6.9"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -15,7 +15,7 @@ image:
     #   - myRegistryKeySecretName
   web:    
     repository: langgenius/dify-web
-    tag: "0.6.3"
+    tag: "0.6.9"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -2593,6 +2593,20 @@ externalS3:
   rootPath: ""
   useIAM: false
   iamEndpoint: ""
+
+
+###################################
+# External OSS
+# - these configs are only used when `externalOSS.enabled` is true
+###################################
+externalOSS:
+  enabled: false
+  endpoint: "https://oss-ap-southeast-1-internal.aliyuncs.com"
+  accessKey: "ak-difyai"
+  secretKey: "sk-difyai"
+  region: "ap-southeast-1"
+  bucketName: "difyai"
+  authVersion: v4
 
 
 ###################################
