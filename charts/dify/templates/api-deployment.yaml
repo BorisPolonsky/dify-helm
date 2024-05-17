@@ -1,4 +1,5 @@
 {{- if and .Values.api.enabled}}
+{{- $usePvc := not (or .Values.externalS3.enabled .Values.externalAzureBlobStorage.enabled) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -69,7 +70,7 @@ spec:
         resources:
           {{- toYaml .Values.api.resources | nindent 12 }}
         volumeMounts:
-        {{- if not .Values.externalS3.enabled }}
+        {{- if $usePvc }}
         - name: app-data
           mountPath: {{ .Values.api.persistence.mountPath | quote }}
           subPath: {{ .Values.api.persistence.persistentVolumeClaim.subPath | default "" }}
@@ -99,7 +100,7 @@ spec:
 {{ toYaml .Values.api.tolerations | indent 8 }}
     {{- end }}
       volumes:
-      {{- if not (or .Values.externalS3.enabled .Values.externalAzureBlobStorage.enabled) }}
+      {{- if $usePvc }}
       - name: app-data
         persistentVolumeClaim:
           claimName: {{ .Values.api.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.fullname" . | trunc 58)) }}
