@@ -286,7 +286,10 @@ postgresql:
       accessModes:
         - ReadWriteOnce
       size: 8Gi
-
+    # Set, tolerations for postgresql-master pods
+    tolerations: []
+    # Set, affinity for postgresql-master pods
+    affinity: {}
   ## @section PostgreSQL read only replica parameters (only used when `architecture` is set to `replication`)
   ##
   readReplicas:
@@ -301,6 +304,10 @@ postgresql:
       accessModes:
         - ReadWriteOnce
       size: 8Gi
+    # Set, tolerations for postgresql-replicas pods
+    tolerations: []
+    # Set, affinity for postgresql-replicas pods
+    affinity: {}
 
 
 weaviate:
