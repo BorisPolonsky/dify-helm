@@ -319,7 +319,7 @@ postgresql:
     ##
     affinity: {}
 
-    ## @param primary.tolerations Tolerations for PostgreSQL primary pods assignment
+    ## @param readReplicas.tolerations Tolerations for PostgreSQL read only pods assignment
     ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
     ##
     tolerations: []
