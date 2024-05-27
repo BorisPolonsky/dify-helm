@@ -287,6 +287,17 @@ postgresql:
         - ReadWriteOnce
       size: 8Gi
 
+    ## @param primary.affinity Affinity for PostgreSQL primary pods assignment
+    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+    ## Note: primary.podAffinityPreset, primary.podAntiAffinityPreset, and primary.nodeAffinityPreset will be ignored when it's set
+    ##
+    affinity: {}
+
+    ## @param primary.tolerations Tolerations for PostgreSQL primary pods assignment
+    ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+    ##
+    tolerations: []
+
   ## @section PostgreSQL read only replica parameters (only used when `architecture` is set to `replication`)
   ##
   readReplicas:
@@ -301,6 +312,17 @@ postgresql:
       accessModes:
         - ReadWriteOnce
       size: 8Gi
+
+    ## @param readReplicas.affinity Affinity for PostgreSQL read only pods assignment
+    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+    ## Note: primary.podAffinityPreset, primary.podAntiAffinityPreset, and primary.nodeAffinityPreset will be ignored when it's set
+    ##
+    affinity: {}
+
+    ## @param readReplicas.tolerations Tolerations for PostgreSQL read only pods assignment
+    ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+    ##
+    tolerations: []
 
 
 weaviate:
