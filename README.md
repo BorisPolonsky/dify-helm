@@ -12,7 +12,8 @@ helm install my-release dify/dify
 
 ## Supported Component 
 ### Components that could be deployed on kubernetes in current version
-- [x] core (api, worker, proxy)
+- [x] core (`api`, `worker`, `sandbox`)
+- [x] proxy (via built-in `nginx` or `ingress`)
 - [x] redis
 - [x] postgresql
 - [x] persistent storage
