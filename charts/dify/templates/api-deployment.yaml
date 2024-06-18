@@ -55,6 +55,13 @@ spec:
         imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
         name: api
         env:
+        {{- if .Values.sandbox.enabled }}
+        - name: CODE_EXECUTION_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "dify.sandbox.fullname" . }}
+              key: "API_KEY"
+        {{- end }}
         {{- if .Values.api.extraEnv }}
           {{- toYaml .Values.api.extraEnv | nindent 8 }}
         {{- end }}
