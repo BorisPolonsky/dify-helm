@@ -94,6 +94,10 @@ CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost .ma
 WEAVIATE_API_KEY: {{ .Values.externalWeaviate.apiKey | b64enc | quote }}
 {{- else if .Values.externalQdrant.enabled }}
 QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey | b64enc | quote }}
+{{- else if .Values.externalPgvector.enabled}}
+PGVECTOR_USER: {{ .Values.externalPgvector.username | b64enc | quote }}
+# The pgvector password.
+PGVECTOR_PASSWORD: {{ .Values.externalPgvector.password | b64enc | quote }}
 {{- else if .Values.externalMilvus.enabled}}
 MILVUS_USER: {{ .Values.externalMilvus.user | b64enc | quote }}
 # The milvus password.
