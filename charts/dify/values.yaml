@@ -264,7 +264,7 @@ sandbox:
     false
 
 ssrfProxy:
-  enabled: true
+  enabled: false
   replicas: 1
   resources: {}
   nodeSelector: {}
@@ -279,7 +279,7 @@ ssrfProxy:
       ## If true, create/use a Persistent Volume Claim for log
       ## If false, flush logs to stdout & stderr
       ##
-      enabled: true
+      enabled: false
       mountPath: "/var/log/squid"
       annotations:
         helm.sh/resource-policy: keep
