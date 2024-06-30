@@ -1,6 +1,9 @@
 {{- define "dify.api.credentials" -}}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 SECRET_KEY: {{ .Values.api.secretKey | b64enc | quote }}
+{{- if .Values.sandbox.enabled }}
+CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
+{{- end }}
 {{- include "dify.db.credentials" . }}
 # The configurations of redis connection.
 # It is consistent with the configuration in the 'redis' service below.
