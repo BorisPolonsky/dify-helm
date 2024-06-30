@@ -251,8 +251,6 @@ sandbox:
   # Apply your own Environment Variables if necessary
   # - name: LANG
   #   value: "C.UTF-8"
-  - name: GIN_MODE
-    value: release
   - name: WORKER_TIMEOUT
     value: "15"
   service:
