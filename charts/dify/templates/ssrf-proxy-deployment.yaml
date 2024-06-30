@@ -1,4 +1,4 @@
-{{- if and .Values.ssrfProxy.enabled}}
+{{- if .Values.ssrfProxy.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -55,10 +55,17 @@ spec:
             containerPort: 3128
             protocol: TCP
         volumeMounts:
-          - mountPath: /var/cache/squid
-            name: squid-cache
-          - mountPath: /var/log/squid
-            name: squid-log
+        - name: squid-conf
+          mountPath: /etc/squid/squid.conf
+          readOnly: true
+          subPath: squid.conf
+        - mountPath: /var/cache/squid
+          name: squid-cache
+        {{- if .Values.ssrfProxy.log.persistence.enabled }}
+        - name: squid-log
+          mountPath: {{ .Values.ssrfProxy.log.persistence.mountPath | quote }}
+          subPath: {{ .Values.ssrfProxy.log.persistence.persistentVolumeClaim.subPath | default "" }}
+        {{- end }}
         resources:
           {{- toYaml .Values.ssrfProxy.resources | nindent 12 }}
         securityContext:
@@ -88,8 +95,15 @@ spec:
 {{ toYaml .Values.ssrfProxy.tolerations | indent 8 }}
     {{- end }}
       volumes:
-        - name: squid-cache
-          emptyDir: {}
-        - name: squid-log
-          emptyDir: {}
+      - name: squid-conf
+        configMap:
+          defaultMode: 420
+          name: {{ template "dify.ssrfProxy.fullname" . }}
+      - name: squid-cache
+        emptyDir: {}
+      {{- if .Values.ssrfProxy.log.persistence.enabled }}
+      - name: squid-log
+        persistentVolumeClaim:
+          claimName: {{ .Values.ssrfProxy.log.persistence.persistentVolumeClaim.existingClaim | default (printf "%s-logs" (include "dify.ssrfProxy.fullname" . | trunc 58)) }}
+      {{- end }}
 {{- end }}
