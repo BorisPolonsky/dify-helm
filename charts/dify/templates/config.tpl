@@ -64,6 +64,10 @@ SENTRY_TRACES_SAMPLE_RATE: "1.0"
 # The sample rate for Sentry profiles. Default: `1.0`
 SENTRY_PROFILES_SAMPLE_RATE: "1.0"
 {{ include "dify.sandbox.config" . }}
+{{- if .Values.ssrfProxy.enabled }}
+HTTP_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
+HTTPS_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.worker.config" -}}
