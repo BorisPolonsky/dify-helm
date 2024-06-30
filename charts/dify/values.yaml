@@ -2700,6 +2700,10 @@ externalQdrant:
   enabled: false
   endpoint: "https://your-qdrant-cluster-url.qdrant.tech/"
   apiKey: "ak-difyai"
+  timeout: 20
+  grpc:
+    enabled: false
+    port: 6334
 
 ###################################
 # External Milvus

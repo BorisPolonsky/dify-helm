@@ -236,7 +236,11 @@ QDRANT_URL: {{ .Values.externalQdrant.endpoint }}
 # The Qdrant API key.
 # QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey }}
 # The Qdrant clinet timeout setting.
-QDRANT_CLIENT_TIMEOUT: "20"
+QDRANT_CLIENT_TIMEOUT: {{ .Values.externalQdrant.timeout | quote }}
+# The Qdrant client enable gRPC mode.
+QDRANT_GRPC_ENABLED: {{ .Values.externalQdrant.grpc.enabled | toString | quote }}
+# The Qdrant server gRPC mode PORT.
+QDRANT_GRPC_PORT: {{ .Values.externalQdrant.grpc.port | quote }}
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
 {{- else if .Values.externalMilvus.enabled}}
 # Milvus configuration Only available when VECTOR_STORE is `milvus`.
