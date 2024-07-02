@@ -242,6 +242,14 @@ QDRANT_GRPC_ENABLED: {{ .Values.externalQdrant.grpc.enabled | toString | quote }
 # The Qdrant server gRPC mode PORT.
 QDRANT_GRPC_PORT: {{ .Values.externalQdrant.grpc.port | quote }}
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
+{{- else if .Values.externalPgvector.enabled}}
+# Pgvector configuration Only available when VECTOR_STORE is `pgvector`.
+VECTOR_STORE: pgvector
+PGVECTOR_HOST: {{ .Values.externalPgvector.address }}
+PGVECTOR_PORT: {{ .Values.externalPgvector.port | toString | quote }}
+PGVECTOR_DATABASE: {{ .Values.externalPgvector.dbName }}
+# DB_USERNAME: {{ .Values.externalPgvector.username }}
+# DB_PASSWORD: {{ .Values.externalPgvector.password }}
 {{- else if .Values.externalMilvus.enabled}}
 # Milvus configuration Only available when VECTOR_STORE is `milvus`.
 VECTOR_STORE: milvus
