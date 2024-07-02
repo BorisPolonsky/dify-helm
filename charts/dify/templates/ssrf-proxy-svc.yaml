@@ -1,0 +1,29 @@
+{{- if .Values.ssrfProxy.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "dify.ssrfProxy.fullname" . }}
+  labels:
+{{ include "dify.labels" . | indent 4 }}
+{{- if .Values.ssrfProxy.service.labels }}
+{{ toYaml .Values.ssrfProxy.service.labels | indent 4 }}
+{{- end }}
+    component: "ssrf-proxy"
+{{- with .Values.ssrfProxy.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  type: ClusterIP
+  {{- if .Values.ssrfProxy.service.clusterIP }}
+  clusterIP: {{ .Values.ssrfProxy.service.clusterIP }}
+  {{- end }}
+  ports:
+    - name: http-squid
+      port: {{ .Values.ssrfProxy.service.port }}
+      protocol: TCP
+      targetPort: http
+  selector:
+{{ include "dify.selectorLabels" . | indent 4 }}
+    component: "ssrf-proxy"
+{{- end }}

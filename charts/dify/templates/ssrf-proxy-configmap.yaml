@@ -1,0 +1,9 @@
+{{- if .Values.ssrfProxy.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "dify.ssrfProxy.fullname" . }}
+data:
+  squid.conf: |-
+    {{- include "dify.ssrfProxy.config.squid" . | indent 4 }}
+{{- end }}

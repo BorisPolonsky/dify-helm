@@ -51,6 +51,8 @@ spec:
           {{- toYaml .Values.sandbox.extraEnv | nindent 8 }}
         {{- end }}
         envFrom:
+        - configMapRef:
+            name: {{ template "dify.sandbox.fullname" . }}
         - secretRef:
             name: {{ template "dify.sandbox.fullname" . }}
         ports:
