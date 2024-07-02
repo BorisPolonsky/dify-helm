@@ -230,6 +230,14 @@ QDRANT_URL: {{ .Values.externalQdrant.endpoint }}
 # The Qdrant client timeout setting.
 QDRANT_CLIENT_TIMEOUT: "20"
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
+{{- else if .Values.externalPgvector.enabled}}
+# Pgvector configuration Only available when VECTOR_STORE is `pgvector`.
+VECTOR_STORE: pgvector
+PGVECTOR_HOST: {{ .Values.externalPgvector.address }}
+PGVECTOR_PORT: {{ .Values.externalPgvector.port | toString | quote }}
+PGVECTOR_DATABASE: {{ .Values.externalPgvector.dbName }}
+# DB_USERNAME: {{ .Values.externalPgvector.username }}
+# DB_PASSWORD: {{ .Values.externalPgvector.password }}
 {{- else if .Values.externalMilvus.enabled}}
 # Milvus configuration Only available when VECTOR_STORE is `milvus`.
 VECTOR_STORE: milvus

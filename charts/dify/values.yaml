@@ -2641,6 +2641,17 @@ externalWeaviate:
   endpoint: "http://weaviate:8080"
   apiKey: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
 
+###################################
+# External Pgvector
+# - these configs take effect when `externalPgvector.enabled` is true
+###################################
+externalPgvector:
+  enabled: false
+  username: "postgres"
+  password: "difyai123456"
+  address: "pgvector"
+  port: 5432
+  dbName: dify
 
 ###################################
 # External Qdrant
