@@ -242,14 +242,6 @@ QDRANT_GRPC_ENABLED: {{ .Values.externalQdrant.grpc.enabled | toString | quote }
 # The Qdrant server gRPC mode PORT.
 QDRANT_GRPC_PORT: {{ .Values.externalQdrant.grpc.port | quote }}
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
-{{- else if .Values.externalPgvector.enabled}}
-# Pgvector configuration Only available when VECTOR_STORE is `pgvector`.
-VECTOR_STORE: pgvector
-PGVECTOR_HOST: {{ .Values.externalPgvector.address }}
-PGVECTOR_PORT: {{ .Values.externalPgvector.port | toString | quote }}
-PGVECTOR_DATABASE: {{ .Values.externalPgvector.dbName }}
-# DB_USERNAME: {{ .Values.externalPgvector.username }}
-# DB_PASSWORD: {{ .Values.externalPgvector.password }}
 {{- else if .Values.externalMilvus.enabled}}
 # Milvus configuration Only available when VECTOR_STORE is `milvus`.
 VECTOR_STORE: milvus
@@ -263,6 +255,14 @@ MILVUS_PORT: {{ .Values.externalMilvus.port | toString | quote }}
 # MILVUS_PASSWORD: {{ .Values.externalMilvus.password | quote }}
 # The milvus tls switch.
 MILVUS_SECURE: {{ .Values.externalMilvus.useTLS | toString | quote }}
+{{- else if .Values.externalPgvector.enabled}}
+# pgvector configurations, only available when VECTOR_STORE is `pgvecto-rs or pgvector`
+VECTOR_STORE: pgvector
+PGVECTOR_HOST: {{ .Values.externalPgvector.address }}
+PGVECTOR_PORT: {{ .Values.externalPgvector.port | toString | quote }}
+PGVECTOR_DATABASE: {{ .Values.externalPgvector.dbName }}
+# DB_USERNAME: {{ .Values.externalPgvector.username }}
+# DB_PASSWORD: {{ .Values.externalPgvector.password }}
 {{- else if .Values.weaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
