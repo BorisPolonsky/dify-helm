@@ -1,6 +1,9 @@
 {{- define "dify.api.credentials" -}}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 SECRET_KEY: {{ .Values.api.secretKey | b64enc | quote }}
+{{- if .Values.sandbox.enabled }}
+CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
+{{- end }}
 {{- include "dify.db.credentials" . }}
 # The configurations of redis connection.
 # It is consistent with the configuration in the 'redis' service below.
@@ -53,12 +56,12 @@ DB_PASSWORD: {{ .password | b64enc | quote }}
 {{- if .Values.externalS3.enabled}}
 S3_ACCESS_KEY: {{ .Values.externalS3.accessKey | b64enc | quote }}
 S3_SECRET_KEY: {{ .Values.externalS3.secretKey | b64enc | quote }}
-{{- else if .Values.externalOSS.enabled }}
-ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey | b64enc | quote  }}
-ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey | b64enc | quote  }}
 {{- else if .Values.externalAzureBlobStorage.enabled }}
 # The Azure Blob storage configurations, only available when STORAGE_TYPE is `azure-blob`.
 AZURE_BLOB_ACCOUNT_KEY: {{ .Values.externalAzureBlobStorage.key | b64enc | quote }}
+{{- else if .Values.externalOSS.enabled }}
+ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey | b64enc | quote  }}
+ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey | b64enc | quote  }}
 {{- else }}
 {{- end }}
 {{- end }}
@@ -97,14 +100,14 @@ CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost .ma
 WEAVIATE_API_KEY: {{ .Values.externalWeaviate.apiKey | b64enc | quote }}
 {{- else if .Values.externalQdrant.enabled }}
 QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey | b64enc | quote }}
-{{- else if .Values.externalPgvector.enabled}}
-PGVECTOR_USER: {{ .Values.externalPgvector.username | b64enc | quote }}
-# The pgvector password.
-PGVECTOR_PASSWORD: {{ .Values.externalPgvector.password | b64enc | quote }}
 {{- else if .Values.externalMilvus.enabled}}
 MILVUS_USER: {{ .Values.externalMilvus.user | b64enc | quote }}
 # The milvus password.
 MILVUS_PASSWORD: {{ .Values.externalMilvus.password | b64enc | quote }}
+{{- else if .Values.externalPgvector.enabled}}
+PGVECTOR_USER: {{ .Values.externalPgvector.username | b64enc | quote }}
+# The pgvector password.
+PGVECTOR_PASSWORD: {{ .Values.externalPgvector.password | b64enc | quote }}
 {{- else if .Values.weaviate.enabled }}
 # The Weaviate API key.
   {{- if .Values.weaviate.authentication.apikey }}

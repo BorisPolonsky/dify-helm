@@ -1,0 +1,105 @@
+{{- if .Values.ssrfProxy.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+{{ include "dify.ud.annotations" . | indent 4 }}
+    descriptions: 'SSRF Proxy'
+  labels:
+{{- include "dify.labels" . | nindent 4 }}
+    component: ssrf-proxy
+    # app: {{ template "dify.ssrfProxy.fullname" . }}
+{{ include "dify.ud.labels" . | indent 4 }}
+  name: {{ template "dify.ssrfProxy.fullname" . }}
+spec:
+  replicas: {{ .Values.ssrfProxy.replicas }}
+  selector:
+    matchLabels:
+{{- include "dify.selectorLabels" . | nindent 6 }}
+      component: ssrf-proxy
+      {{/*
+      # Required labels for istio
+      # app: {{ template "dify.ssrfProxy.fullname" . }}
+      # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+      */}}
+  template:
+    metadata:
+      annotations:
+{{ include "dify.ud.annotations" . | indent 8 }}
+      labels:
+{{- include "dify.selectorLabels" . | nindent 8 }}
+        component: ssrf-proxy
+        {{/*
+        # Required labels for istio
+        # app: {{ template "dify.ssrfProxy.fullname" . }}
+        # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+        */}}
+{{ include "dify.ud.labels" . | indent 8 }}
+    spec:
+      {{- if .Values.image.ssrfProxy.pullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.ssrfProxy.pullSecrets }}
+        - name: {{ . }}
+      {{- end }}
+      {{- end }}
+      containers:
+      - image: "{{ .Values.image.ssrfProxy.repository }}:{{ .Values.image.ssrfProxy.tag }}"
+        imagePullPolicy: "{{ .Values.image.ssrfProxy.pullPolicy }}"
+        name: squid
+        env:
+        {{- if .Values.ssrfProxy.extraEnv }}
+          {{- toYaml .Values.ssrfProxy.extraEnv | nindent 8 }}
+        {{- end }}
+        ports:
+          - name: http
+            containerPort: 3128
+            protocol: TCP
+        volumeMounts:
+        - name: squid-conf
+          mountPath: /etc/squid/squid.conf
+          readOnly: true
+          subPath: squid.conf
+        {{- if .Values.ssrfProxy.log.persistence.enabled }}
+        - name: squid-log
+          mountPath: {{ .Values.ssrfProxy.log.persistence.mountPath | quote }}
+          subPath: {{ .Values.ssrfProxy.log.persistence.persistentVolumeClaim.subPath | default "" }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.ssrfProxy.resources | nindent 12 }}
+        securityContext:
+          allowPrivilegeEscalation: {{ .Values.ssrfProxy.privileged }}
+    {{- if and (.Values.nodeSelector) (not .Values.ssrfProxy.nodeSelector) }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if .Values.ssrfProxy.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.ssrfProxy.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.affinity) (not .Values.ssrfProxy.affinity) }}
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+    {{- end }}
+    {{- if .Values.ssrfProxy.affinity }}
+      affinity:
+{{ toYaml .Values.ssrfProxy.affinity | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.tolerations) (not .Values.ssrfProxy.tolerations) }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+    {{- end }}
+    {{- if .Values.ssrfProxy.tolerations }}
+      tolerations:
+{{ toYaml .Values.ssrfProxy.tolerations | indent 8 }}
+    {{- end }}
+      volumes:
+      - name: squid-conf
+        configMap:
+          defaultMode: 420
+          name: {{ template "dify.ssrfProxy.fullname" . }}
+      {{- if .Values.ssrfProxy.log.persistence.enabled }}
+      - name: squid-log
+        persistentVolumeClaim:
+          claimName: {{ .Values.ssrfProxy.log.persistence.persistentVolumeClaim.existingClaim | default (printf "%s-logs" (include "dify.ssrfProxy.fullname" . | trunc 58)) }}
+      {{- end }}
+{{- end }}
