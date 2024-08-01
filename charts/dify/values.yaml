@@ -2690,18 +2690,6 @@ externalWeaviate:
   apiKey: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
 
 ###################################
-# External Pgvector
-# - these configs take effect when `externalPgvector.enabled` is true
-###################################
-externalPgvector:
-  enabled: false
-  username: "postgres"
-  password: "difyai123456"
-  address: "pgvector"
-  port: 5432
-  dbName: dify
-
-###################################
 # External Qdrant
 # - these configs take effect only if `externalWeaviate.enabled` is `false` and `externalQdrant.enabled` is `true`
 ###################################
@@ -2725,3 +2713,15 @@ externalMilvus:
   user: "user"
   password: "Milvus"
   useTLS: false
+
+###################################
+# External Pgvector
+# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` are set as `false` and `externalPgvector.enabled` is `true`
+###################################
+externalPgvector:
+  enabled: false
+  username: "postgres"
+  password: "difyai123456"
+  address: "pgvector"
+  port: 5432
+  dbName: dify
