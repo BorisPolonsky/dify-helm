@@ -2644,21 +2644,6 @@ externalS3:
   useIAM: false
   iamEndpoint: ""
 
-
-###################################
-# External OSS
-# - these configs are only used when `externalOSS.enabled` is true
-###################################
-externalOSS:
-  enabled: false
-  endpoint: "https://oss-ap-southeast-1-internal.aliyuncs.com"
-  accessKey: "ak-difyai"
-  secretKey: "sk-difyai"
-  region: "ap-southeast-1"
-  bucketName: "difyai"
-  authVersion: v4
-
-
 ###################################
 # External Azure Blob Storage
 # - these configs are only used when `externalS3.enabled` is false and `externalAzureBlobStorage.enabled` is true
@@ -2669,6 +2654,19 @@ externalAzureBlobStorage:
   account: "https://xxx.r2.cloudflarestorage.com"
   key: "difyai"
   container: "difyai-container"
+
+###################################
+# External OSS
+# - these configs are only used when both `externalS3.enabled` and `externalAzureBlobStorage.enabled` are false and `externalOSS.enabled` is true
+###################################
+externalOSS:
+  enabled: false
+  endpoint: "https://oss-ap-southeast-1-internal.aliyuncs.com"
+  accessKey: "ak-difyai"
+  secretKey: "sk-difyai"
+  region: "ap-southeast-1"
+  bucketName: "difyai"
+  authVersion: v4
 
 ###################################
 # External Redis
