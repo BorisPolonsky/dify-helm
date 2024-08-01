@@ -63,7 +63,15 @@ SENTRY_DSN: ''
 SENTRY_TRACES_SAMPLE_RATE: "1.0"
 # The sample rate for Sentry profiles. Default: `1.0`
 SENTRY_PROFILES_SAMPLE_RATE: "1.0"
-{{ include "dify.sandbox.config" . }}
+
+{{- if .Values.sandbox.enabled }}
+CODE_EXECUTION_ENDPOINT: http://{{ template "dify.sandbox.fullname" .}}:{{ .Values.sandbox.service.port }}
+{{- end }}
+
+{{- if .Values.ssrfProxy.enabled }}
+SSRF_PROXY_HTTP_URL: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
+SSRF_PROXY_HTTPS_URL: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.worker.config" -}}
@@ -139,7 +147,7 @@ DB_DATABASE: {{ .Values.postgresql.global.postgresql.auth.database }}
 
 {{- define "dify.storage.config" -}}
 {{- if .Values.externalS3.enabled }}
-# The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob`, Default: `local`
+# The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob` and `aliyun-oss`, Default: `local`
 STORAGE_TYPE: s3
 # The S3 storage configurations, only available when STORAGE_TYPE is `s3`.
 S3_ENDPOINT: {{ .Values.externalS3.endpoint }}
@@ -148,13 +156,23 @@ S3_BUCKET_NAME: {{ .Values.externalS3.bucketName }}
 # S3_SECRET_KEY: {{ .Values.externalS3.secretKey }}
 S3_REGION: 'us-east-1'
 {{- else if .Values.externalAzureBlobStorage.enabled }}
+# The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob` and `aliyun-oss`, Default: `local`
 STORAGE_TYPE: azure-blob
-# The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob`, Default: `local`
 # The Azure Blob storage configurations, only available when STORAGE_TYPE is `azure-blob`.
 AZURE_BLOB_ACCOUNT_NAME: {{ .Values.externalAzureBlobStorage.account | quote }}
 # AZURE_BLOB_ACCOUNT_KEY: {{ .Values.externalAzureBlobStorage.key | quote }}
 AZURE_BLOB_CONTAINER_NAME: {{ .Values.externalAzureBlobStorage.container | quote }}
 AZURE_BLOB_ACCOUNT_URL: {{ .Values.externalAzureBlobStorage.url | quote }}
+{{- else if .Values.externalOSS.enabled }}
+# The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob` and `aliyun-oss`, Default: `local`
+STORAGE_TYPE: aliyun-oss
+# The OSS storage configurations, only available when STORAGE_TYPE is `aliyun-oss`.
+ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint }}
+ALIYUN_OSS_BUCKET_NAME: {{ .Values.externalOSS.bucketName }}
+# ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey }}
+# ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey }}
+ALIYUN_OSS_REGION: {{ .Values.externalOSS.region }}
+ALIYUN_OSS_AUTH_VERSION: {{ .Values.externalOSS.authVersion }}
 {{- else }}
 # The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob`, Default: `local`
 STORAGE_TYPE: local
@@ -217,8 +235,12 @@ VECTOR_STORE: qdrant
 QDRANT_URL: {{ .Values.externalQdrant.endpoint }}
 # The Qdrant API key.
 # QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey }}
-# The Qdrant client timeout setting.
-QDRANT_CLIENT_TIMEOUT: "20"
+# The Qdrant clinet timeout setting.
+QDRANT_CLIENT_TIMEOUT: {{ .Values.externalQdrant.timeout | quote }}
+# The Qdrant client enable gRPC mode.
+QDRANT_GRPC_ENABLED: {{ .Values.externalQdrant.grpc.enabled | toString | quote }}
+# The Qdrant server gRPC mode PORT.
+QDRANT_GRPC_PORT: {{ .Values.externalQdrant.grpc.port | quote }}
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
 {{- else if .Values.externalMilvus.enabled}}
 # Milvus configuration Only available when VECTOR_STORE is `milvus`.
@@ -233,6 +255,14 @@ MILVUS_PORT: {{ .Values.externalMilvus.port | toString | quote }}
 # MILVUS_PASSWORD: {{ .Values.externalMilvus.password | quote }}
 # The milvus tls switch.
 MILVUS_SECURE: {{ .Values.externalMilvus.useTLS | toString | quote }}
+{{- else if .Values.externalPgvector.enabled}}
+# pgvector configurations, only available when VECTOR_STORE is `pgvecto-rs or pgvector`
+VECTOR_STORE: pgvector
+PGVECTOR_HOST: {{ .Values.externalPgvector.address }}
+PGVECTOR_PORT: {{ .Values.externalPgvector.port | toString | quote }}
+PGVECTOR_DATABASE: {{ .Values.externalPgvector.dbName }}
+# DB_USERNAME: {{ .Values.externalPgvector.username }}
+# DB_PASSWORD: {{ .Values.externalPgvector.password }}
 {{- else if .Values.weaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
@@ -268,12 +298,18 @@ SMTP_SERVER: {{ .Values.api.mail.smtp.server | quote }}
 SMTP_PORT: {{ .Values.api.mail.smtp.port | quote }}
 # SMTP_USERNAME: {{ .Values.api.mail.smtp.username | quote }}
 # SMTP_PASSWORD: {{ .Values.api.mail.smtp.password | quote }}
-SMTP_USE_TLS: {{ .Values.api.mail.smtp.useTLS | toString | quote }}
+SMTP_USE_TLS: {{ .Values.api.mail.smtp.tls.enabled | toString | quote }}
+SMTP_OPPORTUNISTIC_TLS: {{ .Values.api.mail.smtp.tls.optimistic | toString | quote }}
 {{- end }}
 {{- end }}
 
 {{- define "dify.sandbox.config" -}}
-CODE_EXECUTION_ENDPOINT: http://{{ template "dify.sandbox.fullname" .}}:{{ .Values.sandbox.service.port }}
+GIN_MODE: release
+SANDBOX_PORT: '8194'
+{{- if .Values.ssrfProxy.enabled }}
+HTTP_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
+HTTPS_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.nginx.config.proxy" }}
@@ -355,4 +391,63 @@ server {
       include proxy.conf;
     }
 }
+{{- end }}
+
+{{- define "dify.ssrfProxy.config.squid" }}
+acl localnet src 0.0.0.1-0.255.255.255	# RFC 1122 "this" network (LAN)
+acl localnet src 10.0.0.0/8		# RFC 1918 local private network (LAN)
+acl localnet src 100.64.0.0/10		# RFC 6598 shared address space (CGN)
+acl localnet src 169.254.0.0/16 	# RFC 3927 link-local (directly plugged) machines
+acl localnet src 172.16.0.0/12		# RFC 1918 local private network (LAN)
+acl localnet src 192.168.0.0/16		# RFC 1918 local private network (LAN)
+acl localnet src fc00::/7       	# RFC 4193 local private network range
+acl localnet src fe80::/10      	# RFC 4291 link-local (directly plugged) machines
+acl SSL_ports port 443
+acl Safe_ports port 80		# http
+acl Safe_ports port 21		# ftp
+acl Safe_ports port 443		# https
+acl Safe_ports port 70		# gopher
+acl Safe_ports port 210		# wais
+acl Safe_ports port 1025-65535	# unregistered ports
+acl Safe_ports port 280		# http-mgmt
+acl Safe_ports port 488		# gss-http
+acl Safe_ports port 591		# filemaker
+acl Safe_ports port 777		# multiling http
+acl CONNECT method CONNECT
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+http_access allow localhost manager
+http_access deny manager
+http_access allow localhost
+include /etc/squid/conf.d/*.conf
+http_access deny all
+
+################################## Proxy Server ################################
+http_port 3128
+coredump_dir /var/spool/squid
+refresh_pattern ^ftp:		1440	20%	10080
+refresh_pattern ^gopher:	1440	0%	1440
+refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
+refresh_pattern \/(Packages|Sources)(|\.bz2|\.gz|\.xz)$ 0 0% 0 refresh-ims
+refresh_pattern \/Release(|\.gpg)$ 0 0% 0 refresh-ims
+refresh_pattern \/InRelease$ 0 0% 0 refresh-ims
+refresh_pattern \/(Translation-.*)(|\.bz2|\.gz|\.xz)$ 0 0% 0 refresh-ims
+refresh_pattern .		0	20%	4320
+
+# upstream proxy, set to your own upstream proxy IP to avoid SSRF attacks
+# cache_peer 172.1.1.1 parent 3128 0 no-query no-digest no-netdb-exchange default
+
+
+################################## Reverse Proxy To Sandbox ################################
+http_port {{ .Values.sandbox.service.port }} accel vhost
+cache_peer {{ template "dify.sandbox.fullname" .}} parent {{ .Values.sandbox.service.port }} 0 no-query originserver
+acl src_all src all
+http_access allow src_all
+
+{{/*Dump logs to stdout only when log persistence is not enabled*/}}
+{{- if not .Values.ssrfProxy.log.persistence.enabled }}
+cache_log none
+access_log none
+cache_store_log none
+{{- end }}
 {{- end }}

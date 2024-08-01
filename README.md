@@ -27,7 +27,8 @@ helm install my-release dify/dify
 - [x] object storage
 - [x] weaviate
 - [x] qdrant
-- [X] milvus
+- [x] milvus
+- [x] pgvector
 
 ## Contributors
 <a href="https://github.com/borispolonsky/dify-helm/graphs/contributors">

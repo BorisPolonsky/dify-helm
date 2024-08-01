@@ -1,4 +1,4 @@
-{{- if not .Values.externalS3.enabled }}
+{{- if not (or .Values.externalS3.enabled .Values.externalAzureBlobStorage.enabled .Values.externalOSS.enabled) }}
 {{- $pvc := .Values.api.persistence.persistentVolumeClaim -}}
 {{- if (not $pvc.existingClaim) }}
 apiVersion: v1
@@ -38,6 +38,37 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ printf "%s-logs" (include "dify.nginx.fullname" . | trunc 58)}}
 {{- with .Values.proxy.log.persistence.annotations  }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+{{ include "dify.labels" . | indent 4 }}
+spec:
+  accessModes:
+  - {{ $pvc.accessModes | quote }}
+  {{- if $pvc.storageClass }}
+    {{- if eq "-" $pvc.storageClass }}
+  storageClassName: ""
+    {{- else }}
+  storageClassName: {{ $pvc.storageClass }}
+    {{- end }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $pvc.size }}
+{{- end }}
+
+
+{{- $pvc := .Values.ssrfProxy.log.persistence.persistentVolumeClaim -}}
+{{- if and .Values.ssrfProxy.log.persistence.enabled (not $pvc.existingClaim) }}
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ printf "%s-logs" (include "dify.ssrfProxy.fullname" . | trunc 58)}}
+{{- with .Values.ssrfProxy.log.persistence.annotations  }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
