@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'charts/dify/**'
+      - 'charts/dify/Chart.yaml'
   workflow_dispatch: # Add this section to enable manual triggering
 
 permissions:
@@ -15,6 +15,13 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Check if owner triggered the workflow
+        run: |
+          if [ "$GITHUB_ACTOR" != "$GITHUB_REPOSITORY_OWNER" ]; then
+            echo "Workflow can only be triggered by the repository owner."
+            exit 1
+          fi
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -32,10 +39,3 @@ jobs:
         uses: helm/chart-releaser-action@v1.2.1
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: Check if owner triggered the workflow
-        run: |
-          if [ "$GITHUB_ACTOR" != "$GITHUB_REPOSITORY_OWNER" ]; then
-            echo "Workflow can only be triggered by the repository owner."
-            exit 1
-          fi
