@@ -3,7 +3,7 @@ name: Release Charts
 on:
   push:
     branches:
-      - master
+      - apolo
     paths:
       - "charts/dify/Chart.yaml"
   workflow_dispatch: # Add this section to enable manual triggering
