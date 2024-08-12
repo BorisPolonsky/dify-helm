@@ -3,6 +3,8 @@
 
 Deploy [langgenius/dify](https://github.com/langgenius/dify), an LLM based chat bot app on kubernetes with helm chart.
 
+See [APOLO.md](./APOLO.md) for Apolo platform deployment instructions.
+
 ## Installation
 ```
 helm repo add dify https://neuro-inc.github.io/dify-helm

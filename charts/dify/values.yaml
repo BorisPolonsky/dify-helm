@@ -243,7 +243,7 @@ web:
     clusterIP: ""
 
 sandbox:
-  enabled: true
+  enabled: false
   replicas: 1
   resources: {}
   nodeSelector: {}
@@ -305,7 +305,7 @@ ssrfProxy:
     clusterIP: ""
 
 postgresql:
-  enabled: true
+  enabled: false
   name: postgres
   global:
     storageClass: ""
@@ -376,7 +376,7 @@ postgresql:
 
 
 weaviate:
-  enabled: true
+  enabled: false
   image:
     # registry where weaviate image is stored
     registry: docker.io
@@ -2620,7 +2620,7 @@ redis:
 # - these configs are only used when `externalPostgres.enabled` is true
 ###################################
 externalPostgres:
-  enabled: false
+  enabled: true
   username: "postgres"
   password: "difyai123456"
   address: localhost
@@ -2719,7 +2719,7 @@ externalMilvus:
 # - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` are set as `false` and `externalPgvector.enabled` is `true`
 ###################################
 externalPgvector:
-  enabled: false
+  enabled: true
   username: "postgres"
   password: "difyai123456"
   address: "pgvector"
