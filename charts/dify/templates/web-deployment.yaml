@@ -29,6 +29,7 @@ spec:
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
         component: web
+{{- include "dify.web.extraPodLabels" . | indent 8 }}
         {{/*
         # Required labels for istio
         # app: {{ template "dify.web.fullname" . }}

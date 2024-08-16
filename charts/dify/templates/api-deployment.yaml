@@ -30,6 +30,7 @@ spec:
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
         component: api
+{{- include "dify.api.extraPodLabels" . | indent 8 }}
         {{/*
         # Required labels for istio
         # app: {{ template "dify.api.fullname" . }}

@@ -62,6 +62,7 @@ api:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  labels: {}
   extraEnv:
   # Apply your own Environment Variables if necessary.
   # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
@@ -171,6 +172,7 @@ worker:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  labels: {}
   extraEnv:
   # Apply your own Environment Variables if necessary.
   # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
@@ -193,6 +195,7 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  labels: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
@@ -232,6 +235,7 @@ web:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  labels: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   - name: EDITION
@@ -249,6 +253,7 @@ sandbox:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  labels: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
@@ -272,6 +277,7 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  labels: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG

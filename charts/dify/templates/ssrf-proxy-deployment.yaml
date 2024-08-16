@@ -29,6 +29,8 @@ spec:
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
         component: ssrf-proxy
+{{- include "dify.ssrfProxy.extraPodLabels" . | indent 8 }}
+        component: ssrf-proxy
         {{/*
         # Required labels for istio
         # app: {{ template "dify.ssrfProxy.fullname" . }}

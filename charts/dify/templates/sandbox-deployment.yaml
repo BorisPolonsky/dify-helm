@@ -29,6 +29,7 @@ spec:
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
         component: sandbox
+{{- include "dify.sandbox.extraPodLabels" . | indent 8 }}
         {{/*
         # Required labels for istio
         # app: {{ template "dify.sandbox.fullname" . }}
