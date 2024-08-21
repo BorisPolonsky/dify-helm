@@ -29,7 +29,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "dify.api.fullname" -}}
 {{ template "dify.fullname" . }}-api
-{{- end -}}
+{{- end }}
 
 {{/*
 Create a default fully qualified worker name.
@@ -37,7 +37,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "dify.worker.fullname" -}}
 {{ template "dify.fullname" . }}-worker
-{{- end -}}
+{{- end }}
 
 {{/*
 Create a default fully qualified web name.
@@ -45,7 +45,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "dify.web.fullname" -}}
 {{ template "dify.fullname" . }}-web
-{{- end -}}
+{{- end }}
 
 {{/*
 Create a default fully qualified web name.
@@ -53,7 +53,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "dify.sandbox.fullname" -}}
 {{ template "dify.fullname" . }}-sandbox
-{{- end -}}
+{{- end }}
 
 {{/*
 Create a default fully qualified web name.
@@ -61,7 +61,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "dify.ssrfProxy.fullname" -}}
 {{ template "dify.fullname" . }}-ssrf-proxy
-{{- end -}}
+{{- end }}
 
 {{/*
 Create a default fully qualified nginx name.
@@ -69,7 +69,7 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 */}}
 {{- define "dify.nginx.fullname" -}}
 {{ template "dify.fullname" . }}-proxy
-{{- end -}}
+{{- end }}
 
 {{/*
 Create chart name and version as used by the chart label.
@@ -94,15 +94,15 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- define "dify.ud.labels" -}}
 {{- if .Values.labels }}
 {{- toYaml .Values.labels }}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{/* annotations defiend by user*/}}
 {{- define "dify.ud.annotations" -}}
 {{- if .Values.annotations }}
 {{- toYaml .Values.annotations }}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{/*
 Selector labels
@@ -127,40 +127,40 @@ Create the name of the service account to use
 {{- define "dify.api.extraPodLabels "-}}
 {{- if .Values.api.labels }}
 {{- toYaml .Values.api.labels }}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{/* extra worker pods labels */}}
 {{- define "dify.worker.extraPodLabels "-}}
 {{- if .Values.worker.labels }}
 {{- toYaml .Values.worker.labels }}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{/* extra proxy pods labels */}}
 {{- define "dify.proxy.extraPodLabels "-}}
 {{- if .Values.proxy.labels }}
 {{- toYaml .Values.proxy.labels }}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{/* extra web pods labels */}}
 {{- define "dify.web.extraPodLabels "-}}
 {{- if .Values.web.labels }}
 {{- toYaml .Values.web.labels }}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{/* extra sandbox pods labels */}}
 {{- define "dify.sandbox.extraPodLabels "-}}
 {{- if .Values.sandbox.labels }}
 {{- toYaml .Values.sandbox.labels }}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
 
 {{/* extra sandbox pods labels */}}
 {{- define "dify.ssrfProxy.extraPodLabels "-}}
 {{- if .Values.ssrfProxy.labels }}
 {{- toYaml .Values.ssrfProxy.labels }}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
