@@ -27,9 +27,9 @@ spec:
       annotations:
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
-{{- include "dify.selectorLabels" . | nindent 8 }}
+{{ include "dify.selectorLabels" . | nindent 8 }}
         component: ssrf-proxy
-{{- include "dify.ssrfProxy.extraPodLabels" . | indent 8 }}
+{{ include "dify.ssrfProxy.extraPodLabels" . | indent 8 }}
         component: ssrf-proxy
         {{/*
         # Required labels for istio

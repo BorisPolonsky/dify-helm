@@ -27,9 +27,9 @@ spec:
       annotations:
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
-{{- include "dify.selectorLabels" . | nindent 8 }}
+{{ include "dify.selectorLabels" . | nindent 8 }}
         component: proxy
-{{- include "dify.proxy.extraPodLabels" . | indent 8 }}
+{{ include "dify.proxy.extraPodLabels" . | indent 8 }}
         {{/*
         # Required labels for istio
         # app: {{ template "dify.nginx.fullname" . }}
