@@ -83,6 +83,7 @@ Common labels
 */}}
 {{- define "dify.labels" -}}
 helm.sh/chart: {{ include "dify.chart" . }}
+application: dify
 {{ include "dify.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
