@@ -26,13 +26,13 @@ appVersion: "0.6.16"
 
 dependencies:
 - name: postgresql
-  version: 12.5.6
+  version: 15.5.32
   repository: https://charts.bitnami.com/bitnami
   condition: postgresql.enabled
   tags:
     - postgres
 - name: redis
-  version: 16.13.2
+  version: 20.1.3
   repository: https://charts.bitnami.com/bitnami
   condition: redis.enabled
   tags:
@@ -41,6 +41,13 @@ dependencies:
   version: 16.1.0
   repository: https://weaviate.github.io/weaviate-helm
   condition: weaviate.enabled
+  tags:
+    - vector
+    - search
+- name: qdrant
+  version: 1.11.3
+  repository: https://qdrant.github.io/qdrant-helm
+  condition: qdrant.enabled
   tags:
     - vector
     - search
