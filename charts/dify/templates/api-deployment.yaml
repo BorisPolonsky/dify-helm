@@ -37,6 +37,9 @@ spec:
         */}}
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
+      {{- if .Values.api.serviceAccountName}}
+      serviceAccountName: {{ .Values.api.serviceAccountName }}
+      {{- end }}
       {{- if eq .Release.Name "dify"}}
       {{/*
       Disable service environment variables,
