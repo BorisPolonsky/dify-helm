@@ -29,17 +29,10 @@ apolo run --pass-config ghcr.io/neuro-inc/app-deployment -- install https://gith
   --set "web.replicas=1" \  # optional
   --set "web.preset_name=cpu-small" \ # required
   --set "redis.master.preset_name=cpu-small" \  # required
-  --set "externalPostgres.username=PGUsername" \    # autofilled
-  --set "externalPostgres.password=PGPassword" \    # autofilled
-  --set "externalPostgres.address=PGHostname" \ # autofilled
-  --set "externalPostgres.port=5432" \  # autofilled
-  --set "externalPostgres.dbName=PGDBName" \  # optional: database to use
-  --set "externalPostgres.platformAppName=myappname" \ # TODO: PGVector app name to integrate with
-  --set "externalS3.bucketName=platformBucketName" \ # autofilled
-  --set "externalPgvector.username=PGUsername" \    # autofilled
-  --set "externalPgvector.password=PGPassword" \    # autofilled
-  --set "externalPgvector.address=PGHostname" \ # autofilled
-  --set "externalPgvector.port=5432" \  # autofilled
-  --set "externalPgvector.dbName=PGDBName" \    # autofilled
+  --set "externalPostgres.username=PGUsername" \    # optional, user within PGVector app to use for integration. otherwise, the first one in a list will be used
+  --set "externalPostgres.dbName=PGDBName" \  # optional: database to use, otherwise the first one of user's DBs will be used
+  --set "externalPostgres.platformAppName=myappname" \ # required: PGVector app name to integrate with
+  --set "externalPgvector.username=PGUsername" \    # optional, user within PGVector app to use for integration. otherwise, the first one in a list will be used
+  --set "externalPgvector.dbName=PGDBName" \    # optional: database to use, otherwise the first one of user's DBs will be used
   --set "externalPgvector.platformAppName=myappname" # Required: PGVector app name to integrate with
 ```
