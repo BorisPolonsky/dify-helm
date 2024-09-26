@@ -13,6 +13,9 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{ include "dify.storage.credentials" . }}
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
+{{- if .Values.api.initPassword }}
+INIT_PASSWORD: {{ .Values.api.initPassword | b64enc | quote }}
+{{- end}}
 {{- end }}
 
 {{- define "dify.worker.credentials" -}}
