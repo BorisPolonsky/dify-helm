@@ -233,6 +233,14 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  ## Configure extra options for proxy containers' liveness, readiness and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param proxy.customLivenessProbe Custom livenessProbe that overrides the default one
+  customLivenessProbe: {}
+  ## @param proxy.customReadinessProbe Custom readinessProbe that overrides the default one
+  customReadinessProbe: {}
+  ## @param proxy.customStartupProbe Custom startupProbe that overrides the default one
+  customStartupProbe: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
