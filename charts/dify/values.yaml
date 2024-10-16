@@ -67,15 +67,15 @@ api:
   ## @param api.livenessProbe.enabled Enable livenessProbe on api nodes
   livenessProbe:
     enabled: true
-    initialDelaySeconds: 5
-    periodSeconds: 10
+    initialDelaySeconds: 30
+    periodSeconds: 30
     timeoutSeconds: 5
     failureThreshold: 5
     successThreshold: 1
   ## @param api.readinessProbe.enabled Enable readinessProbe on api nodes
   readinessProbe:
     enabled: true
-    initialDelaySeconds: 5
+    initialDelaySeconds: 10
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 5
@@ -302,7 +302,7 @@ web:
   livenessProbe:
     enabled: true
     initialDelaySeconds: 5
-    periodSeconds: 10
+    periodSeconds: 30
     timeoutSeconds: 5
     failureThreshold: 5
     successThreshold: 1
