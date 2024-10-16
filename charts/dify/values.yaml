@@ -329,6 +329,38 @@ sandbox:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  ## Configure extra options for sandbox containers' liveness, readiness and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param sandbox.livenessProbe.enabled Enable livenessProbe on sandbox nodes
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 1
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  ## @param sandbox.readinessProbe.enabled Enable readinessProbe on sandbox nodes
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  ## @param sandbox.startupProbe.enabled Enable startupProbe on sandbox containers
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  ## @param sandbox.customLivenessProbe Custom livenessProbe that overrides the default one
+  customLivenessProbe: {}
+  ## @param sandbox.customReadinessProbe Custom readinessProbe that overrides the default one
+  customReadinessProbe: {}
+  ## @param sandbox.customStartupProbe Custom startupProbe that overrides the default one
+  customStartupProbe: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
