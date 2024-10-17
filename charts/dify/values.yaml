@@ -384,6 +384,14 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  ## Configure extra options for ssrf proxy containers' liveness, readiness and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param ssrfProxy.customLivenessProbe Custom livenessProbe that overrides the default one
+  customLivenessProbe: {}
+  ## @param ssrfProxy.customReadinessProbe Custom readinessProbe that overrides the default one
+  customReadinessProbe: {}
+  ## @param ssrfProxy.customStartupProbe Custom startupProbe that overrides the default one
+  customStartupProbe: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
