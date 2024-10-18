@@ -49,6 +49,35 @@ spec:
       - image: "{{ .Values.image.web.repository }}:{{ .Values.image.web.tag }}"
         imagePullPolicy: "{{ .Values.image.web.pullPolicy }}"
         name: web
+        {{- if .Values.web.customLivenessProbe }}
+        livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customLivenessProbe "context" $) | nindent 10 }}
+        {{- else if .Values.web.livenessProbe.enabled }}
+        livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.livenessProbe "enabled") "context" $) | nindent 10 }}
+          httpGet:
+            path: /apps
+            port: http
+            httpHeaders:
+            - name: accept-language
+              value: en
+        {{- end }}
+        {{- if .Values.web.customReadinessProbe }}
+        readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customReadinessProbe "context" $) | nindent 10 }}
+        {{- else if .Values.web.readinessProbe.enabled }}
+        readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.readinessProbe "enabled") "context" $) | nindent 10 }}
+          httpGet:
+            path: /apps
+            port: http
+            httpHeaders:
+            - name: accept-language
+              value: en
+        {{- end }}
+        {{- if .Values.web.customStartupProbe }}
+        startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customStartupProbe "context" $) | nindent 10 }}
+        {{- else if .Values.web.startupProbe.enabled }}
+        startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.startupProbe "enabled") "context" $) | nindent 10 }}
+          tcpSocket:
+            port: web
+        {{- end }}
         env:
         {{- if .Values.web.extraEnv }}
           {{- toYaml .Values.web.extraEnv | nindent 8 }}

@@ -49,6 +49,27 @@ spec:
       - image: "{{ .Values.image.sandbox.repository }}:{{ .Values.image.sandbox.tag }}"
         imagePullPolicy: "{{ .Values.image.sandbox.pullPolicy }}"
         name: sandbox
+        {{- if .Values.sandbox.customLivenessProbe }}
+        livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.customLivenessProbe "context" $) | nindent 10 }}
+        {{- else if .Values.sandbox.livenessProbe.enabled }}
+        livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.sandbox.livenessProbe "enabled") "context" $) | nindent 10 }}
+          tcpSocket:
+            port: sandbox
+        {{- end }}
+        {{- if .Values.sandbox.customReadinessProbe }}
+        readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.customReadinessProbe "context" $) | nindent 10 }}
+        {{- else if .Values.sandbox.readinessProbe.enabled }}
+        readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.sandbox.readinessProbe "enabled") "context" $) | nindent 10 }}
+          tcpSocket:
+            port: sandbox
+        {{- end }}
+        {{- if .Values.sandbox.customStartupProbe }}
+        startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.customStartupProbe "context" $) | nindent 10 }}
+        {{- else if .Values.sandbox.startupProbe.enabled }}
+        startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.sandbox.startupProbe "enabled") "context" $) | nindent 10 }}
+          tcpSocket:
+            port: sandbox
+        {{- end }}
         env:
         {{- if .Values.sandbox.extraEnv }}
           {{- toYaml .Values.sandbox.extraEnv | nindent 8 }}

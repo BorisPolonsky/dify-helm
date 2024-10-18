@@ -50,6 +50,15 @@ spec:
       - image: "{{ .Values.image.api.repository }}:{{ .Values.image.api.tag }}"
         imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
         name: worker
+        {{- if .Values.worker.customLivenessProbe }}
+        livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.worker.customLivenessProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.worker.customReadinessProbe }}
+        readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.worker.customReadinessProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.worker.customStartupProbe }}
+        startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.worker.customStartupProbe "context" $) | nindent 10 }}
+        {{- end }}
         env:
         {{- if .Values.worker.extraEnv }}
           {{- toYaml .Values.worker.extraEnv | nindent 8 }}

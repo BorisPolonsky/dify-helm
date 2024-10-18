@@ -62,6 +62,38 @@ api:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  ## Configure extra options for api containers' liveness, readiness and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param api.livenessProbe.enabled Enable livenessProbe on api nodes
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  ## @param api.readinessProbe.enabled Enable readinessProbe on api nodes
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  ## @param api.startupProbe.enabled Enable startupProbe on api containers
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  ## @param api.customLivenessProbe Custom livenessProbe that overrides the default one
+  customLivenessProbe: {}
+  ## @param api.customReadinessProbe Custom readinessProbe that overrides the default one
+  customReadinessProbe: {}
+  ## @param api.customStartupProbe Custom startupProbe that overrides the default one
+  customStartupProbe: {}
   extraEnv:
   # Apply your own Environment Variables if necessary.
   # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
@@ -171,6 +203,14 @@ worker:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  ## Configure extra options for worker containers' liveness, readiness and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param worker.customLivenessProbe Custom livenessProbe that overrides the default one
+  customLivenessProbe: {}
+  ## @param worker.customReadinessProbe Custom readinessProbe that overrides the default one
+  customReadinessProbe: {}
+  ## @param worker.customStartupProbe Custom startupProbe that overrides the default one
+  customStartupProbe: {}
   extraEnv:
   # Apply your own Environment Variables if necessary.
   # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
@@ -193,6 +233,14 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  ## Configure extra options for proxy containers' liveness, readiness and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param proxy.customLivenessProbe Custom livenessProbe that overrides the default one
+  customLivenessProbe: {}
+  ## @param proxy.customReadinessProbe Custom readinessProbe that overrides the default one
+  customReadinessProbe: {}
+  ## @param proxy.customStartupProbe Custom startupProbe that overrides the default one
+  customStartupProbe: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
@@ -232,6 +280,38 @@ web:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  ## Configure extra options for web containers' liveness, readiness and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param web.livenessProbe.enabled Enable livenessProbe on web nodes
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  ## @param web.readinessProbe.enabled Enable readinessProbe on web nodes
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  ## @param web.startupProbe.enabled Enable startupProbe on web containers
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  ## @param web.customLivenessProbe Custom livenessProbe that overrides the default one
+  customLivenessProbe: {}
+  ## @param web.customReadinessProbe Custom readinessProbe that overrides the default one
+  customReadinessProbe: {}
+  ## @param web.customStartupProbe Custom startupProbe that overrides the default one
+  customStartupProbe: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   - name: EDITION
@@ -249,6 +329,38 @@ sandbox:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  ## Configure extra options for sandbox containers' liveness, readiness and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param sandbox.livenessProbe.enabled Enable livenessProbe on sandbox nodes
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 1
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  ## @param sandbox.readinessProbe.enabled Enable readinessProbe on sandbox nodes
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  ## @param sandbox.startupProbe.enabled Enable startupProbe on sandbox containers
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  ## @param sandbox.customLivenessProbe Custom livenessProbe that overrides the default one
+  customLivenessProbe: {}
+  ## @param sandbox.customReadinessProbe Custom readinessProbe that overrides the default one
+  customReadinessProbe: {}
+  ## @param sandbox.customStartupProbe Custom startupProbe that overrides the default one
+  customStartupProbe: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
@@ -272,6 +384,14 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  ## Configure extra options for ssrf proxy containers' liveness, readiness and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param ssrfProxy.customLivenessProbe Custom livenessProbe that overrides the default one
+  customLivenessProbe: {}
+  ## @param ssrfProxy.customReadinessProbe Custom readinessProbe that overrides the default one
+  customReadinessProbe: {}
+  ## @param ssrfProxy.customStartupProbe Custom startupProbe that overrides the default one
+  customStartupProbe: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG

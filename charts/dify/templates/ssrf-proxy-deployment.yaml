@@ -46,6 +46,15 @@ spec:
       - image: "{{ .Values.image.ssrfProxy.repository }}:{{ .Values.image.ssrfProxy.tag }}"
         imagePullPolicy: "{{ .Values.image.ssrfProxy.pullPolicy }}"
         name: squid
+        {{- if .Values.ssrfProxy.customLivenessProbe }}
+        livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.customLivenessProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.ssrfProxy.customReadinessProbe }}
+        readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.customReadinessProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.ssrfProxy.customStartupProbe }}
+        startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.customStartupProbe "context" $) | nindent 10 }}
+        {{- end }}
         env:
         {{- if .Values.ssrfProxy.extraEnv }}
           {{- toYaml .Values.ssrfProxy.extraEnv | nindent 8 }}
