@@ -241,6 +241,8 @@ proxy:
   customReadinessProbe: {}
   ## @param proxy.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  ## @param proxy.clientMaxBodySize Custom client_max_body_size param nginx default: 15m
+  clientMaxBodySize: ""
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG

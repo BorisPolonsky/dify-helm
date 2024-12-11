@@ -355,7 +355,7 @@ http {
     keepalive_timeout  65;
 
     #gzip  on;
-    client_max_body_size 15M;
+    client_max_body_size {{ .Values.proxy.clientMaxBodySize | default "15m" }};
 
     include /etc/nginx/conf.d/*.conf;
 }
