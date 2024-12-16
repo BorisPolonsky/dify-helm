@@ -37,9 +37,7 @@ spec:
         */}}
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
-      {{- if .Values.worker.serviceAccountName}}
-      serviceAccountName: {{ .Values.worker.serviceAccountName }}
-      {{- end }}
+      serviceAccountName: {{ include "dify.worker.serviceAccountName" . }}
       {{- if .Values.image.api.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.api.pullSecrets }}

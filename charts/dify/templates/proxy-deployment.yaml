@@ -36,9 +36,7 @@ spec:
         */}}
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
-      {{- if .Values.proxy.serviceAccountName}}
-      serviceAccountName: {{ .Values.proxy.serviceAccountName }}
-      {{- end }}
+      serviceAccountName: {{ include "dify.proxy.serviceAccountName" . }}
       {{- if .Values.image.proxy.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.proxy.pullSecrets }}
