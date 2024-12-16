@@ -2791,6 +2791,15 @@ externalOSS:
   authVersion: v4
 
 ###################################
+# External Google Cloud Storage
+# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` are false and `externalGCS.enabled` is true
+###################################
+externalGCS:
+  enabled: false
+  bucketName: "difyai"
+  serviceAccountJsonBase64: ""
+
+###################################
 # External Redis
 # - these configs are only used when `externalRedis.enabled` is true
 ###################################

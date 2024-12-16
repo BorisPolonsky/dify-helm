@@ -147,7 +147,7 @@ DB_DATABASE: {{ .Values.postgresql.global.postgresql.auth.database }}
 
 {{- define "dify.storage.config" -}}
 {{- if .Values.externalS3.enabled }}
-# The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob` and `aliyun-oss`, Default: `local`
+# The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob` and `google-storage`, Default: `local`
 STORAGE_TYPE: s3
 # The S3 storage configurations, only available when STORAGE_TYPE is `s3`.
 S3_ENDPOINT: {{ .Values.externalS3.endpoint }}
@@ -156,7 +156,7 @@ S3_BUCKET_NAME: {{ .Values.externalS3.bucketName }}
 # S3_SECRET_KEY: {{ .Values.externalS3.secretKey }}
 S3_REGION: 'us-east-1'
 {{- else if .Values.externalAzureBlobStorage.enabled }}
-# The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob` and `aliyun-oss`, Default: `local`
+# The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob` and `google-storage`, Default: `local`
 STORAGE_TYPE: azure-blob
 # The Azure Blob storage configurations, only available when STORAGE_TYPE is `azure-blob`.
 AZURE_BLOB_ACCOUNT_NAME: {{ .Values.externalAzureBlobStorage.account | quote }}
@@ -164,7 +164,7 @@ AZURE_BLOB_ACCOUNT_NAME: {{ .Values.externalAzureBlobStorage.account | quote }}
 AZURE_BLOB_CONTAINER_NAME: {{ .Values.externalAzureBlobStorage.container | quote }}
 AZURE_BLOB_ACCOUNT_URL: {{ .Values.externalAzureBlobStorage.url | quote }}
 {{- else if .Values.externalOSS.enabled }}
-# The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob` and `aliyun-oss`, Default: `local`
+# The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob` and `google-storage`, Default: `local`
 STORAGE_TYPE: aliyun-oss
 # The OSS storage configurations, only available when STORAGE_TYPE is `aliyun-oss`.
 ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint }}
@@ -173,6 +173,11 @@ ALIYUN_OSS_BUCKET_NAME: {{ .Values.externalOSS.bucketName }}
 # ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey }}
 ALIYUN_OSS_REGION: {{ .Values.externalOSS.region }}
 ALIYUN_OSS_AUTH_VERSION: {{ .Values.externalOSS.authVersion }}
+{{- else if .Values.externalGCS.enabled }}
+# The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob` and `google-storage`, Default: `local`
+STORAGE_TYPE: google-storage
+GOOGLE_STORAGE_BUCKET_NAME: {{ .Values.externalGCS.bucketName }}
+GOOGLE_STORAGE_SERVICE_ACCOUNT_JSON_BASE64: {{ .Values.externalGCS.serviceAccountJsonBase64 }}
 {{- else }}
 # The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob`, Default: `local`
 STORAGE_TYPE: local
