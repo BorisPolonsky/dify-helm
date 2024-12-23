@@ -2765,6 +2765,7 @@ externalS3:
   rootPath: ""
   useIAM: false
   iamEndpoint: ""
+  region: "us-east-1"
 
 ###################################
 # External Azure Blob Storage
