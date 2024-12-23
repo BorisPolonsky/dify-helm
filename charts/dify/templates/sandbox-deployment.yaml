@@ -36,9 +36,7 @@ spec:
         */}}
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
-      {{- if .Values.sandbox.serviceAccountName}}
-      serviceAccountName: {{ .Values.sandbox.serviceAccountName }}
-      {{- end }}
+      serviceAccountName: {{ include "dify.sandbox.serviceAccountName" . }}
       {{- if .Values.image.sandbox.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.sandbox.pullSecrets }}
