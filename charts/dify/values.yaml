@@ -2872,9 +2872,9 @@ externalPgvector:
 
 ###################################
 # External Tencent
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` are set as `false` and `externalTencent.enabled` is `true`
+# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` are set as `false` and `externalTvector.enabled` is `true`
 ###################################
-externalTencent:
+externalTvector:
   enabled: false
   url: "your-tencent-vector-db-url"
   apiKey: "your-tencent-vector-api-key"

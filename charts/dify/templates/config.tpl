@@ -273,7 +273,7 @@ MILVUS_PORT: {{ .Values.externalMilvus.port | toString | quote }}
 # MILVUS_PASSWORD: {{ .Values.externalMilvus.password | quote }}
 # The milvus tls switch.
 MILVUS_SECURE: {{ .Values.externalMilvus.useTLS | toString | quote }}
-{{- else if .Values.externalTencent.enabled}}
+{{- else if .Values.externalTvector.enabled}}
 # tencent vector configurations, only available when VECTOR_STORE is `tencent`
 VECTOR_STORE: tencent 
 TENCENT_VECTOR_DB_URL: {{ .Values.externalTencent.url }}
