@@ -113,12 +113,67 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Create the name of the service account to use
+Create the name of the service account to use for the Dify API
 */}}
-{{- define "dify.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "dify.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
+{{- define "dify.api.serviceAccountName" -}}
+{{- if .Values.api.serviceAccount.create -}}
+    {{ default (include "dify.api.fullname" .) .Values.api.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.api.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for the Proxy
+*/}}
+{{- define "dify.proxy.serviceAccountName" -}}
+{{- if .Values.proxy.serviceAccount.create -}}
+    {{ default (include "dify.nginx.fullname" .) .Values.proxy.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.proxy.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for the Sandbox
+*/}}
+{{- define "dify.sandbox.serviceAccountName" -}}
+{{- if .Values.sandbox.serviceAccount.create -}}
+    {{ default (include "dify.sandbox.fullname" .) .Values.sandbox.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.sandbox.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for the ssrfProxy
+*/}}
+{{- define "dify.ssrfProxy.serviceAccountName" -}}
+{{- if .Values.ssrfProxy.serviceAccount.create -}}
+    {{ default (include "dify.ssrfProxy.fullname" .) .Values.ssrfProxy.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.ssrfProxy.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for the Web
+*/}}
+{{- define "dify.web.serviceAccountName" -}}
+{{- if .Values.web.serviceAccount.create -}}
+    {{ default (include "dify.web.fullname" .) .Values.web.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.web.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for the Dify Worker
+*/}}
+{{- define "dify.worker.serviceAccountName" -}}
+{{- if .Values.worker.serviceAccount.create -}}
+    {{ default (include "dify.worker.fullname" .) .Values.worker.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.worker.serviceAccount.name }}
+{{- end -}}
+{{- end -}}

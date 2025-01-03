@@ -36,6 +36,7 @@ spec:
         */}}
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
+      serviceAccountName: {{ include "dify.ssrfProxy.serviceAccountName" . }}
       {{- if .Values.image.ssrfProxy.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.ssrfProxy.pullSecrets }}

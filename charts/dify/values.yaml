@@ -194,7 +194,22 @@ api:
       accessModes: ReadWriteMany
       size: 5Gi
       subPath: ""
-
+  ## Dify API ServiceAccount configuration
+  ##
+  serviceAccount:
+    ## @param api.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: false
+    ## @param api.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param api.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+    ##
+    automountServiceAccountToken: false
+    ## @param api.serviceAccount.annotations Additional custom annotations for the ServiceAccount
+    ##
+    annotations: {}
 
 worker:
   enabled: true
@@ -225,6 +240,22 @@ worker:
   #        name: my-secret
   #        key: DB_PASSWORD
   logLevel: INFO
+  ## Dify Worker ServiceAccount configuration
+  ##
+  serviceAccount:
+    ## @param worker.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: false
+    ## @param worker.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param worker.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+    ##
+    automountServiceAccountToken: false
+    ## @param worker.serviceAccount.annotations Additional custom annotations for the ServiceAccount
+    ##
+    annotations: {}
 
 proxy:
   enabled: true
@@ -274,6 +305,22 @@ proxy:
     annotations: {}
     labels: {}
     clusterIP: ""
+  ## Proxy ServiceAccount configuration
+  ##
+  serviceAccount:
+    ## @param proxy.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: false
+    ## @param proxy.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param proxy.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+    ##
+    automountServiceAccountToken: false
+    ## @param proxy.serviceAccount.annotations Additional custom annotations for the ServiceAccount
+    ##
+    annotations: {}
 
 web:
   enabled: true
@@ -323,6 +370,22 @@ web:
     annotations: {}
     labels: {}
     clusterIP: ""
+  ## Web ServiceAccount configuration
+  ##
+  serviceAccount:
+    ## @param web.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: false
+    ## @param web.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param web.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+    ##
+    automountServiceAccountToken: false
+    ## @param web.serviceAccount.annotations Additional custom annotations for the ServiceAccount
+    ##
+    annotations: {}
 
 sandbox:
   enabled: true
@@ -378,6 +441,22 @@ sandbox:
     apiKey: "dify-sandbox"
   privileged:
     false
+  ## Sandbox ServiceAccount configuration
+  ##
+  serviceAccount:
+    ## @param sandbox.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: false
+    ## @param sandbox.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param sandbox.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+    ##
+    automountServiceAccountToken: false
+    ## @param sandbox.serviceAccount.annotations Additional custom annotations for the ServiceAccount
+    ##
+    annotations: {}
 
 ssrfProxy:
   enabled: false
@@ -425,6 +504,22 @@ ssrfProxy:
     annotations: {}
     labels: {}
     clusterIP: ""
+  ## ssrfProxy ServiceAccount configuration
+  ##
+  serviceAccount:
+    ## @param ssrfProxy.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: false
+    ## @param ssrfProxy.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param ssrfProxy.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+    ##
+    automountServiceAccountToken: false
+    ## @param ssrfProxy.serviceAccount.annotations Additional custom annotations for the ServiceAccount
+    ##
+    annotations: { }
 
 postgresql:
   enabled: true
