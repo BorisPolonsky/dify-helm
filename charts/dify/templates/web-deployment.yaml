@@ -44,7 +44,7 @@ spec:
       {{- end }}
       {{- end }}
       containers:
-      - image: "{{ .Values.image.web.repository }}:{{ .Values.image.web.tag }}"
+      - image: "{{ .Values.image.web.repository }}:{{ default .Chart.AppVersion .Values.image.web.tag }}"
         imagePullPolicy: "{{ .Values.image.web.pullPolicy }}"
         name: web
         {{- if .Values.web.customLivenessProbe }}
