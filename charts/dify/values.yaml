@@ -2801,6 +2801,18 @@ externalGCS:
   serviceAccountJsonBase64: ""
 
 ###################################
+# External TENCENT COS
+# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled`  and `externalGCS.enabled` are false and `externalCOS.enabled` is true
+###################################
+externalCOS:
+  enabled: false
+  secretKey: "your-secret-key"
+  secretId: "your-secret-id"
+  region: "your-region"
+  bucketName: "your-bucket-name"
+  scheme: "your-scheme"
+
+###################################
 # External Redis
 # - these configs are only used when `externalRedis.enabled` is true
 ###################################
@@ -2857,3 +2869,17 @@ externalPgvector:
   address: "pgvector"
   port: 5432
   dbName: dify
+
+###################################
+# External Tencent
+# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` are set as `false` and `externalTvector.enabled` is `true`
+###################################
+externalTvector:
+  enabled: false
+  url: "your-tencent-vector-db-url"
+  apiKey: "your-tencent-vector-api-key"
+  timeout: 30
+  username: "root"
+  database: "dify"
+  shard: 1
+  replicas: 2

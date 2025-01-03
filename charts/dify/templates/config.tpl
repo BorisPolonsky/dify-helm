@@ -178,6 +178,19 @@ ALIYUN_OSS_AUTH_VERSION: {{ .Values.externalOSS.authVersion }}
 STORAGE_TYPE: google-storage
 GOOGLE_STORAGE_BUCKET_NAME: {{ .Values.externalGCS.bucketName }}
 GOOGLE_STORAGE_SERVICE_ACCOUNT_JSON_BASE64: {{ .Values.externalGCS.serviceAccountJsonBase64 }}
+{{- else if .Values.externalCOS.enabled }}
+# The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss`, `google-storage` and `tencent-cos`, Default: `local`
+STORAGE_TYPE: tencent-cos
+# The name of the Tencent COS bucket to use for storing files.
+TENCENT_COS_BUCKET_NAME: {{ .Values.externalCOS.bucketName }}
+# The secret key to use for authenticating with the Tencent COS service.
+TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey }}
+# The secret id to use for authenticating with the Tencent COS service.
+TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId }}
+# The region of the Tencent COS service.
+TENCENT_COS_REGION: {{ .Values.externalCOS.region }}
+# The scheme of the Tencent COS service.
+TENCENT_COS_SCHEME: {{ .Values.externalCOS.scheme }}
 {{- else }}
 # The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob`, Default: `local`
 STORAGE_TYPE: local
@@ -260,6 +273,16 @@ MILVUS_PORT: {{ .Values.externalMilvus.port | toString | quote }}
 # MILVUS_PASSWORD: {{ .Values.externalMilvus.password | quote }}
 # The milvus tls switch.
 MILVUS_SECURE: {{ .Values.externalMilvus.useTLS | toString | quote }}
+{{- else if .Values.externalTvector.enabled}}
+# tencent vector configurations, only available when VECTOR_STORE is `tencent`
+VECTOR_STORE: tencent 
+TENCENT_VECTOR_DB_URL: {{ .Values.externalTencent.url }}
+TENCENT_VECTOR_DB_API_KEY: {{ .Values.externalTencent.apiKey }}
+TENCENT_VECTOR_DB_TIMEOUT: {{ .Values.externalTencent.timeout | quote }}
+TENCENT_VECTOR_DB_USERNAME: {{ .Values.externalTencent.username }}
+TENCENT_VECTOR_DB_DATABASE: {{ .Values.externalTencent.database }}
+TENCENT_VECTOR_DB_SHARD: {{ .Values.externalTencent.shard | quote }}
+TENCENT_VECTOR_DB_REPLICAS: {{ .Values.externalTencent.replicas | quote }}
 {{- else if .Values.externalPgvector.enabled}}
 # pgvector configurations, only available when VECTOR_STORE is `pgvecto-rs or pgvector`
 VECTOR_STORE: pgvector
