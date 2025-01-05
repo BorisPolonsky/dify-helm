@@ -5,7 +5,7 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "0.6.16"
+    tag: "0.14.2"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -15,7 +15,7 @@ image:
     #   - myRegistryKeySecretName
   web:    
     repository: langgenius/dify-web
-    tag: "0.6.16"
+    tag: "0.14.2"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -25,7 +25,7 @@ image:
     #   - myRegistryKeySecretName
   sandbox:
     repository: langgenius/dify-sandbox
-    tag: "0.2.1"
+    tag: "0.2.10"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
