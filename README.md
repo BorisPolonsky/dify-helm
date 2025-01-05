@@ -30,7 +30,7 @@ helm install my-release dify/dify
 - [x] qdrant
 - [x] milvus
 - [x] pgvector
-
+- [x] Tencent Vector DB
 ## Contributors
 <a href="https://github.com/borispolonsky/dify-helm/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=borispolonsky/dify-helm" />
