@@ -2966,13 +2966,13 @@ externalPgvector:
   dbName: dify
 
 ###################################
-# External Tencent
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` are set as `false` and `externalTvector.enabled` is `true`
+# External Tencent Vector DB
+# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` are set as `false` and `externalTencentVectorDB.enabled` is `true`
 ###################################
-externalTvector:
+externalTencentVectorDB:
   enabled: false
   url: "your-tencent-vector-db-url"
-  apiKey: "your-tencent-vector-api-key"
+  apiKey: "your-tencent-vector-db-api-key"
   timeout: 30
   username: "root"
   database: "dify"

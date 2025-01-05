@@ -273,16 +273,6 @@ MILVUS_PORT: {{ .Values.externalMilvus.port | toString | quote }}
 # MILVUS_PASSWORD: {{ .Values.externalMilvus.password | quote }}
 # The milvus tls switch.
 MILVUS_SECURE: {{ .Values.externalMilvus.useTLS | toString | quote }}
-{{- else if .Values.externalTvector.enabled}}
-# tencent vector configurations, only available when VECTOR_STORE is `tencent`
-VECTOR_STORE: tencent 
-TENCENT_VECTOR_DB_URL: {{ .Values.externalTencent.url }}
-TENCENT_VECTOR_DB_API_KEY: {{ .Values.externalTencent.apiKey }}
-TENCENT_VECTOR_DB_TIMEOUT: {{ .Values.externalTencent.timeout | quote }}
-TENCENT_VECTOR_DB_USERNAME: {{ .Values.externalTencent.username }}
-TENCENT_VECTOR_DB_DATABASE: {{ .Values.externalTencent.database }}
-TENCENT_VECTOR_DB_SHARD: {{ .Values.externalTencent.shard | quote }}
-TENCENT_VECTOR_DB_REPLICAS: {{ .Values.externalTencent.replicas | quote }}
 {{- else if .Values.externalPgvector.enabled}}
 # pgvector configurations, only available when VECTOR_STORE is `pgvecto-rs or pgvector`
 VECTOR_STORE: pgvector
@@ -291,6 +281,16 @@ PGVECTOR_PORT: {{ .Values.externalPgvector.port | toString | quote }}
 PGVECTOR_DATABASE: {{ .Values.externalPgvector.dbName }}
 # DB_USERNAME: {{ .Values.externalPgvector.username }}
 # DB_PASSWORD: {{ .Values.externalPgvector.password }}
+{{- else if .Values.externalTencentVectorDB.enabled}}
+# tencent vector configurations, only available when VECTOR_STORE is `tencent`
+VECTOR_STORE: tencent
+TENCENT_VECTOR_DB_URL: {{ .Values.externalTencentVectorDB.url | quote }}
+TENCENT_VECTOR_DB_API_KEY: {{ .Values.externalTencentVectorDB.apiKey | quote }}
+TENCENT_VECTOR_DB_TIMEOUT: {{ .Values.externalTencentVectorDB.timeout | quote }}
+TENCENT_VECTOR_DB_USERNAME: {{ .Values.externalTencentVectorDB.username | quote }}
+TENCENT_VECTOR_DB_DATABASE: {{ .Values.externalTencentVectorDB.database | quote }}
+TENCENT_VECTOR_DB_SHARD: {{ .Values.externalTencentVectorDB.shard | quote }}
+TENCENT_VECTOR_DB_REPLICAS: {{ .Values.externalTencentVectorDB.replicas | quote }}
 {{- else if .Values.weaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
