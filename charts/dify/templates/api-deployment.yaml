@@ -52,7 +52,7 @@ spec:
       {{- end }}
       {{- end }}
       containers:
-      - image: "{{ .Values.image.api.repository }}:{{ .Values.image.api.tag }}"
+      - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
         imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
         name: api
         {{- if .Values.api.customLivenessProbe }}
