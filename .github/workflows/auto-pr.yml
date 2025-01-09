@@ -1,0 +1,16 @@
+name: Upstream to PR
+
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs: {}
+
+jobs:
+  autoupdate:
+    uses: neuro-inc/reuse/.github/workflows/auto-pr.yaml@master
+    with:
+      upstream_repository: https://github.com/BorisPolonsky/dify-helm
+      upstream_tag_regex: 'dify-\d+\..*'
+    secrets:
+      personal_access_token: ${{ secrets.AUTO_PR_PAT }}
