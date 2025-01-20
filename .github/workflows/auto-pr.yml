@@ -13,4 +13,4 @@ jobs:
       upstream_repository: https://github.com/BorisPolonsky/dify-helm
       upstream_tag_regex: 'dify-\d+\..*'
     secrets:
-      personal_access_token: ${{ secrets.AUTO_PR_PAT }}
+      personal_access_token: ${{ secrets.GH_AUTO_PR }}
