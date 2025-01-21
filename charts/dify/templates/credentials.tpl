@@ -13,6 +13,9 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{ include "dify.storage.credentials" . }}
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
+{{- if .Values.pluginDaemon.enabled }}
+PLUGIN_API_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.worker.credentials" -}}
@@ -30,6 +33,9 @@ SECRET_KEY: {{ .Values.api.secretKey | b64enc | quote }}
 # The Vector store configurations.
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
+{{- if .Values.pluginDaemon.enabled }}
+PLUGIN_API_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.web.credentials" -}}
@@ -131,9 +137,5 @@ API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.pluginDaemon.credentials" -}}
-SERVER_KEY: ${PLUGIN_DAEMON_KEY:-lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi}
-DIFY_INNER_API_KEY: ${PLUGIN_DIFY_INNER_API_KEY:-QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1}
-PLUGIN_REMOTE_INSTALLING_HOST: ${PLUGIN_DEBUGGING_HOST:-0.0.0.0}
-PLUGIN_REMOTE_INSTALLING_PORT: ${PLUGIN_DEBUGGING_PORT:-5003}
-PLUGIN_WORKING_PATH: ${PLUGIN_WORKING_PATH:-/app/storage/cwd}
+SERVER_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
 {{- end }}

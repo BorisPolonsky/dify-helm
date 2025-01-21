@@ -72,6 +72,10 @@ CODE_EXECUTION_ENDPOINT: http://{{ template "dify.sandbox.fullname" .}}:{{ .Valu
 SSRF_PROXY_HTTP_URL: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
 SSRF_PROXY_HTTPS_URL: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
 {{- end }}
+
+{{- if .Values.pluginDaemon.enabled }}
+PLUGIN_API_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.port }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.worker.config" -}}
@@ -104,6 +108,9 @@ LOG_LEVEL: {{ .Values.worker.logLevel | quote }}
 # The Vector store configurations.
 {{ include "dify.vectordb.config" . }}
 {{ include "dify.mail.config" . }}
+{{- if .Values.pluginDaemon.enabled }}
+PLUGIN_API_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.port }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.web.config" -}}
@@ -414,6 +421,11 @@ server {
       include proxy.conf;
     }
 
+    location /e {
+      proxy_pass http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.port }};
+      include proxy.conf;
+    }
+
     location / {
       proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};
       include proxy.conf;
@@ -480,13 +492,9 @@ cache_store_log none
 {{- end }}
 {{- end }}
 
-{{- define "dify.pluginDaemon.config" -}}
-DB_DATABASE: ${DB_PLUGIN_DATABASE:-dify_plugin}
-SERVER_PORT: ${PLUGIN_DAEMON_PORT:-5002}
-MAX_PLUGIN_PACKAGE_SIZE: ${PLUGIN_MAX_PACKAGE_SIZE:-52428800}
-PPROF_ENABLED: ${PLUGIN_PPROF_ENABLED:-false}
-DIFY_INNER_API_URL: ${PLUGIN_DIFY_INNER_API_URL:-http://api:5001}
-PLUGIN_REMOTE_INSTALLING_HOST: ${PLUGIN_DEBUGGING_HOST:-0.0.0.0}
-PLUGIN_REMOTE_INSTALLING_PORT: ${PLUGIN_DEBUGGING_PORT:-5003}
-PLUGIN_WORKING_PATH: ${PLUGIN_WORKING_PATH:-/app/storage/cwd}
+{{- define "dify.pluginDaemon.config" }}
+DB_DATABASE: {{ template "dify.pluginDaemon.database" . }}
+SERVER_PORT: "5002"
+MAX_PLUGIN_PACKAGE_SIZE: "52428800"
+PLUGIN_WORKING_PATH: "/app/storage/cwd"
 {{- end }}

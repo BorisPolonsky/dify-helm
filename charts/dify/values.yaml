@@ -552,20 +552,30 @@ pluginDaemon:
   # - name: LANG
   #   value: "C.UTF-8"
   service:
-    daemon:
-      port: 5002
-      annotations: {}
-      labels: {}
-      clusterIP: ""
-    debugging:
-      port: 5003
-      annotations: {}
-      labels: {}
-      clusterIP: ""
+    port: 5002
+    annotations: {}
+    labels: {}
+    clusterIP: ""
   auth:
-    api: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
-    internalApi: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
+    apiKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
   database: "dify_plugin"
+  persistence:
+    mountPath: "/app/storage/cwd"
+    annotations:
+      helm.sh/resource-policy: keep
+    persistentVolumeClaim:
+      existingClaim: ""
+      ## Dify Plugin Daemon Persistent Volume Storage Class
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.
+      ## ReadWriteMany access mode required for `pluginDaemon`
+      ##
+      storageClass:
+      accessModes: ReadWriteMany
+      size: 5Gi
+      subPath: ""
   ## pluginDaemon ServiceAccount configuration
   ##
   serviceAccount:

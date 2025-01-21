@@ -1,5 +1,4 @@
 {{- if and .Values.pluginDaemon.enabled}}
-{{- $usePvc := not (or .Values.externalS3.enabled .Values.externalOSS.enabled .Values.externalAzureBlobStorage.enabled .Values.externalGCS.enabled .Values.externalCOS.enabled) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -38,15 +37,15 @@ spec:
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
       serviceAccountName: {{ include "dify.pluginDaemon.serviceAccountName" . }}
-      {{- if .Values.imagepluginDaemon.pullSecrets }}
+      {{- if .Values.image.pluginDaemon.pullSecrets }}
       imagePullSecrets:
-      {{- range .Values.imagepluginDaemon.pullSecrets }}
+      {{- range .Values.image.pluginDaemon.pullSecrets }}
         - name: {{ . }}
       {{- end }}
       {{- end }}
       containers:
-      - image: "{{ .Values.imagepluginDaemon.repository }}:{{ default .Chart.AppVersion .Values.imagepluginDaemon.tag }}"
-        imagePullPolicy: "{{ .Values.imagepluginDaemon.pullPolicy }}"
+      - image: "{{ .Values.image.pluginDaemon.repository }}:{{ default .Chart.AppVersion .Values.image.pluginDaemon.tag }}"
+        imagePullPolicy: "{{ .Values.image.pluginDaemon.pullPolicy }}"
         name: plugin-daemon
         {{- if .Values.pluginDaemon.customLivenessProbe }}
         livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.customLivenessProbe "context" $) | nindent 10 }}
@@ -66,14 +65,16 @@ spec:
             name: {{ template "dify.pluginDaemon.fullname" . }}
         - secretRef:
             name: {{ template "dify.pluginDaemon.fullname" . }}
+        ports:
+          - name: api
+            containerPort: 5002
+            protocol: TCP
         resources:
           {{- toYaml .Values.pluginDaemon.resources | nindent 12 }}
         volumeMounts:
-        {{- if $usePvc }}
         - name: app-data
-          mountPath: {{ .ValuespluginDaemon.persistence.mountPath | quote }}
-          subPath: {{ .ValuespluginDaemon.persistence.persistentVolumeClaim.subPath | default "" }}
-        {{- end }}
+          mountPath: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
+          subPath: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.subPath | default "" }}
     {{- if and (.Values.nodeSelector) (not .Values.pluginDaemon.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
@@ -99,9 +100,7 @@ spec:
 {{ toYaml .Values.pluginDaemon.tolerations | indent 8 }}
     {{- end }}
       volumes:
-      {{- if $usePvc }}
       - name: app-data
         persistentVolumeClaim:
-          claimName: {{ .ValuespluginDaemon.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.fullname" . | trunc 58)) }}
-      {{- end }}
+          claimName: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.fullname" . | trunc 58)) }}
 {{- end }}
