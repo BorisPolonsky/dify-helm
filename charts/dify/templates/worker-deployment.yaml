@@ -61,9 +61,9 @@ spec:
         {{- if .Values.worker.customStartupProbe }}
         startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.worker.customStartupProbe "context" $) | nindent 10 }}
         {{- end }}
-        {{- if .Values.worker.securityContext }}
+        {{- if .Values.worker.containerSecurityContext }}
         securityContext:
-{{ toYaml .Values.worker.securityContext | indent 10 }}
+{{ toYaml .Values.worker.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
         {{- if .Values.worker.extraEnv }}

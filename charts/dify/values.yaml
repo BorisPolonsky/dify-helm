@@ -97,7 +97,7 @@ api:
   # Configure Pods Security Context
   podSecurityContext: {}
   # Configure Container Security Context
-  securityContext: {}
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary.
   # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
@@ -233,7 +233,7 @@ worker:
   # Configure Pods Security Context
   podSecurityContext: {}
   # Configure Container Security Context
-  securityContext: {}
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary.
   # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
@@ -285,7 +285,7 @@ proxy:
   # Configure Pods Security Context
   podSecurityContext: {}
   # Configure Container Security Context
-  securityContext: {}
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
@@ -376,7 +376,7 @@ web:
   # Configure Pods Security Context
   podSecurityContext: {}
   # Configure Container Security Context
-  securityContext: {}
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   - name: EDITION
@@ -445,7 +445,7 @@ sandbox:
   # Configure Pods Security Context
   podSecurityContext: {}
   # Configure Container Security Context
-  securityContext: {}
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
@@ -496,7 +496,7 @@ ssrfProxy:
   # Configure Pods Security Context
   podSecurityContext: {}
   # Configure Container Security Context
-  securityContext: {}
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG

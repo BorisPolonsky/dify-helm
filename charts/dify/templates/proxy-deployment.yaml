@@ -60,9 +60,9 @@ spec:
         {{- if .Values.proxy.customStartupProbe }}
         startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.proxy.customStartupProbe "context" $) | nindent 10 }}
         {{- end }}
-        {{- if .Values.proxy.securityContext }}
+        {{- if .Values.proxy.containerSecurityContext }}
         securityContext:
-{{ toYaml .Values.proxy.securityContext | indent 10 }}
+{{ toYaml .Values.proxy.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
         {{- if .Values.proxy.extraEnv }}

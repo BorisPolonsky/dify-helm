@@ -80,9 +80,9 @@ spec:
           tcpSocket:
             port: web
         {{- end }}
-        {{- if .Values.web.securityContext }}
+        {{- if .Values.web.containerSecurityContext }}
         securityContext:
-{{ toYaml .Values.web.securityContext | indent 10 }}
+{{ toYaml .Values.web.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
         {{- if .Values.web.extraEnv }}

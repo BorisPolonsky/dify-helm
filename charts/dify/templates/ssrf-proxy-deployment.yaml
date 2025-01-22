@@ -60,9 +60,9 @@ spec:
         {{- if .Values.ssrfProxy.customStartupProbe }}
         startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.customStartupProbe "context" $) | nindent 10 }}
         {{- end }}
-        {{- if .Values.ssrfProxy.securityContext }}
+        {{- if .Values.ssrfProxy.containerSecurityContext }}
         securityContext:
-{{ toYaml .Values.ssrfProxy.securityContext | indent 10 }}
+{{ toYaml .Values.ssrfProxy.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
         {{- if .Values.ssrfProxy.extraEnv }}

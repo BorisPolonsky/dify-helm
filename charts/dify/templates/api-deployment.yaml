@@ -82,9 +82,9 @@ spec:
           tcpSocket:
             port: api
         {{- end }}
-        {{- if .Values.api.securityContext }}
+        {{- if .Values.api.containerSecurityContext }}
         securityContext:
-{{ toYaml .Values.api.securityContext | indent 10 }}
+{{ toYaml .Values.api.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
         {{- if .Values.sandbox.enabled }}
