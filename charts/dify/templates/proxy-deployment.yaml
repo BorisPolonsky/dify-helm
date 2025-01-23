@@ -43,6 +43,10 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
+      {{- if .Values.proxy.podSecurityContext }}
+      securityContext:
+{{ toYaml .Values.proxy.podSecurityContext | indent 8 }}
+      {{- end }}
       containers:
       - image: "{{ .Values.image.proxy.repository }}:{{ .Values.image.proxy.tag }}"
         imagePullPolicy: "{{ .Values.image.proxy.pullPolicy }}"
@@ -55,6 +59,10 @@ spec:
         {{- end }}
         {{- if .Values.proxy.customStartupProbe }}
         startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.proxy.customStartupProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.proxy.containerSecurityContext }}
+        securityContext:
+{{ toYaml .Values.proxy.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
         {{- if .Values.proxy.extraEnv }}

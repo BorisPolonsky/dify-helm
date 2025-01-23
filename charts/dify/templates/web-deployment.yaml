@@ -43,6 +43,10 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
+      {{- if .Values.web.podSecurityContext }}
+      securityContext:
+{{ toYaml .Values.web.podSecurityContext | indent 8 }}
+      {{- end }}
       containers:
       - image: "{{ .Values.image.web.repository }}:{{ default .Chart.AppVersion .Values.image.web.tag }}"
         imagePullPolicy: "{{ .Values.image.web.pullPolicy }}"
@@ -75,6 +79,10 @@ spec:
         startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.startupProbe "enabled") "context" $) | nindent 10 }}
           tcpSocket:
             port: web
+        {{- end }}
+        {{- if .Values.web.containerSecurityContext }}
+        securityContext:
+{{ toYaml .Values.web.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
         {{- if .Values.web.extraEnv }}

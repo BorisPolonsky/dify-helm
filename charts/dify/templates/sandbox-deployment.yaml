@@ -43,6 +43,10 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
+      {{- if .Values.sandbox.podSecurityContext }}
+      securityContext:
+{{ toYaml .Values.sandbox.podSecurityContext | indent 8 }}
+      {{- end }}
       containers:
       - image: "{{ .Values.image.sandbox.repository }}:{{ .Values.image.sandbox.tag }}"
         imagePullPolicy: "{{ .Values.image.sandbox.pullPolicy }}"
@@ -67,6 +71,10 @@ spec:
         startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.sandbox.startupProbe "enabled") "context" $) | nindent 10 }}
           tcpSocket:
             port: sandbox
+        {{- end }}
+        {{- if .Values.sandbox.containerSecurityContext }}
+        securityContext:
+{{ toYaml .Values.sandbox.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
         {{- if .Values.sandbox.extraEnv }}

@@ -44,6 +44,10 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
+      {{- if .Values.worker.podSecurityContext }}
+      securityContext:
+{{ toYaml .Values.worker.podSecurityContext | indent 8 }}
+      {{- end }}
       containers:
       - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
         imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
@@ -56,6 +60,10 @@ spec:
         {{- end }}
         {{- if .Values.worker.customStartupProbe }}
         startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.worker.customStartupProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.worker.containerSecurityContext }}
+        securityContext:
+{{ toYaml .Values.worker.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
         {{- if .Values.worker.extraEnv }}
