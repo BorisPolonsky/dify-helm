@@ -571,6 +571,10 @@ pluginDaemon:
   customReadinessProbe: {}
   ## @param pluginDaemon.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  # Configure Pods Security Context
+  podSecurityContext: {}
+  # Configure Container Security Context
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
