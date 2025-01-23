@@ -105,6 +105,10 @@ api:
   customReadinessProbe: {}
   ## @param api.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  # Configure Pods Security Context
+  podSecurityContext: {}
+  # Configure Container Security Context
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary.
   # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
@@ -237,6 +241,10 @@ worker:
   customReadinessProbe: {}
   ## @param worker.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  # Configure Pods Security Context
+  podSecurityContext: {}
+  # Configure Container Security Context
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary.
   # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
@@ -285,6 +293,10 @@ proxy:
   customStartupProbe: {}
   ## @param proxy.clientMaxBodySize Custom client_max_body_size param nginx default: 15m
   clientMaxBodySize: ""
+  # Configure Pods Security Context
+  podSecurityContext: {}
+  # Configure Container Security Context
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
@@ -372,6 +384,10 @@ web:
   customReadinessProbe: {}
   ## @param web.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  # Configure Pods Security Context
+  podSecurityContext: {}
+  # Configure Container Security Context
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   - name: EDITION
@@ -437,6 +453,10 @@ sandbox:
   customReadinessProbe: {}
   ## @param sandbox.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  # Configure Pods Security Context
+  podSecurityContext: {}
+  # Configure Container Security Context
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
@@ -484,6 +504,10 @@ ssrfProxy:
   customReadinessProbe: {}
   ## @param ssrfProxy.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  # Configure Pods Security Context
+  podSecurityContext: {}
+  # Configure Container Security Context
+  containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG

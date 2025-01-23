@@ -43,6 +43,10 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
+      {{- if .Values.ssrfProxy.podSecurityContext }}
+      securityContext:
+{{ toYaml .Values.ssrfProxy.podSecurityContext | indent 8 }}
+      {{- end }}
       containers:
       - image: "{{ .Values.image.ssrfProxy.repository }}:{{ .Values.image.ssrfProxy.tag }}"
         imagePullPolicy: "{{ .Values.image.ssrfProxy.pullPolicy }}"
@@ -55,6 +59,10 @@ spec:
         {{- end }}
         {{- if .Values.ssrfProxy.customStartupProbe }}
         startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.customStartupProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.ssrfProxy.containerSecurityContext }}
+        securityContext:
+{{ toYaml .Values.ssrfProxy.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
         {{- if .Values.ssrfProxy.extraEnv }}
