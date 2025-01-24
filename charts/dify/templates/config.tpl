@@ -493,7 +493,7 @@ cache_store_log none
 {{- end }}
 
 {{- define "dify.pluginDaemon.config" }}
-DB_DATABASE: {{ template "dify.pluginDaemon.database" . }}
+DB_DATABASE: {{ .Values.pluginDaemon.database | quote }}
 SERVER_PORT: "5002"
 MAX_PLUGIN_PACKAGE_SIZE: "52428800"
 PLUGIN_WORKING_PATH: "/app/storage/cwd"
