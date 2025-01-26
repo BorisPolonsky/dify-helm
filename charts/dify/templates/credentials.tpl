@@ -137,5 +137,7 @@ API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.pluginDaemon.credentials" -}}
+{{ include "dify.db.credentials" . }}
+{{ include "dify.redis.credentials" . }}
 SERVER_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
 {{- end }}
