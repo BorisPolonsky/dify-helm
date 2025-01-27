@@ -12,5 +12,6 @@ jobs:
     with:
       upstream_repository: https://github.com/BorisPolonsky/dify-helm
       upstream_tag_regex: 'dify-\d+\..*'
+      team_reviewers: 'mlops'
     secrets:
       personal_access_token: ${{ secrets.GH_AUTO_PR }}
