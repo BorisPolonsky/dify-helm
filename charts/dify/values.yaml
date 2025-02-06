@@ -13,7 +13,7 @@ image:
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
-  web:    
+  web:
     repository: langgenius/dify-web
     tag: "0.14.2"
     pullPolicy: IfNotPresent
@@ -543,7 +543,7 @@ ssrfProxy:
     automountServiceAccountToken: false
     ## @param ssrfProxy.serviceAccount.annotations Additional custom annotations for the ServiceAccount
     ##
-    annotations: { }
+    annotations: {}
 
 postgresql:
   enabled: true
@@ -645,15 +645,15 @@ weaviate:
     - 'http'
     - '--config-file'
     - '/weaviate-config/conf.yaml'
-    - --read-timeout=60s 
+    - --read-timeout=60s
     - --write-timeout=60s
 
   # below is an example that can be used to set an arbitrary nofile limit at
   # startup:
   #
-  # command: 
+  # command:
   #   - "/bin/sh"
-  # args: 
+  # args:
   #   - "-c"
   #   - "ulimit -n 65535 && /bin/weaviate --host 0.0.0.0 --port 8080 --scheme http --config-file /weaviate-config/conf.yaml"
 
@@ -673,7 +673,7 @@ weaviate:
         repo: alpine
         tag: latest
         pullPolicy: IfNotPresent
-    
+
     extraInitContainers: {}
     # - image: some-image
     #   name: some-name
@@ -809,7 +809,7 @@ weaviate:
     # Expose metrics on port 2112 for Prometheus to scrape
     PROMETHEUS_MONITORING_ENABLED: false
 
-    # Set a MEM limit for the Weaviate Pod so it can help you both increase GC-related 
+    # Set a MEM limit for the Weaviate Pod so it can help you both increase GC-related
     # performance as well as avoid GC-related out-of-memory (“OOM”) situations
     # GOMEMLIMIT: 6GiB
 
@@ -861,13 +861,13 @@ weaviate:
       envconfig:
         # Configure folder where backups should be saved
         BACKUP_FILESYSTEM_PATH: /tmp/backups
-    
+
     s3:
       enabled: false
       # If one is using AWS EKS and has already configured K8s Service Account
       # that holds the AWS credentials one can pass a name of that service account
       # here using this setting.
-      # NOTE: the root `serviceAccountName` config has priority over this one, and 
+      # NOTE: the root `serviceAccountName` config has priority over this one, and
       # if the root one is set this one will NOT overwrite it. This one is here for
       # backwards compatibility.
       serviceAccountName:
@@ -876,7 +876,7 @@ weaviate:
         # Configure bucket where backups should be saved, this setting is mandatory
         BACKUP_S3_BUCKET: weaviate-backups
 
-        # Optional setting. Defaults to empty string. 
+        # Optional setting. Defaults to empty string.
         # Set this option if you want to save backups to a given location
         # inside the bucket
         # BACKUP_S3_PATH: path/inside/bucket
