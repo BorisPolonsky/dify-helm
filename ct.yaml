@@ -6,3 +6,4 @@ chart-repos:
   - weaviate=https://weaviate.github.io/weaviate-helm
 
 check-version-increment: false
+validate-maintainers: false
