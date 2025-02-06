@@ -1,5 +1,3 @@
 lint:
   rules:
-    # Not needed at PR stage
-    check-version-increment: false
     maintainers: false
