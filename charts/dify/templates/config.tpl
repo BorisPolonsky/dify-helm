@@ -500,5 +500,5 @@ DB_DATABASE: {{ .Values.pluginDaemon.database | quote }}
 {{- end }}
 SERVER_PORT: "5002"
 MAX_PLUGIN_PACKAGE_SIZE: "52428800"
-PLUGIN_WORKING_PATH: "/app/storage/cwd"
+PLUGIN_WORKING_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
 {{- end }}
