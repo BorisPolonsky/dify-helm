@@ -14,7 +14,7 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
-PLUGIN_API_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
+PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
 {{- end }}
 {{- end }}
 
@@ -34,7 +34,7 @@ SECRET_KEY: {{ .Values.api.secretKey | b64enc | quote }}
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
-PLUGIN_API_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
+PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
 {{- end }}
 {{- end }}
 

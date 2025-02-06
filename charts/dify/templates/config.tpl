@@ -74,7 +74,7 @@ SSRF_PROXY_HTTPS_URL: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Value
 {{- end }}
 
 {{- if .Values.pluginDaemon.enabled }}
-PLUGIN_API_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.port }}
+PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.port }}
 {{- end }}
 {{- end }}
 
@@ -109,7 +109,7 @@ LOG_LEVEL: {{ .Values.worker.logLevel | quote }}
 {{ include "dify.vectordb.config" . }}
 {{ include "dify.mail.config" . }}
 {{- if .Values.pluginDaemon.enabled }}
-PLUGIN_API_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.port }}
+PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.port }}
 {{- end }}
 {{- end }}
 
