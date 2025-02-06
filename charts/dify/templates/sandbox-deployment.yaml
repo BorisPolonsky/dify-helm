@@ -55,14 +55,16 @@ spec:
         livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.customLivenessProbe "context" $) | nindent 10 }}
         {{- else if .Values.sandbox.livenessProbe.enabled }}
         livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.sandbox.livenessProbe "enabled") "context" $) | nindent 10 }}
-          tcpSocket:
+          httpGet:
+            path: /health
             port: sandbox
         {{- end }}
         {{- if .Values.sandbox.customReadinessProbe }}
         readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.customReadinessProbe "context" $) | nindent 10 }}
         {{- else if .Values.sandbox.readinessProbe.enabled }}
         readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.sandbox.readinessProbe "enabled") "context" $) | nindent 10 }}
-          tcpSocket:
+          httpGet:
+            path: /health
             port: sandbox
         {{- end }}
         {{- if .Values.sandbox.customStartupProbe }}
