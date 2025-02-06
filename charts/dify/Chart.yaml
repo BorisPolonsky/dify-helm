@@ -24,6 +24,9 @@ version: 0.22.0
 # It is recommended to use it with quotes.
 appVersion: "0.14.2"
 
+maintainers:
+  - name: "Boris Polonsky"
+
 dependencies:
 - name: postgresql
   version: 12.5.6
