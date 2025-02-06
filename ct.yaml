@@ -1,0 +1,4 @@
+lint:
+  rules:
+    versionIncrement: false
+    maintainers: false
