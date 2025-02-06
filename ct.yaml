@@ -1,7 +1,3 @@
-lint:
-  rules:
-    maintainers: false
-
 chart-dirs:
   - charts
 
