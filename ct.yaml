@@ -4,3 +4,5 @@ chart-dirs:
 chart-repos:
   - bitnami=https://charts.bitnami.com/bitnami
   - weaviate=https://weaviate.github.io/weaviate-helm
+
+check-version-increment: false
