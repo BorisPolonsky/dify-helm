@@ -26,6 +26,8 @@ spec:
   template:
     metadata:
       annotations:
+        checksum/api-config: {{ include (print $.Template.BasePath "/api-config.yaml") . | sha256sum }}
+        checksum/api-secret: {{ include (print $.Template.BasePath "/api-secret.yaml") . | sha256sum }}
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}

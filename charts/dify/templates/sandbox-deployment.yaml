@@ -25,6 +25,8 @@ spec:
   template:
     metadata:
       annotations:
+        checksum/sandbox-config: {{ include (print $.Template.BasePath "/sandbox-config.yaml") . | sha256sum }}
+        checksum/sandbox-secret: {{ include (print $.Template.BasePath "/sandbox-secret.yaml") . | sha256sum }}
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
