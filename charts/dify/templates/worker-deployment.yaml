@@ -26,6 +26,8 @@ spec:
   template:
     metadata:
       annotations:
+        checksum/worker-config: {{ include (print $.Template.BasePath "/worker-config.yaml") . | sha256sum }}
+        checksum/worker-secret: {{ include (print $.Template.BasePath "/worker-secret.yaml") . | sha256sum }}
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
