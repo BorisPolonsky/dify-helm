@@ -1,0 +1,29 @@
+{{- if .Values.pluginDaemon.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "dify.pluginDaemon.fullname" . }}
+  labels:
+{{ include "dify.labels" . | indent 4 }}
+{{- if .Values.pluginDaemon.service.labels }}
+{{ toYaml .Values.pluginDaemon.service.labels | indent 4 }}
+{{- end }}
+    component: "plugin-daemon"
+{{- with .Values.pluginDaemon.service.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+  type: ClusterIP
+  {{- if .Values.pluginDaemon.service.clusterIP }}
+  clusterIP: {{ .Values.pluginDaemon.service.clusterIP }}
+  {{- end }}
+  ports:
+    - name: http-api
+      port: {{ .Values.pluginDaemon.service.port }}
+      protocol: TCP
+      targetPort: api
+  selector:
+{{ include "dify.selectorLabels" . | indent 4 }}
+    component: "plugin-daemon"
+{{- end }}

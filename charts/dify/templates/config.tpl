@@ -72,6 +72,10 @@ CODE_EXECUTION_ENDPOINT: http://{{ template "dify.sandbox.fullname" .}}:{{ .Valu
 SSRF_PROXY_HTTP_URL: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
 SSRF_PROXY_HTTPS_URL: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
 {{- end }}
+
+{{- if .Values.pluginDaemon.enabled }}
+PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.port }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.worker.config" -}}
@@ -104,6 +108,9 @@ LOG_LEVEL: {{ .Values.worker.logLevel | quote }}
 # The Vector store configurations.
 {{ include "dify.vectordb.config" . }}
 {{ include "dify.mail.config" . }}
+{{- if .Values.pluginDaemon.enabled }}
+PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.port }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.web.config" -}}
@@ -414,6 +421,17 @@ server {
       include proxy.conf;
     }
 
+    location /explore {
+      proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};
+      proxy_set_header Dify-Hook-Url $scheme://$host$request_uri;
+      include proxy.conf;
+    }
+
+    location /e {
+      proxy_pass http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.port }};
+      include proxy.conf;
+    }
+
     location / {
       proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};
       include proxy.conf;
@@ -478,4 +496,15 @@ cache_log none
 access_log none
 cache_store_log none
 {{- end }}
+{{- end }}
+
+{{- define "dify.pluginDaemon.config" }}
+{{- include "dify.redis.config" . }}
+{{- include "dify.db.config" .}}
+{{- if .Values.pluginDaemon.database }}
+DB_DATABASE: {{ .Values.pluginDaemon.database | quote }}
+{{- end }}
+SERVER_PORT: "5002"
+MAX_PLUGIN_PACKAGE_SIZE: "52428800"
+PLUGIN_WORKING_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
 {{- end }}

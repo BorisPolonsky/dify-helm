@@ -72,6 +72,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a default fully qualified plugin-daemon name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "dify.pluginDaemon.fullname" -}}
+{{ template "dify.fullname" . }}-plugin-daemon
+{{- end -}}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "dify.chart" -}}
@@ -175,5 +183,16 @@ Create the name of the service account to use for the Dify Worker
     {{ default (include "dify.worker.fullname" .) .Values.worker.serviceAccount.name | trunc 63 | trimSuffix "-" }}
 {{- else -}}
     {{ default "default" .Values.worker.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for the Dify Plugin Daemon
+*/}}
+{{- define "dify.pluginDaemon.serviceAccountName" -}}
+{{- if .Values.pluginDaemon.serviceAccount.create -}}
+    {{ default (include "dify.pluginDaemon.fullname" .) .Values.pluginDaemon.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.pluginDaemon.serviceAccount.name }}
 {{- end -}}
 {{- end -}}

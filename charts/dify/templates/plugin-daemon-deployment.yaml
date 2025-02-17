@@ -1,0 +1,116 @@
+{{- if and .Values.pluginDaemon.enabled}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+{{ include "dify.ud.annotations" . | indent 4 }}
+    descriptions: plugin-daemon
+  labels:
+{{- include "dify.labels" . | nindent 4 }}
+    component: plugin-daemon
+    # app: {{ template "dify.pluginDaemon.fullname" . }}
+{{ include "dify.ud.labels" . | indent 4 }}
+  name: {{ template "dify.pluginDaemon.fullname" . }}
+spec:
+  replicas: {{ .Values.pluginDaemon.replicas }}
+  selector:
+    matchLabels:
+{{- include "dify.selectorLabels" . | nindent 6 }}
+      component: plugin-daemon
+      {{/*
+      # Required labels for istio
+      # app: {{ template "dify.pluginDaemon.fullname" . }}
+      # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+      */}}
+  template:
+    metadata:
+      annotations:
+        checksum/plugin-daemon-config: {{ include (print $.Template.BasePath "/plugin-daemon-config.yaml") . | sha256sum }}
+        checksum/plugin-daemon-secret: {{ include (print $.Template.BasePath "/plugin-daemon-secret.yaml") . | sha256sum }}
+{{ include "dify.ud.annotations" . | indent 8 }}
+      labels:
+{{- include "dify.selectorLabels" . | nindent 8 }}
+        component: plugin-daemon
+        {{/*
+        # Required labels for istio
+        # app: {{ template "dify.pluginDaemon.fullname" . }}
+        # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+        */}}
+{{ include "dify.ud.labels" . | indent 8 }}
+    spec:
+      serviceAccountName: {{ include "dify.pluginDaemon.serviceAccountName" . }}
+      {{- if .Values.image.pluginDaemon.pullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.pluginDaemon.pullSecrets }}
+        - name: {{ . }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.pluginDaemon.podSecurityContext }}
+      securityContext:
+{{ toYaml .Values.pluginDaemon.podSecurityContext | indent 8 }}
+      {{- end }}
+      containers:
+      - image: "{{ .Values.image.pluginDaemon.repository }}:{{ default .Chart.AppVersion .Values.image.pluginDaemon.tag }}"
+        imagePullPolicy: "{{ .Values.image.pluginDaemon.pullPolicy }}"
+        name: plugin-daemon
+        {{- if .Values.pluginDaemon.customLivenessProbe }}
+        livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.customLivenessProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.pluginDaemon.customReadinessProbe }}
+        readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.customReadinessProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.pluginDaemon.customStartupProbe }}
+        startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.customStartupProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.pluginDaemon.containerSecurityContext }}
+        securityContext:
+{{ toYaml .Values.pluginDaemon.containerSecurityContext | indent 10 }}
+        {{- end }}
+        env:
+        {{- if .Values.pluginDaemon.extraEnv }}
+          {{- toYaml .Values.pluginDaemon.extraEnv | nindent 8 }}
+        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: {{ template "dify.pluginDaemon.fullname" . }}
+        - secretRef:
+            name: {{ template "dify.pluginDaemon.fullname" . }}
+        ports:
+          - name: api
+            containerPort: 5002
+            protocol: TCP
+        resources:
+          {{- toYaml .Values.pluginDaemon.resources | nindent 12 }}
+        volumeMounts:
+        - name: app-data
+          mountPath: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
+          subPath: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.subPath | default "" }}
+    {{- if and (.Values.nodeSelector) (not .Values.pluginDaemon.nodeSelector) }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if .Values.pluginDaemon.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.pluginDaemon.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.affinity) (not .Values.pluginDaemon.affinity) }}
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+    {{- end }}
+    {{- if .Values.pluginDaemon.affinity }}
+      affinity:
+{{ toYaml .Values.pluginDaemon.affinity | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.tolerations) (not .Values.pluginDaemon.tolerations) }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+    {{- end }}
+    {{- if .Values.pluginDaemon.tolerations }}
+      tolerations:
+{{ toYaml .Values.pluginDaemon.tolerations | indent 8 }}
+    {{- end }}
+      volumes:
+      - name: app-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.fullname" . | trunc 58)) }}
+{{- end }}

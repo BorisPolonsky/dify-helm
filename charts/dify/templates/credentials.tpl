@@ -13,6 +13,9 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{ include "dify.storage.credentials" . }}
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
+{{- if .Values.pluginDaemon.enabled }}
+PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.worker.credentials" -}}
@@ -30,6 +33,9 @@ SECRET_KEY: {{ .Values.api.secretKey | b64enc | quote }}
 # The Vector store configurations.
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
+{{- if .Values.pluginDaemon.enabled }}
+PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.web.credentials" -}}
@@ -128,4 +134,10 @@ SMTP_PASSWORD: {{ .Values.api.mail.smtp.password | b64enc | quote }}
 
 {{- define "dify.sandbox.credentials" -}}
 API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
+{{- end }}
+
+{{- define "dify.pluginDaemon.credentials" -}}
+{{ include "dify.db.credentials" . }}
+{{ include "dify.redis.credentials" . }}
+SERVER_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
 {{- end }}
