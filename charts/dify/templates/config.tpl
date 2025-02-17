@@ -421,6 +421,12 @@ server {
       include proxy.conf;
     }
 
+    location /explore {
+      proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};
+      proxy_set_header Dify-Hook-Url $scheme://$host$request_uri;
+      include proxy.conf;
+    }
+
     location /e {
       proxy_pass http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.port }};
       include proxy.conf;
