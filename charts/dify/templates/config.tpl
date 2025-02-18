@@ -274,6 +274,8 @@ VECTOR_STORE: milvus
 MILVUS_HOST: {{ .Values.externalMilvus.host | quote }}
 # The milvus host.
 MILVUS_PORT: {{ .Values.externalMilvus.port | toString | quote }}
+# The milvus database
+MILVUS_DATABASE: {{ .Values.externalMilvus.database | quote }}
 # The milvus username.
 # MILVUS_USER: {{ .Values.externalMilvus.user | quote }}
 # The milvus password.
