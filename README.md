@@ -7,7 +7,7 @@ Deploy [langgenius/dify](https://github.com/langgenius/dify), an LLM based chat 
 ```
 helm repo add dify https://borispolonsky.github.io/dify-helm
 helm repo update
-helm install my-release dify/dify
+helm install my-dify-release dify/dify
 ```
 
 ## Supported Component 
@@ -23,14 +23,23 @@ helm install my-release dify/dify
 - [ ] qdrant
 - [ ] milvus
 ### External components that can be used by this app with proper configuration
-- [x] redis
-- [x] postgresql
-- [x] object storage
-- [x] weaviate
-- [x] qdrant
-- [x] milvus
-- [x] pgvector
-- [x] Tencent Vector DB
+
+- [x] Redis
+- [x] PostgreSQL
+- Object Storage:
+  - [x] Amazon S3
+  - [x] Microsoft Azure Blob Storage
+  - [x] Alibaba Cloud OSS
+  - [x] Google Cloud Storage
+  - [x] Tencent Cloud COS
+- External Vector DB:
+  - [x] Weaviate
+  - [x] Qdrant
+  - [x] Milvus
+  - [x] PGVector
+  - [x] Tencent Vector DB
+  - [x] MyScaleDB
+
 ## Contributors
 <a href="https://github.com/borispolonsky/dify-helm/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=borispolonsky/dify-helm" />
