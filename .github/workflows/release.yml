@@ -32,6 +32,12 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
+      - name: Add Helm dependency repos
+        run: |
+          helm repo add bitnami  https://charts.bitnami.com/bitnami
+          helm repo add weaviate https://weaviate.github.io/weaviate-helm
+          helm repo update
+
       - name: Update dependency
         run: find charts -mindepth 1 -maxdepth 1 -type d | xargs -I{} echo helm dependency update {}
     
