@@ -114,6 +114,12 @@ MILVUS_PASSWORD: {{ .Values.externalMilvus.password | b64enc | quote }}
 PGVECTOR_USER: {{ .Values.externalPgvector.username | b64enc | quote }}
 # The pgvector password.
 PGVECTOR_PASSWORD: {{ .Values.externalPgvector.password | b64enc | quote }}
+{{- else if .Values.externalTencentVectorDB.enabled}}
+TENCENT_VECTOR_DB_USERNAME: {{ .Values.externalTencentVectorDB.username | b64enc | quote }}
+TENCENT_VECTOR_DB_API_KEY: {{ .Values.externalTencentVectorDB.apiKey | b64enc | quote }}
+{{- else if .Values.externalMyScaleDB.enabled}}
+MYSCALE_USER: {{ .Values.externalMyScaleDB.username | b64enc | quote }}
+MYSCALE_PASSWORD: {{ .Values.externalMyScaleDB.password | b64enc | quote }}
 {{- else if .Values.weaviate.enabled }}
 # The Weaviate API key.
   {{- if .Values.weaviate.authentication.apikey }}
