@@ -248,7 +248,7 @@ REDIS_DB: "0"
 
 {{- define "dify.vectordb.config" -}}
 {{- if .Values.externalWeaviate.enabled }}
-# The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
+# The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`, `pgvector`, `tencent`, `myscale`.
 VECTOR_STORE: weaviate
 # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
 WEAVIATE_ENDPOINT: {{ .Values.externalWeaviate.endpoint | quote }}
@@ -294,12 +294,21 @@ PGVECTOR_DATABASE: {{ .Values.externalPgvector.dbName }}
 # tencent vector configurations, only available when VECTOR_STORE is `tencent`
 VECTOR_STORE: tencent
 TENCENT_VECTOR_DB_URL: {{ .Values.externalTencentVectorDB.url | quote }}
-TENCENT_VECTOR_DB_API_KEY: {{ .Values.externalTencentVectorDB.apiKey | quote }}
+# TENCENT_VECTOR_DB_API_KEY: {{ .Values.externalTencentVectorDB.apiKey | quote }}
 TENCENT_VECTOR_DB_TIMEOUT: {{ .Values.externalTencentVectorDB.timeout | quote }}
-TENCENT_VECTOR_DB_USERNAME: {{ .Values.externalTencentVectorDB.username | quote }}
+# TENCENT_VECTOR_DB_USERNAME: {{ .Values.externalTencentVectorDB.username | quote }}
 TENCENT_VECTOR_DB_DATABASE: {{ .Values.externalTencentVectorDB.database | quote }}
 TENCENT_VECTOR_DB_SHARD: {{ .Values.externalTencentVectorDB.shard | quote }}
 TENCENT_VECTOR_DB_REPLICAS: {{ .Values.externalTencentVectorDB.replicas | quote }}
+{{- else if .Values.externalMyScaleDB.enabled}}
+# MyScaleDB vector db configurations, only available when VECTOR_STORE is `myscale`
+VECTOR_STORE: myscale
+MYSCALE_HOST: {{ .Values.externalMyScaleDB.host | quote }}
+MYSCALE_PORT: {{ .Values.externalMyScaleDB.port | toString | quote }}
+# MYSCALE_USER: {{ .Values.externalMyScaleDB.username | quote }}
+# MYSCALE_PASSWORD: {{ .Values.externalMyScaleDB.password | quote }}
+MYSCALE_DATABASE: {{ .Values.externalMyScaleDB.database | quote }}
+MYSCALE_FTS_PARAMS: {{ .Values.externalMyScaleDB.ftsParams | quote }}
 {{- else if .Values.weaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
