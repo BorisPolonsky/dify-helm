@@ -33,6 +33,12 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
       - name: Update dependency
         run: find charts -mindepth 1 -maxdepth 1 -type d | xargs -I{} helm dependency update {}
+
+      - name: Add repos
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add weaviate https://weaviate.github.io/weaviate-helm
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.7.0
         env:
