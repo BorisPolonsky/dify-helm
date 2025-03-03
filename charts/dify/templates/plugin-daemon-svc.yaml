@@ -19,10 +19,16 @@ spec:
   clusterIP: {{ .Values.pluginDaemon.service.clusterIP }}
   {{- end }}
   ports:
-    - name: http-api
-      port: {{ .Values.pluginDaemon.service.port }}
-      protocol: TCP
-      targetPort: api
+  - name: http-daemon
+    port: {{ .Values.pluginDaemon.service.ports.daemon }}
+    protocol: TCP
+    targetPort: daemon
+  {{- if .Values.pluginDaemon.service.ports.pluginInstall }}
+  - name: http-plugin-install
+    port: {{ .Values.pluginDaemon.service.ports.pluginInstall }}
+    protocol: TCP
+    targetPort: plugin-install
+    {{- end }}
   selector:
 {{ include "dify.selectorLabels" . | indent 4 }}
     component: "plugin-daemon"
