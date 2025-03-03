@@ -434,6 +434,15 @@ server {
       include proxy.conf;
     }
 
+    location /marketplace {
+      rewrite ^/marketplace/(.*)$ /$1 break;
+      proxy_ssl_server_name on;
+      proxy_pass https://marketplace.dify.ai;
+      proxy_pass_request_headers off;
+      proxy_set_header Host "marketplace.dify.ai";
+      proxy_set_header Connection "";
+    }
+
     location / {
       proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};
       include proxy.conf;
