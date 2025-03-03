@@ -580,7 +580,11 @@ pluginDaemon:
   # - name: LANG
   #   value: "C.UTF-8"
   service:
-    port: 5002
+    ports:
+      daemon: 5002
+      # Leave it unspecified in order NOT to expose port for remote installation as a `Service`.
+      pluginInstall:
+      # pluginInstall: 5003
     annotations: {}
     labels: {}
     clusterIP: ""
