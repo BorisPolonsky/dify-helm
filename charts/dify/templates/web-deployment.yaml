@@ -86,6 +86,10 @@ spec:
 {{ toYaml .Values.web.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
+        - name: MARKETPLACE_URL
+          value: https://marketplace.dify.ai
+        - name: MARKETPLACE_API_URL
+          value: /marketplace
         {{- if .Values.web.extraEnv }}
           {{- toYaml .Values.web.extraEnv | nindent 8 }}
         {{- end }}
