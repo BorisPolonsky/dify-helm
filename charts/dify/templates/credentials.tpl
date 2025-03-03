@@ -14,7 +14,8 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
-PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
+PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | b64enc | quote }}
+INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
 {{- end }}
 {{- end }}
 
@@ -34,7 +35,8 @@ SECRET_KEY: {{ .Values.api.secretKey | b64enc | quote }}
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
-PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
+PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | b64enc | quote }}
+INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
 {{- end }}
 {{- end }}
 
@@ -139,5 +141,6 @@ API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{- define "dify.pluginDaemon.credentials" -}}
 {{ include "dify.db.credentials" . }}
 {{ include "dify.redis.credentials" . }}
-SERVER_KEY: {{ .Values.pluginDaemon.auth.apiKey | b64enc | quote }}
+SERVER_KEY: {{ .Values.pluginDaemon.auth.serverKey | b64enc | quote }}
+DIFY_INNER_API_KEY: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
 {{- end }}

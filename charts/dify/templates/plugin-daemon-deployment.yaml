@@ -76,9 +76,12 @@ spec:
         - secretRef:
             name: {{ template "dify.pluginDaemon.fullname" . }}
         ports:
-          - name: api
-            containerPort: 5002
-            protocol: TCP
+        - name: daemon
+          containerPort: 5002
+          protocol: TCP
+        - name: plugin-install
+          containerPort: 5003
+          protocol: TCP
         resources:
           {{- toYaml .Values.pluginDaemon.resources | nindent 12 }}
         volumeMounts:
