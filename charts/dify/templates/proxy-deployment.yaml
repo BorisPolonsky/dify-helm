@@ -105,9 +105,9 @@ spec:
       affinity:
 {{ toYaml .Values.affinity | indent 8 }}
     {{- end }}
-    {{- if .Values.proxy.affinity }}
+    {{- with .Values.proxy.affinity}}
       affinity:
-{{ toYaml .Values.proxy.affinity | indent 8 }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.proxy.tolerations) }}
       tolerations:

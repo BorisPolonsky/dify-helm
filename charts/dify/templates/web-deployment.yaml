@@ -114,9 +114,9 @@ spec:
       affinity:
 {{ toYaml .Values.affinity | indent 8 }}
     {{- end }}
-    {{- if .Values.web.affinity }}
+    {{- with .Values.web.affinity}}
       affinity:
-{{ toYaml .Values.web.affinity | indent 8 }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.web.tolerations) }}
       tolerations:
