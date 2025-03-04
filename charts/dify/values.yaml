@@ -614,6 +614,8 @@ pluginDaemon:
     annotations: {}
     labels: {}
     clusterIP: ""
+  remote_installing:
+    port: 5003
   auth:
     serverKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
     # A separate key for interactions between `api`(`worker`) and `pluginDaemon`
@@ -3012,6 +3014,7 @@ externalOSS:
   region: "ap-southeast-1"
   bucketName: "difyai"
   authVersion: v4
+  path: "your-path"
 
 ###################################
 # External Google Cloud Storage
