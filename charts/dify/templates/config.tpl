@@ -25,6 +25,7 @@ APP_WEB_URL: {{ .Values.api.url.appWeb | quote }}
 # used to display File preview or download Url to the front-end or as Multi-model inputs;
 # Url is signed and has expiration time.
 FILES_URL: {{ .Values.api.url.files | quote }}
+{{- include "dify.marketplace.config" . }}
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
 MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
 
@@ -111,6 +112,7 @@ LOG_LEVEL: {{ .Values.worker.logLevel | quote }}
 {{- if .Values.pluginDaemon.enabled }}
 PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.ports.daemon }}
 {{- end }}
+{{- include "dify.marketplace.config" . }}
 {{- end }}
 
 {{- define "dify.web.config" -}}
@@ -123,6 +125,8 @@ CONSOLE_API_URL: {{ .Values.api.url.consoleApi | quote }}
 # example: http://udify.app
 APP_API_URL: {{ .Values.api.url.appApi | quote }}
 # The DSN for Sentry
+{{- include "dify.marketplace.config" . }}
+MARKETPLACE_URL: {{ .Values.api.url.marketplace | quote }}
 {{- end }}
 
 {{- define "dify.db.config" -}}
@@ -443,15 +447,6 @@ server {
       include proxy.conf;
     }
 
-    location /marketplace {
-      rewrite ^/marketplace/(.*)$ /$1 break;
-      proxy_ssl_server_name on;
-      proxy_pass https://marketplace.dify.ai;
-      proxy_pass_request_headers off;
-      proxy_set_header Host "marketplace.dify.ai";
-      proxy_set_header Connection "";
-    }
-
     location / {
       proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};
       include proxy.conf;
@@ -538,5 +533,15 @@ PLUGIN_REMOTE_INSTALLING_HOST: "0.0.0.0"
 PLUGIN_REMOTE_INSTALLING_PORT: "5003"
 MAX_PLUGIN_PACKAGE_SIZE: "52428800"
 PLUGIN_WORKING_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
-DIFY_INNER_API_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }}
+DIFY_INNER_API_URL: "http://{{ template "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
+{{- include "dify.marketplace.config" . }}
+{{- end }}
+
+{{- define "dify.marketplace.config" }}
+{{- if .Values.pluginDaemon.marketplace.enabled }}
+MARKETPLACE_ENABLED: "true"
+MARKETPLACE_API_URL: {{ .Values.api.url.marketplaceApi | quote }}
+{{- else }}
+MARKETPLACE_ENABLED: "false"
+{{- end }}
 {{- end }}
