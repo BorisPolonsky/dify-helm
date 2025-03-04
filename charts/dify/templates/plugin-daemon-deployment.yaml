@@ -100,9 +100,9 @@ spec:
       affinity:
 {{ toYaml .Values.affinity | indent 8 }}
     {{- end }}
-    {{- if .Values.pluginDaemon.affinity }}
+    {{- with .Values.pluginDaemon.affinity}}
       affinity:
-{{ toYaml .Values.pluginDaemon.affinity | indent 8 }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.pluginDaemon.tolerations) }}
       tolerations:
