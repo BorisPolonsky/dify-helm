@@ -131,7 +131,7 @@ APP_API_URL: {{ .Values.api.url.appApi | quote }}
 # DB_PASSWORD: {{ .Values.externalPostgres.password }}
 DB_HOST: {{ .Values.externalPostgres.address }}
 DB_PORT: {{ .Values.externalPostgres.port | toString | quote }}
-DB_DATABASE: {{ .Values.externalPostgres.dbName }}
+DB_DATABASE: {{ .Values.externalPostgres.database.api | quote }}
 {{- else if .Values.postgresql.enabled }}
   {{ with .Values.postgresql.global.postgresql.auth }}
   {{- if empty .username }}
@@ -509,12 +509,21 @@ cache_store_log none
 {{- end }}
 {{- end }}
 
+{{- define "dify.pluginDaemon.db.config" -}}
+{{- if .Values.externalPostgres.enabled }}
+DB_HOST: {{ .Values.externalPostgres.address }}
+DB_PORT: {{ .Values.externalPostgres.port | toString | quote }}
+DB_DATABASE: {{ .Values.externalPostgres.database.pluginDaemon | quote }}
+{{- else if .Values.postgresql.enabled }}
+# N.B.: `pluginDaemon` will the very same `PostgresSQL` database as `api`, `worker`,
+# which is NOT recommended for production and subject to possible confliction in the future releases of `dify`
+{{- include "dify.db.config" . }}
+{{- end }}
+{{- end }}
+
 {{- define "dify.pluginDaemon.config" }}
 {{- include "dify.redis.config" . }}
-{{- include "dify.db.config" .}}
-{{- if .Values.pluginDaemon.database }}
-DB_DATABASE: {{ .Values.pluginDaemon.database | quote }}
-{{- end }}
+{{- include "dify.pluginDaemon.db.config" .}}
 SERVER_PORT: "5002"
 PLUGIN_REMOTE_INSTALLING_HOST: "0.0.0.0"
 PLUGIN_REMOTE_INSTALLING_PORT: "5003"
