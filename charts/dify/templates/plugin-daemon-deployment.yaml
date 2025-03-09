@@ -115,5 +115,5 @@ spec:
       volumes:
       - name: app-data
         persistentVolumeClaim:
-          claimName: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.fullname" . | trunc 58)) }}
+          claimName: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.pluginDaemon.fullname" . | trunc 58)) }}
 {{- end }}
