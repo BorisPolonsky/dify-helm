@@ -175,6 +175,8 @@ api:
     # or download URL to the front-end or as a multi-modal model input;
     # In order to prevent others from forging, the image preview URL is signed and has a 5-minute expiration time.
     files: ""
+    marketplaceApi: "https://marketplace.dify.ai"
+    marketplace: "https://marketplace.dify.ai"
   mail:
     # default email sender from email address, if not given a specific address
     defaultSender: "YOUR EMAIL FROM (e.g., no-reply <no-reply@dify.ai>)"
@@ -637,6 +639,8 @@ pluginDaemon:
       accessModes: ReadWriteMany
       size: 5Gi
       subPath: ""
+  marketplace:
+    enabled: true
   ## pluginDaemon ServiceAccount configuration
   ##
   serviceAccount:
