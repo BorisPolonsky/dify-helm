@@ -178,12 +178,13 @@ AZURE_BLOB_ACCOUNT_URL: {{ .Values.externalAzureBlobStorage.url | quote }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss` and `google-storage`, Default: `local`
 STORAGE_TYPE: aliyun-oss
 # The OSS storage configurations, only available when STORAGE_TYPE is `aliyun-oss`.
-ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint }}
-ALIYUN_OSS_BUCKET_NAME: {{ .Values.externalOSS.bucketName }}
+ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint | quote }}
+ALIYUN_OSS_BUCKET_NAME: {{ .Values.externalOSS.bucketName | quote }}
 # ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey }}
 # ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey }}
-ALIYUN_OSS_REGION: {{ .Values.externalOSS.region }}
-ALIYUN_OSS_AUTH_VERSION: {{ .Values.externalOSS.authVersion }}
+ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}
+ALIYUN_OSS_AUTH_VERSION: {{ .Values.externalOSS.authVersion | quote }}
+ALIYUN_OSS_PATH: {{ .Values.externalOSS.path | quote }}
 {{- else if .Values.externalGCS.enabled }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss` and `google-storage`, Default: `local`
 STORAGE_TYPE: google-storage

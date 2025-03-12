@@ -3017,6 +3017,7 @@ externalOSS:
   region: "ap-southeast-1"
   bucketName: "difyai"
   authVersion: v4
+  path: "your-path"
 
 ###################################
 # External Google Cloud Storage
