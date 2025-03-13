@@ -99,9 +99,9 @@ spec:
       affinity:
 {{ toYaml .Values.affinity | indent 8 }}
     {{- end }}
-    {{- with .Values.ssrfProxy.affinity}}
+    {{- if .Values.ssrfProxy.affinity }}
       affinity:
-        {{- tpl (toYaml .) $ | nindent 8 }}
+{{ toYaml .Values.ssrfProxy.affinity | indent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.ssrfProxy.tolerations) }}
       tolerations:

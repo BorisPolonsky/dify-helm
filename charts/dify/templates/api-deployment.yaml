@@ -125,12 +125,12 @@ spec:
 {{ toYaml .Values.api.nodeSelector | indent 8 }}
     {{- end }}
     {{- if and (.Values.affinity) (not .Values.api.affinity) }}
-      affinity: 
+      affinity:
 {{ toYaml .Values.affinity | indent 8 }}
     {{- end }}
-    {{- with .Values.api.affinity}}
+    {{- if .Values.api.affinity }}
       affinity:
-        {{- tpl (toYaml .) $ | nindent 8 }}
+{{ toYaml .Values.api.affinity | indent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.api.tolerations) }}
       tolerations:

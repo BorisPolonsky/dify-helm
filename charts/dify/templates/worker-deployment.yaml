@@ -96,9 +96,9 @@ spec:
       affinity:
 {{ toYaml .Values.affinity | indent 8 }}
     {{- end }}
-    {{- with .Values.worker.affinity}}
+    {{- if .Values.worker.affinity }}
       affinity:
-        {{- tpl (toYaml .) $ | nindent 8 }}
+{{ toYaml .Values.worker.affinity | indent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.worker.tolerations) }}
       tolerations:

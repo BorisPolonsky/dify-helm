@@ -109,9 +109,9 @@ spec:
       affinity:
 {{ toYaml .Values.affinity | indent 8 }}
     {{- end }}
-    {{- with .Values.sandbox.affinity}}
+    {{- if .Values.sandbox.affinity }}
       affinity:
-        {{- tpl (toYaml .) $ | nindent 8 }}
+{{ toYaml .Values.sandbox.affinity | indent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.sandbox.tolerations) }}
       tolerations:
