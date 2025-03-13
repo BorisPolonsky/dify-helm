@@ -13,6 +13,7 @@ image:
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
+
   web:
     repository: langgenius/dify-web
     tag: "1.0.0"
@@ -23,6 +24,7 @@ image:
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
+
   sandbox:
     repository: langgenius/dify-sandbox
     tag: "0.2.10"
@@ -33,6 +35,7 @@ image:
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
+
   proxy:
     repository: nginx
     tag: latest
@@ -73,9 +76,15 @@ api:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  ## Configure extra options for api containers' liveness, readiness and startup probes
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  ## Configure extra options for API containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
-  ## @param api.livenessProbe.enabled Enable livenessProbe on api nodes
+  ## @param api.livenessProbe.enabled Enable livenessProbe on API nodes
   livenessProbe:
     enabled: true
     initialDelaySeconds: 30
@@ -83,7 +92,7 @@ api:
     timeoutSeconds: 5
     failureThreshold: 5
     successThreshold: 1
-  ## @param api.readinessProbe.enabled Enable readinessProbe on api nodes
+  ## @param api.readinessProbe.enabled Enable readinessProbe on API nodes
   readinessProbe:
     enabled: true
     initialDelaySeconds: 10
@@ -91,7 +100,7 @@ api:
     timeoutSeconds: 5
     failureThreshold: 5
     successThreshold: 1
-  ## @param api.startupProbe.enabled Enable startupProbe on api containers
+  ## @param api.startupProbe.enabled Enable startupProbe on API containers
   startupProbe:
     enabled: false
     initialDelaySeconds: 5
@@ -111,7 +120,7 @@ api:
   containerSecurityContext: {}
   extraEnv:
     # Apply your own Environment Variables if necessary.
-    # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
+    # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
     # The direct approach
     # - name: LANG
     #   value: "C.UTF-8"
@@ -123,7 +132,7 @@ api:
     #        name: my-secret
     #        key: DB_PASSWORD
     - name: CHECK_UPDATE_URL
-      # Won't check for update if left empty
+      # Won't check for updates if left empty
       #   value: https://updates.dify.ai
       value: ""
     - name: CODE_MAX_NUMBER
@@ -154,21 +163,23 @@ api:
     # The front-end URL of the console web, used to concatenate some front-end addresses and for CORS configuration use.
     # If empty, it is the same domain. Example: https://console.dify.ai
     consoleWeb: ""
-    # Service API Url, used to display Service API Base Url to the front-end.
+    # Service API URL, used to display Service API Base URL to the front-end.
     # If empty, it is the same domain. Example: https://api.dify.ai
     serviceApi: ""
-    # WebApp API backend Url, used to declare the back-end URL for the front-end API.
+    # WebApp API backend URL, used to declare the back-end URL for the front-end API.
     # If empty, it is the same domain. Example: https://app.dify.ai
     appApi: ""
-    # WebApp Url, used to display WebAPP API Base Url to the front-end. If empty, it is the same domain. Example: https://api.app.dify.ai
+    # WebApp URL, used to display WebAPP API Base URL to the front-end. If empty, it is the same domain. Example: https://api.app.dify.ai
     appWeb: ""
     # File preview or download URL prefix, used to display the file preview
     # or download URL to the front-end or as a multi-modal model input;
     # In order to prevent others from forging, the image preview URL is signed and has a 5-minute expiration time.
     files: ""
+    marketplaceApi: "https://marketplace.dify.ai"
+    marketplace: "https://marketplace.dify.ai"
   mail:
-    # default email sender from email address, if not not given specific address
-    defaultSender: "YOUR EMAIL FROM (eg: no-reply <no-reply@dify.ai>)"
+    # default email sender from email address, if not given a specific address
+    defaultSender: "YOUR EMAIL FROM (e.g., no-reply <no-reply@dify.ai>)"
     # Mail type, supported values are `smtp`, `resend` https://docs.dify.ai/getting-started/install-self-hosted/environments#mail-related-configuration
     type: "resend"
     resend:
@@ -233,7 +244,13 @@ worker:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  ## Configure extra options for worker containers' liveness, readiness and startup probes
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  ## Configure extra options for worker containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param worker.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
@@ -247,7 +264,7 @@ worker:
   containerSecurityContext: {}
   extraEnv:
   # Apply your own Environment Variables if necessary.
-  # Variable defined here takes higher priority than those from `ConfigMap` generated given `.Values`
+  # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
   # The direct approach
   # - name: LANG
   #   value: "C.UTF-8"
@@ -283,7 +300,7 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  ## Configure extra options for proxy containers' liveness, readiness and startup probes
+  ## Configure extra options for proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param proxy.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
@@ -352,7 +369,13 @@ web:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  ## Configure extra options for web containers' liveness, readiness and startup probes
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  ## Configure extra options for web containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param web.livenessProbe.enabled Enable livenessProbe on web nodes
   livenessProbe:
@@ -392,10 +415,6 @@ web:
     # Apply your own Environment Variables if necessary
     - name: EDITION
       value: "SELF_HOSTED"
-    - name: MARKETPLACE_URL
-      value: "https://marketplace.dify.ai"
-    - name: MARKETPLACE_API_URL
-      value: "https://marketplace.dify.ai"
   service:
     port: 3000
     annotations: {}
@@ -425,7 +444,13 @@ sandbox:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  ## Configure extra options for sandbox containers' liveness, readiness and startup probes
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  ## Configure extra options for sandbox containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param sandbox.livenessProbe.enabled Enable livenessProbe on sandbox nodes
   livenessProbe:
@@ -499,7 +524,7 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  ## Configure extra options for ssrf proxy containers' liveness, readiness and startup probes
+  ## Configure extra options for ssrf proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param ssrfProxy.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
@@ -566,7 +591,7 @@ pluginDaemon:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  ## Configure extra options for plugin daemon containers' liveness, readiness and startup probes
+  ## Configure extra options for plugin daemon containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param pluginDaemon.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
@@ -595,7 +620,6 @@ pluginDaemon:
     serverKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
     # A separate key for interactions between `api`(`worker`) and `pluginDaemon`
     difyApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
-  database: "dify_plugin"
   persistence:
     mountPath: "/app/storage/cwd"
     annotations:
@@ -613,6 +637,8 @@ pluginDaemon:
       accessModes: ReadWriteMany
       size: 5Gi
       subPath: ""
+  marketplace:
+    enabled: true
   ## pluginDaemon ServiceAccount configuration
   ##
   serviceAccount:
@@ -2946,7 +2972,9 @@ externalPostgres:
   password: "difyai123456"
   address: localhost
   port: 5432
-  dbName: dify
+  database:
+    api: "dify"
+    pluginDaemon: "dify_plugin"
   maxOpenConns: 20
   maxIdleConns: 5
 
@@ -2989,6 +3017,7 @@ externalOSS:
   region: "ap-southeast-1"
   bucketName: "difyai"
   authVersion: v4
+  path: "your-path"
 
 ###################################
 # External Google Cloud Storage
@@ -3094,3 +3123,16 @@ externalTencentVectorDB:
   database: "dify"
   shard: 1
   replicas: 2
+
+###################################
+# External MyScaleDB Vector DB
+# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` are set as `false` and `externalMyScaleDB.enabled` is `true`
+###################################
+externalMyScaleDB:
+  enabled: false
+  host: "myscale"
+  port: 8123
+  user: "default"
+  password: ""
+  database: "dify"
+  ftsParams: ""
