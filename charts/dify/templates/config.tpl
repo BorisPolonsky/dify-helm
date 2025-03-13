@@ -25,6 +25,7 @@ APP_WEB_URL: {{ .Values.api.url.appWeb | quote }}
 # used to display File preview or download Url to the front-end or as Multi-model inputs;
 # Url is signed and has expiration time.
 FILES_URL: {{ .Values.api.url.files | quote }}
+{{- include "dify.marketplace.config" . }}
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
 MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
 
@@ -111,6 +112,7 @@ LOG_LEVEL: {{ .Values.worker.logLevel | quote }}
 {{- if .Values.pluginDaemon.enabled }}
 PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.ports.daemon }}
 {{- end }}
+{{- include "dify.marketplace.config" . }}
 {{- end }}
 
 {{- define "dify.web.config" -}}
@@ -123,6 +125,8 @@ CONSOLE_API_URL: {{ .Values.api.url.consoleApi | quote }}
 # example: http://udify.app
 APP_API_URL: {{ .Values.api.url.appApi | quote }}
 # The DSN for Sentry
+{{- include "dify.marketplace.config" . }}
+MARKETPLACE_URL: {{ .Values.api.url.marketplace | quote }}
 {{- end }}
 
 {{- define "dify.db.config" -}}
@@ -174,12 +178,13 @@ AZURE_BLOB_ACCOUNT_URL: {{ .Values.externalAzureBlobStorage.url | quote }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss` and `google-storage`, Default: `local`
 STORAGE_TYPE: aliyun-oss
 # The OSS storage configurations, only available when STORAGE_TYPE is `aliyun-oss`.
-ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint }}
-ALIYUN_OSS_BUCKET_NAME: {{ .Values.externalOSS.bucketName }}
+ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint | quote }}
+ALIYUN_OSS_BUCKET_NAME: {{ .Values.externalOSS.bucketName | quote }}
 # ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey }}
 # ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey }}
-ALIYUN_OSS_REGION: {{ .Values.externalOSS.region }}
-ALIYUN_OSS_AUTH_VERSION: {{ .Values.externalOSS.authVersion }}
+ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}
+ALIYUN_OSS_AUTH_VERSION: {{ .Values.externalOSS.authVersion | quote }}
+ALIYUN_OSS_PATH: {{ .Values.externalOSS.path | quote }}
 {{- else if .Values.externalGCS.enabled }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss` and `google-storage`, Default: `local`
 STORAGE_TYPE: google-storage
@@ -248,7 +253,7 @@ REDIS_DB: "0"
 
 {{- define "dify.vectordb.config" -}}
 {{- if .Values.externalWeaviate.enabled }}
-# The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
+# The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`, `pgvector`, `tencent`, `myscale`.
 VECTOR_STORE: weaviate
 # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
 WEAVIATE_ENDPOINT: {{ .Values.externalWeaviate.endpoint | quote }}
@@ -294,12 +299,21 @@ PGVECTOR_DATABASE: {{ .Values.externalPgvector.dbName }}
 # tencent vector configurations, only available when VECTOR_STORE is `tencent`
 VECTOR_STORE: tencent
 TENCENT_VECTOR_DB_URL: {{ .Values.externalTencentVectorDB.url | quote }}
-TENCENT_VECTOR_DB_API_KEY: {{ .Values.externalTencentVectorDB.apiKey | quote }}
+# TENCENT_VECTOR_DB_API_KEY: {{ .Values.externalTencentVectorDB.apiKey | quote }}
 TENCENT_VECTOR_DB_TIMEOUT: {{ .Values.externalTencentVectorDB.timeout | quote }}
-TENCENT_VECTOR_DB_USERNAME: {{ .Values.externalTencentVectorDB.username | quote }}
+# TENCENT_VECTOR_DB_USERNAME: {{ .Values.externalTencentVectorDB.username | quote }}
 TENCENT_VECTOR_DB_DATABASE: {{ .Values.externalTencentVectorDB.database | quote }}
 TENCENT_VECTOR_DB_SHARD: {{ .Values.externalTencentVectorDB.shard | quote }}
 TENCENT_VECTOR_DB_REPLICAS: {{ .Values.externalTencentVectorDB.replicas | quote }}
+{{- else if .Values.externalMyScaleDB.enabled}}
+# MyScaleDB vector db configurations, only available when VECTOR_STORE is `myscale`
+VECTOR_STORE: myscale
+MYSCALE_HOST: {{ .Values.externalMyScaleDB.host | quote }}
+MYSCALE_PORT: {{ .Values.externalMyScaleDB.port | toString | quote }}
+# MYSCALE_USER: {{ .Values.externalMyScaleDB.username | quote }}
+# MYSCALE_PASSWORD: {{ .Values.externalMyScaleDB.password | quote }}
+MYSCALE_DATABASE: {{ .Values.externalMyScaleDB.database | quote }}
+MYSCALE_FTS_PARAMS: {{ .Values.externalMyScaleDB.ftsParams | quote }}
 {{- else if .Values.weaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
@@ -434,15 +448,6 @@ server {
       include proxy.conf;
     }
 
-    location /marketplace {
-      rewrite ^/marketplace/(.*)$ /$1 break;
-      proxy_ssl_server_name on;
-      proxy_pass https://marketplace.dify.ai;
-      proxy_pass_request_headers off;
-      proxy_set_header Host "marketplace.dify.ai";
-      proxy_set_header Connection "";
-    }
-
     location / {
       proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};
       include proxy.conf;
@@ -529,5 +534,15 @@ PLUGIN_REMOTE_INSTALLING_HOST: "0.0.0.0"
 PLUGIN_REMOTE_INSTALLING_PORT: "5003"
 MAX_PLUGIN_PACKAGE_SIZE: "52428800"
 PLUGIN_WORKING_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
-DIFY_INNER_API_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }}
+DIFY_INNER_API_URL: "http://{{ template "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
+{{- include "dify.marketplace.config" . }}
+{{- end }}
+
+{{- define "dify.marketplace.config" }}
+{{- if .Values.pluginDaemon.marketplace.enabled }}
+MARKETPLACE_ENABLED: "true"
+MARKETPLACE_API_URL: {{ .Values.api.url.marketplaceApi | quote }}
+{{- else }}
+MARKETPLACE_ENABLED: "false"
+{{- end }}
 {{- end }}
