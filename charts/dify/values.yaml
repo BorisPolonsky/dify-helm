@@ -3041,6 +3041,17 @@ externalCOS:
   scheme: "your-scheme"
 
 ###################################
+# External HUAWEI OBS
+# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled`  and `externalGCS.enabled` and `externalCOS.enabled` are false and `externalOBS.enabled` is true
+###################################
+externalOBS:
+  enabled: false
+  secretKey: "your-secret-key"
+  secretId: "your-secret-id"
+  bucketName: "your-bucket-name"
+  server: "your-server"
+
+###################################
 # External Redis
 # - these configs are only used when `externalRedis.enabled` is true
 ###################################
