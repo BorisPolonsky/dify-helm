@@ -621,7 +621,7 @@ pluginDaemon:
     # A separate key for interactions between `api`(`worker`) and `pluginDaemon`
     difyApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
   persistence:
-    mountPath: "/app/storage/cwd"
+    mountPath: "/app/storage"
     annotations:
       helm.sh/resource-policy: keep
     persistentVolumeClaim:
