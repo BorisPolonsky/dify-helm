@@ -32,6 +32,7 @@ helm install my-release dify/dify
   - [x] Alibaba Cloud OSS
   - [x] Google Cloud Storage
   - [x] Tencent Cloud COS
+  - [x] Huawei Cloud OBS
 - External Vector DB:
   - [x] Weaviate
   - [x] Qdrant
