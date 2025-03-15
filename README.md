@@ -7,7 +7,7 @@ Deploy [langgenius/dify](https://github.com/langgenius/dify), an LLM based chat 
 ```
 helm repo add dify https://borispolonsky.github.io/dify-helm
 helm repo update
-helm install my-dify-release dify/dify
+helm install my-release dify/dify
 ```
 
 ## Supported Component 
