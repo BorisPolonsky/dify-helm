@@ -639,6 +639,10 @@ pluginDaemon:
       subPath: ""
   marketplace:
     enabled: true
+    # Takes effect only if built-in `nginx` were enabled
+    # If enabled, route marketplace api call to built-in `nginx` and strip headers for tracking.
+    # https://github.com/BorisPolonsky/dify-helm/pull/131
+    apiProxyEnabled: false
   ## pluginDaemon ServiceAccount configuration
   ##
   serviceAccount:

@@ -126,6 +126,11 @@ CONSOLE_API_URL: {{ .Values.api.url.consoleApi | quote }}
 APP_API_URL: {{ .Values.api.url.appApi | quote }}
 # The DSN for Sentry
 {{- include "dify.marketplace.config" . }}
+{{- if and .Values.pluginDaemon.enabled .Values.pluginDaemon.marketplace.enabled .Values.pluginDaemon.marketplace.apiProxyEnabled }}
+MARKETPLACE_API_URL: "/marketplace"
+{{- else }}
+MARKETPLACE_API_URL: {{ .Values.api.url.marketplaceApi | quote }}
+{{- end }}
 MARKETPLACE_URL: {{ .Values.api.url.marketplace | quote }}
 {{- end }}
 
@@ -447,6 +452,17 @@ server {
       proxy_pass http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.ports.daemon }};
       include proxy.conf;
     }
+
+    {{- if and .Values.pluginDaemon.enabled .Values.pluginDaemon.marketplace.enabled .Values.pluginDaemon.marketplace.apiProxyEnabled }}
+    location /marketplace {
+      rewrite ^/marketplace/(.*)$ /$1 break;
+      proxy_ssl_server_name on;
+      proxy_pass {{ .Values.api.url.marketplace | quote }};
+      proxy_pass_request_headers off;
+      proxy_set_header Host {{ regexReplaceAll "^https?://([^/]+).*" .Values.api.url.marketplace "${1}" | quote }};
+      proxy_set_header Connection "";
+    }
+    {{- end }}
 
     location / {
       proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};
