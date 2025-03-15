@@ -119,36 +119,36 @@ api:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-    # Apply your own Environment Variables if necessary.
-    # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
-    # The direct approach
-    # - name: LANG
-    #   value: "C.UTF-8"
-    #   - name: SECRET_KEY
-    # Use existing k8s secrets
-    #  - name: DB_PASSWORD
-    #    valueFrom:
-    #      secretKeyRef:
-    #        name: my-secret
-    #        key: DB_PASSWORD
-    - name: CHECK_UPDATE_URL
-      # Won't check for updates if left empty
-      #   value: https://updates.dify.ai
-      value: ""
-    - name: CODE_MAX_NUMBER
-      value: "9223372036854775807"
-    - name: CODE_MIN_NUMBER
-      value: "-9223372036854775808"
-    - name: CODE_MAX_STRING_LENGTH
-      value: "80000"
-    - name: TEMPLATE_TRANSFORM_MAX_LENGTH
-      value: "80000"
-    - name: CODE_MAX_STRING_ARRAY_LENGTH
-      value: "30"
-    - name: CODE_MAX_OBJECT_ARRAY_LENGTH
-      value: "30"
-    - name: CODE_MAX_NUMBER_ARRAY_LENGTH
-      value: "1000"
+  # Apply your own Environment Variables if necessary.
+  # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
+  # The direct approach
+  # - name: LANG
+  #   value: "C.UTF-8"
+  #   - name: SECRET_KEY
+  # Use existing k8s secrets
+  #  - name: DB_PASSWORD
+  #    valueFrom:
+  #      secretKeyRef:
+  #        name: my-secret
+  #        key: DB_PASSWORD
+  - name: CHECK_UPDATE_URL
+    # Won't check for updates if left empty
+    #   value: https://updates.dify.ai
+    value: ""
+  - name: CODE_MAX_NUMBER
+    value: "9223372036854775807"
+  - name: CODE_MIN_NUMBER
+    value: "-9223372036854775808"
+  - name: CODE_MAX_STRING_LENGTH
+    value: "80000"
+  - name: TEMPLATE_TRANSFORM_MAX_LENGTH
+    value: "80000"
+  - name: CODE_MAX_STRING_ARRAY_LENGTH
+    value: "30"
+  - name: CODE_MAX_OBJECT_ARRAY_LENGTH
+    value: "30"
+  - name: CODE_MAX_NUMBER_ARRAY_LENGTH
+    value: "1000"
   service:
     port: 5001
     annotations: {}
@@ -179,7 +179,7 @@ api:
     marketplace: "https://marketplace.dify.ai"
   mail:
     # default email sender from email address, if not given a specific address
-    defaultSender: "YOUR EMAIL FROM (e.g., no-reply <no-reply@dify.ai>)"
+    defaultSender: "YOUR EMAIL FROM (e.g.: no-reply <no-reply@dify.ai>)"
     # Mail type, supported values are `smtp`, `resend` https://docs.dify.ai/getting-started/install-self-hosted/environments#mail-related-configuration
     type: "resend"
     resend:
@@ -412,9 +412,9 @@ web:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-    # Apply your own Environment Variables if necessary
-    - name: EDITION
-      value: "SELF_HOSTED"
+  # Apply your own Environment Variables if necessary
+  - name: EDITION
+    value: "SELF_HOSTED"
   service:
     port: 3000
     annotations: {}
@@ -487,11 +487,11 @@ sandbox:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-    # Apply your own Environment Variables if necessary
-    # - name: LANG
-    #   value: "C.UTF-8"
-    - name: WORKER_TIMEOUT
-      value: "15"
+  # Apply your own Environment Variables if necessary
+  # - name: LANG
+  #   value: "C.UTF-8"
+  - name: WORKER_TIMEOUT
+    value: "15"
   service:
     port: 8194
     annotations: {}
@@ -639,6 +639,10 @@ pluginDaemon:
       subPath: ""
   marketplace:
     enabled: true
+    # Takes effect only if built-in `nginx` were enabled
+    # If enabled, route marketplace api call to built-in `nginx` and strip headers for tracking.
+    # https://github.com/BorisPolonsky/dify-helm/pull/131
+    apiProxyEnabled: false
   ## pluginDaemon ServiceAccount configuration
   ##
   serviceAccount:
@@ -889,11 +893,11 @@ weaviate:
     admin_list:
       enabled: true
       users:
-        # Examples
-        # - admin_user1
-        # - admin_user2
-        # - api-key-user-admin
-        - hello@dify.ai
+      # Examples
+      # - admin_user1
+      # - admin_user2
+      # - api-key-user-admin
+      - hello@dify.ai
       read_only_users:
       # Examples
       # - readonly_user1

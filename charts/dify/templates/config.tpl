@@ -126,6 +126,11 @@ CONSOLE_API_URL: {{ .Values.api.url.consoleApi | quote }}
 APP_API_URL: {{ .Values.api.url.appApi | quote }}
 # The DSN for Sentry
 {{- include "dify.marketplace.config" . }}
+{{- if and .Values.pluginDaemon.enabled .Values.pluginDaemon.marketplace.enabled .Values.pluginDaemon.marketplace.apiProxyEnabled }}
+MARKETPLACE_API_URL: "/marketplace"
+{{- else }}
+MARKETPLACE_API_URL: {{ .Values.api.url.marketplaceApi | quote }}
+{{- end }}
 MARKETPLACE_URL: {{ .Values.api.url.marketplace | quote }}
 {{- end }}
 
@@ -448,6 +453,17 @@ server {
       include proxy.conf;
     }
 
+    {{- if and .Values.pluginDaemon.enabled .Values.pluginDaemon.marketplace.enabled .Values.pluginDaemon.marketplace.apiProxyEnabled }}
+    location /marketplace {
+      rewrite ^/marketplace/(.*)$ /$1 break;
+      proxy_ssl_server_name on;
+      proxy_pass {{ .Values.api.url.marketplace | quote }};
+      proxy_pass_request_headers off;
+      proxy_set_header Host {{ regexReplaceAll "^https?://([^/]+).*" .Values.api.url.marketplace "${1}" | quote }};
+      proxy_set_header Connection "";
+    }
+    {{- end }}
+
     location / {
       proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};
       include proxy.conf;
@@ -533,7 +549,7 @@ SERVER_PORT: "5002"
 PLUGIN_REMOTE_INSTALLING_HOST: "0.0.0.0"
 PLUGIN_REMOTE_INSTALLING_PORT: "5003"
 MAX_PLUGIN_PACKAGE_SIZE: "52428800"
-PLUGIN_WORKING_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
+PLUGIN_WORKING_PATH: {{ printf "%s/cwd" .Values.pluginDaemon.persistence.mountPath | clean | quote }}
 DIFY_INNER_API_URL: "http://{{ template "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
 {{- include "dify.marketplace.config" . }}
 {{- end }}
