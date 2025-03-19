@@ -280,18 +280,10 @@ QDRANT_GRPC_PORT: {{ .Values.externalQdrant.grpc.port | quote }}
 {{- else if .Values.externalMilvus.enabled}}
 # Milvus configuration Only available when VECTOR_STORE is `milvus`.
 VECTOR_STORE: milvus
-# The milvus host.
-MILVUS_HOST: {{ .Values.externalMilvus.host | quote }}
-# The milvus host.
-MILVUS_PORT: {{ .Values.externalMilvus.port | toString | quote }}
+# Milvus endpoint
+MILVUS_URI: {{ .Values.externalMilvus.uri | quote }}
 # The milvus database
 MILVUS_DATABASE: {{ .Values.externalMilvus.database | quote }}
-# The milvus username.
-# MILVUS_USER: {{ .Values.externalMilvus.user | quote }}
-# The milvus password.
-# MILVUS_PASSWORD: {{ .Values.externalMilvus.password | quote }}
-# The milvus tls switch.
-MILVUS_SECURE: {{ .Values.externalMilvus.useTLS | toString | quote }}
 {{- else if .Values.externalPgvector.enabled}}
 # pgvector configurations, only available when VECTOR_STORE is `pgvecto-rs or pgvector`
 VECTOR_STORE: pgvector
