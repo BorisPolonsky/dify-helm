@@ -3095,12 +3095,11 @@ externalQdrant:
 ###################################
 externalMilvus:
   enabled: false
-  host: "your-milvus.domain"
-  port: 19530
-  database: "default"
-  user: "user"
-  password: "Milvus"
-  useTLS: false
+  uri: "http://your-milvus.domain:19530"
+  database: 'default'
+  token: ""
+  user: ""
+  password: ""
 
 ###################################
 # External Pgvector

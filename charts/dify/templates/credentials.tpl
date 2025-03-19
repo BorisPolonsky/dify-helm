@@ -109,8 +109,11 @@ WEAVIATE_API_KEY: {{ .Values.externalWeaviate.apiKey | b64enc | quote }}
 {{- else if .Values.externalQdrant.enabled }}
 QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey | b64enc | quote }}
 {{- else if .Values.externalMilvus.enabled}}
+# the milvus token
+MILVUS_TOKEN: {{ .Values.externalMilvus.token | b64enc | quote }}
+# the milvus username
 MILVUS_USER: {{ .Values.externalMilvus.user | b64enc | quote }}
-# The milvus password.
+# the milvus password
 MILVUS_PASSWORD: {{ .Values.externalMilvus.password | b64enc | quote }}
 {{- else if .Values.externalPgvector.enabled}}
 PGVECTOR_USER: {{ .Values.externalPgvector.username | b64enc | quote }}
