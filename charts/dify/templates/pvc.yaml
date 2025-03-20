@@ -1,4 +1,4 @@
-{{- if not (or .Values.externalS3.enabled .Values.externalAzureBlobStorage.enabled .Values.externalOSS.enabled) }}
+{{- if not (or .Values.externalS3.enabled .Values.externalAzureBlobStorage.enabled .Values.externalOSS.enabled .Values.externalGCS.enabled .Values.externalCOS.enabled .Values.externalOBS.enabled) }}
 {{- $pvc := .Values.api.persistence.persistentVolumeClaim -}}
 {{- if (not $pvc.existingClaim) }}
 apiVersion: v1

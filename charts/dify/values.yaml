@@ -3034,7 +3034,7 @@ externalGCS:
 
 ###################################
 # External TENCENT COS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled`  and `externalGCS.enabled` are false and `externalCOS.enabled` is true
+# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` are false and `externalCOS.enabled` is true
 ###################################
 externalCOS:
   enabled: false
@@ -3046,7 +3046,7 @@ externalCOS:
 
 ###################################
 # External HUAWEI OBS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled`  and `externalGCS.enabled` and `externalCOS.enabled` are false and `externalOBS.enabled` is true
+# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` are false and `externalOBS.enabled` is true
 ###################################
 externalOBS:
   enabled: false
