@@ -1,5 +1,7 @@
 # dify-helm
 [![Github All Releases](https://img.shields.io/github/downloads/borispolonsky/dify-helm/total.svg)]()
+[![Release Charts](https://github.com/BorisPolonsky/dify-helm/actions/workflows/release.yml/badge.svg)](https://github.com/BorisPolonsky/dify-helm/actions/workflows/release.yml)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/dify-helm)](https://artifacthub.io/packages/search?repo=dify-helm)
 
 Deploy [langgenius/dify](https://github.com/langgenius/dify), an LLM based chat bot app on kubernetes with helm chart.
 
