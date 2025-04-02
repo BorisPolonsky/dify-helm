@@ -440,7 +440,7 @@ server {
       include proxy.conf;
     }
 
-    location /e {
+    location /e/ {
       proxy_pass http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.ports.daemon }};
       include proxy.conf;
     }
