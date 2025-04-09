@@ -4,8 +4,8 @@
 
 image:
   api:
-    repository: langgenius/dify-api
-    tag: "1.0.0"
+    repository: eudcacrweappsprod.azurecr.io/langgenius/dify-api
+    tag: "1.2.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -16,7 +16,7 @@ image:
 
   web:
     repository: langgenius/dify-web
-    tag: "1.0.0"
+    tag: "1.2.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -27,7 +27,7 @@ image:
 
   sandbox:
     repository: langgenius/dify-sandbox
-    tag: "0.2.10"
+    tag: "0.2.11"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -60,7 +60,7 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.0.3-local
+    tag: 0.0.7-local
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -217,7 +217,7 @@ api:
       ## ReadWriteMany access mode required for `api` and `worker`
       ##
       storageClass:
-      accessModes: ReadWriteMany
+      accessModes: ReadWriteOnce
       size: 5Gi
       subPath: ""
   ## Dify API ServiceAccount configuration
@@ -337,7 +337,7 @@ proxy:
         ## ReadWriteMany access mode required for nginx
         ##
         storageClass:
-        accessModes: ReadWriteMany
+        accessModes: ReadWriteOnce
         size: 1Gi
         subPath: ""
   service:
@@ -559,7 +559,7 @@ ssrfProxy:
         ## ReadWriteMany access mode required for squid
         ##
         storageClass:
-        accessModes: ReadWriteMany
+        accessModes: ReadWriteOnce
         size: 1Gi
         subPath: ""
   service:
@@ -634,7 +634,7 @@ pluginDaemon:
       ## ReadWriteMany access mode required for `pluginDaemon`
       ##
       storageClass:
-      accessModes: ReadWriteMany
+      accessModes: ReadWriteOnce
       size: 5Gi
       subPath: ""
   marketplace:
@@ -678,7 +678,7 @@ postgresql:
     pullPolicy: IfNotPresent
   ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
   ##
-  architecture: replication
+  architecture: standalone
   ## Replication configuration
   ## Ignored if `architecture` is `standalone`
   ##
@@ -730,8 +730,17 @@ postgresql:
     ##
     tolerations: []
 
-weaviate:
+qdrant:
   enabled: true
+  image:
+    repository: docker.io/qdrant/qdrant
+    tag: v1.13.6
+    pullPolicy: IfNotPresent
+  apiKey: "difyai123456"
+  fullnameOverride: ""
+
+weaviate:
+  enabled: false
   image:
     # registry where weaviate image is stored
     registry: docker.io
@@ -1295,7 +1304,7 @@ redis:
 
   ## @param architecture Redis&reg; architecture. Allowed values: `standalone` or `replication`
   ##
-  architecture: replication
+  architecture: standalone
   ## Redis&reg; Authentication parameters
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/redis#setting-the-server-password-on-first-run
   ##
