@@ -436,6 +436,7 @@ web:
     ## @param web.serviceAccount.annotations Additional custom annotations for the ServiceAccount
     ##
     annotations: {}
+  enableServiceLinks: false
 
 sandbox:
   enabled: true
