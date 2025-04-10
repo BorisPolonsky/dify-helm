@@ -4,7 +4,7 @@
 
 image:
   api:
-    repository: eudcacrweappsprod.azurecr.io/langgenius/dify-api
+    repository: langgenius/dify-api
     tag: "1.2.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
@@ -734,7 +734,7 @@ qdrant:
   enabled: true
   image:
     repository: docker.io/qdrant/qdrant
-    tag: v1.13.6
+    tag: v1.7.3
     pullPolicy: IfNotPresent
   apiKey: "difyai123456"
   fullnameOverride: ""
@@ -3105,7 +3105,7 @@ externalQdrant:
 externalMilvus:
   enabled: false
   uri: "http://your-milvus.domain:19530"
-  database: 'default'
+  database: "default"
   token: ""
   user: ""
   password: ""
