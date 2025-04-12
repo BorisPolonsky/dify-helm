@@ -436,6 +436,9 @@ web:
     ## @param web.serviceAccount.annotations Additional custom annotations for the ServiceAccount
     ##
     annotations: {}
+  ## @param web.enableServiceLinks Disable this feature if additional environment variables would lead to `E2BIG` errors in case frontend were managed by `pm2`
+  ##
+  enableServiceLinks: false
 
 sandbox:
   enabled: true

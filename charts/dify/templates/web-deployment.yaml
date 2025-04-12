@@ -98,6 +98,7 @@ spec:
             protocol: TCP
         resources:
           {{- toYaml .Values.web.resources | nindent 12 }}
+        enableServiceLinks: {{ .Values.web.enableServiceLinks }}
     {{- if and (.Values.nodeSelector) (not .Values.web.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
