@@ -1,3 +1,4 @@
+{{- $usePvc := not (or .Values.externalS3.enabled .Values.externalAzureBlobStorage.enabled .Values.externalOSS.enabled .Values.externalCOS.enabled) -}}
 {{- if and .Values.pluginDaemon.enabled}}
 apiVersion: apps/v1
 kind: Deployment

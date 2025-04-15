@@ -92,7 +92,7 @@ spec:
 
 {{- $pvc := .Values.pluginDaemon.persistence.persistentVolumeClaim -}}
 {{- if and .Values.pluginDaemon.enabled (not $pvc.existingClaim) }}
-
+{{- if not (and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon) }}
 ---
 
 apiVersion: v1
@@ -118,4 +118,5 @@ spec:
   resources:
     requests:
       storage: {{ $pvc.size }}
+{{- end }}
 {{- end }}
