@@ -5,7 +5,7 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.0.0"
+    tag: "1.2.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -16,7 +16,7 @@ image:
 
   web:
     repository: langgenius/dify-web
-    tag: "1.0.0"
+    tag: "1.2.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -27,7 +27,7 @@ image:
 
   sandbox:
     repository: langgenius/dify-sandbox
-    tag: "0.2.10"
+    tag: "0.2.11"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -60,7 +60,7 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.0.3-local
+    tag: 0.0.7-local
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -623,6 +623,9 @@ pluginDaemon:
     serverKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
     # A separate key for interactions between `api`(`worker`) and `pluginDaemon`
     difyApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
+  ## Storage for `pluginDaemon`
+  ## Ignored if external object storage were configured via `.Values.externalS3` sections.
+  ##
   persistence:
     mountPath: "/app/storage"
     annotations:
@@ -2995,10 +2998,12 @@ externalS3:
   accessKey: "ak-difyai"
   secretKey: "sk-difyai"
   useSSL: false
-  bucketName: "difyai"
-  rootPath: ""
+  bucketName:
+    # Shared storage for `api` and `worker`
+    api: "difyai"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalS3.enabled` is set to `true`).
+    pluginDaemon:
   useIAM: false
-  iamEndpoint: ""
   region: "us-east-1"
 
 ###################################
@@ -3044,7 +3049,10 @@ externalCOS:
   secretKey: "your-secret-key"
   secretId: "your-secret-id"
   region: "your-region"
-  bucketName: "your-bucket-name"
+  bucketName:
+    api: "your-bucket-name"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalCOS.enabled` is set to `true`).
+    pluginDaemon:
   scheme: "your-scheme"
 
 ###################################

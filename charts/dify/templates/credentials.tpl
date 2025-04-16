@@ -150,6 +150,16 @@ API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{- define "dify.pluginDaemon.credentials" -}}
 {{ include "dify.db.credentials" . }}
 {{ include "dify.redis.credentials" . }}
+{{ include "dify.pluginDaemon.storage.credentials" . }}
 SERVER_KEY: {{ .Values.pluginDaemon.auth.serverKey | b64enc | quote }}
 DIFY_INNER_API_KEY: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
+{{- end }}
+
+{{- define "dify.pluginDaemon.storage.credentials" -}}
+{{- if and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon }}
+AWS_ACCESS_KEY: {{ .Values.externalS3.accessKey | b64enc | quote }}
+AWS_SECRET_KEY: {{ .Values.externalS3.secretKey | b64enc | quote }}
+{{- else if and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon }}
+TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey | b64enc | quote }}
+{{- end }}
 {{- end }}

@@ -167,7 +167,7 @@ DB_DATABASE: {{ .Values.postgresql.global.postgresql.auth.database }}
 STORAGE_TYPE: s3
 # The S3 storage configurations, only available when STORAGE_TYPE is `s3`.
 S3_ENDPOINT: {{ .Values.externalS3.endpoint }}
-S3_BUCKET_NAME: {{ .Values.externalS3.bucketName }}
+S3_BUCKET_NAME: {{ .Values.externalS3.bucketName.api }}
 # S3_ACCESS_KEY: {{ .Values.externalS3.accessKey }}
 # S3_SECRET_KEY: {{ .Values.externalS3.secretKey }}
 S3_REGION: {{ .Values.externalS3.region }}
@@ -537,6 +537,7 @@ DB_DATABASE: {{ .Values.externalPostgres.database.pluginDaemon | quote }}
 {{- define "dify.pluginDaemon.config" }}
 {{- include "dify.redis.config" . }}
 {{- include "dify.pluginDaemon.db.config" .}}
+{{- include "dify.pluginDaemon.storage.config" .}}
 SERVER_PORT: "5002"
 PLUGIN_REMOTE_INSTALLING_HOST: "0.0.0.0"
 PLUGIN_REMOTE_INSTALLING_PORT: "5003"
@@ -552,5 +553,23 @@ MARKETPLACE_ENABLED: "true"
 MARKETPLACE_API_URL: {{ .Values.api.url.marketplaceApi | quote }}
 {{- else }}
 MARKETPLACE_ENABLED: "false"
+{{- end }}
+{{- end }}
+
+{{- define "dify.pluginDaemon.storage.config" -}}
+{{- if and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon }}
+PLUGIN_STORAGE_TYPE: aws_s3
+S3_USE_PATH_STYLE: "true"
+S3_ENDPOINT: {{ .Values.externalS3.endpoint }}
+PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalS3.bucketName.pluginDaemon | quote }}
+AWS_REGION: {{ .Values.externalS3.region }}
+{{- else if and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon }}
+PLUGIN_STORAGE_TYPE: "tencent_cos"
+TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId | quote }}
+TENCENT_COS_REGION: {{ .Values.externalCOS.region | quote }}
+PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalCOS.bucketName.pluginDaemon | quote }}
+{{- else }}
+PLUGIN_STORAGE_TYPE: local
+STORAGE_LOCAL_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
 {{- end }}
 {{- end }}
