@@ -61,15 +61,17 @@ DB_PASSWORD: {{ .password | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.storage.credentials" -}}
-{{- if .Values.externalS3.enabled}}
+{{- if .Values.externalS3.enabled }}
 S3_ACCESS_KEY: {{ .Values.externalS3.accessKey | b64enc | quote }}
 S3_SECRET_KEY: {{ .Values.externalS3.secretKey | b64enc | quote }}
 {{- else if .Values.externalAzureBlobStorage.enabled }}
 # The Azure Blob storage configurations, only available when STORAGE_TYPE is `azure-blob`.
 AZURE_BLOB_ACCOUNT_KEY: {{ .Values.externalAzureBlobStorage.key | b64enc | quote }}
 {{- else if .Values.externalOSS.enabled }}
-ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey | b64enc | quote  }}
-ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey | b64enc | quote  }}
+ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey | b64enc | quote }}
+ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey | b64enc | quote }}
+{{- else if .Values.externalCOS.enabled }}
+TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey| b64enc | quote }}
 {{- else }}
 {{- end }}
 {{- end }}
