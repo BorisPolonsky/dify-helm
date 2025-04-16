@@ -563,6 +563,11 @@ S3_USE_PATH_STYLE: "true"
 S3_ENDPOINT: {{ .Values.externalS3.endpoint }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalS3.bucketName.pluginDaemon | quote }}
 AWS_REGION: {{ .Values.externalS3.region }}
+{{- else if and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon }}
+PLUGIN_STORAGE_TYPE: "tencent_cos"
+TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId | quote }}
+TENCENT_COS_REGION: {{ .Values.externalCOS.region | quote }}
+PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalCOS.bucketName.pluginDaemon | quote }}
 {{- else }}
 PLUGIN_STORAGE_TYPE: local
 STORAGE_LOCAL_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}

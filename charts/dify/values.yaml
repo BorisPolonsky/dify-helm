@@ -623,6 +623,9 @@ pluginDaemon:
     serverKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
     # A separate key for interactions between `api`(`worker`) and `pluginDaemon`
     difyApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
+  ## Storage for `pluginDaemon`
+  ## Ignored if external object storage were configured via `.Values.externalS3` sections.
+  ##
   persistence:
     mountPath: "/app/storage"
     annotations:
@@ -2998,7 +3001,7 @@ externalS3:
   bucketName:
     # Shared storage for `api` and `worker`
     api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalS3.enabled` is set to `true`).
     pluginDaemon:
   useIAM: false
   region: "us-east-1"
@@ -3046,7 +3049,10 @@ externalCOS:
   secretKey: "your-secret-key"
   secretId: "your-secret-id"
   region: "your-region"
-  bucketName: "your-bucket-name"
+  bucketName:
+    api: "your-bucket-name"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalCOS.enabled` is set to `true`).
+    pluginDaemon:
   scheme: "your-scheme"
 
 ###################################
