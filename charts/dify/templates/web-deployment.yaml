@@ -38,6 +38,7 @@ spec:
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
       serviceAccountName: {{ include "dify.web.serviceAccountName" . }}
+      enableServiceLinks: {{ .Values.web.enableServiceLinks }}
       {{- if .Values.image.web.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.web.pullSecrets }}
@@ -98,7 +99,6 @@ spec:
             protocol: TCP
         resources:
           {{- toYaml .Values.web.resources | nindent 12 }}
-        enableServiceLinks: {{ .Values.web.enableServiceLinks }}
     {{- if and (.Values.nodeSelector) (not .Values.web.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
