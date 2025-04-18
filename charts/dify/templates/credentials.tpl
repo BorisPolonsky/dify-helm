@@ -132,6 +132,9 @@ MYSCALE_PASSWORD: {{ .Values.externalMyScaleDB.password | b64enc | quote }}
   {{- if .Values.weaviate.authentication.apikey }}
 WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys | b64enc | quote }}
   {{- end }}
+{{- else if .Values.externalTableStoreDB.enabled}}
+TABLESTORE_ACCESS_KEY_ID: {{ .Values.externalTableStoreDB.access_key_id | b64enc | quote }}
+TABLESTORE_ACCESS_KEY_SECRET: {{ .Values.externalTableStoreDB.access_key_secret | b64enc | quote }}
 {{- end }}
 {{- end }}
 

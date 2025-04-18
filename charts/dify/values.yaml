@@ -3150,3 +3150,14 @@ externalMyScaleDB:
   password: ""
   database: "dify"
   ftsParams: ""
+
+###################################
+# External TableStore Vector DB
+# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` and `externalMyScaleDB.enabled` are set as `false` and `externalTableStoreDB.enabled` is `true`
+###################################
+externalTableStoreDB:
+  enabled: false
+  endpoint: "endpoint"
+  instance_name: "instance"
+  access_key_id: "your-secret-id"
+  access_key_secret: "your-secret-key"
