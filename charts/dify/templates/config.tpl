@@ -332,9 +332,9 @@ WEAVIATE_ENDPOINT: {{ printf "http://%s" .name | quote }}
 # TableStore configurations, only available when VECTOR_STORE is `tablestore`
 VECTOR_STORE: tablestore
 TABLESTORE_ENDPOINT: {{ .Values.externalTableStoreDB.endpoint | quote }}
-TABLESTORE_INSTANCE_NAME: {{ .Values.externalTableStoreDB.instance_name | quote }}
-# TABLESTORE_ACCESS_KEY_ID: {{ .Values.externalTableStoreDB.access_key_id | quote }}
-# TABLESTORE_ACCESS_KEY_SECRET: {{ .Values.externalTableStoreDB.access_key_secret | quote }}
+TABLESTORE_INSTANCE_NAME: {{ .Values.externalTableStoreDB.instanceName | quote }}
+# TABLESTORE_ACCESS_KEY_ID: {{ .Values.externalTableStoreDB.accessKeyId | quote }}
+# TABLESTORE_ACCESS_KEY_SECRET: {{ .Values.externalTableStoreDB.accessKeySecret | quote }}
 {{- end }}
 {{- end }}
 
