@@ -1025,7 +1025,7 @@ weaviate:
       # If one has already defined secrets with AWS credentials one can pass them using
       # this setting:
       envSecrets: {}
-      #   AWS_ACCESS_KEY_ID: name-of-the-k8s-secret-containing-the-key-id
+      #   AWS_ACCESS_: name-of-the-k8s-secret-containing-the-key-id
       #   AWS_SECRET_ACCESS_KEY: name-of-the-k8s-secret-containing-the-key
 
     gcs:
@@ -3158,6 +3158,6 @@ externalMyScaleDB:
 externalTableStoreDB:
   enabled: false
   endpoint: "endpoint"
-  instance_name: "instance"
-  access_key_id: "your-secret-id"
-  access_key_secret: "your-secret-key"
+  instanceName: "instance-name"
+  accessKeyId: "your-secret-id"
+  accessKeySecret: "your-secret-key"
