@@ -3153,9 +3153,9 @@ externalMyScaleDB:
 
 ###################################
 # External TableStore Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` and `externalMyScaleDB.enabled` are set as `false` and `externalTableStoreDB.enabled` is `true`
+# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` and `externalMyScaleDB.enabled` are set as `false` and `externalTableStore.enabled` is `true`
 ###################################
-externalTableStoreDB:
+externalTableStore:
   enabled: false
   endpoint: "endpoint"
   instanceName: "instance-name"
