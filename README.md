@@ -42,6 +42,7 @@ helm install my-release dify/dify
   - [x] PGVector
   - [x] Tencent Vector DB
   - [x] MyScaleDB
+  - [x] TableStore
 
 ## Contributors
 <a href="https://github.com/borispolonsky/dify-helm/graphs/contributors">

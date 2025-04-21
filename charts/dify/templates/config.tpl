@@ -328,6 +328,13 @@ WEAVIATE_ENDPOINT: {{ printf "http://%s" .name | quote }}
   {{- if .Values.weaviate.authentication.apikey }}
 # WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys }}
   {{- end }}
+{{- else if .Values.externalTableStore.enabled }}
+# TableStore configurations, only available when VECTOR_STORE is `tablestore`
+VECTOR_STORE: tablestore
+TABLESTORE_ENDPOINT: {{ .Values.externalTableStore.endpoint | quote }}
+TABLESTORE_INSTANCE_NAME: {{ .Values.externalTableStore.instanceName | quote }}
+# TABLESTORE_ACCESS_KEY_ID: {{ .Values.externalTableStore.accessKeyId | quote }}
+# TABLESTORE_ACCESS_KEY_SECRET: {{ .Values.externalTableStore.accessKeySecret | quote }}
 {{- end }}
 {{- end }}
 

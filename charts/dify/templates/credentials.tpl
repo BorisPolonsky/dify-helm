@@ -127,6 +127,9 @@ TENCENT_VECTOR_DB_API_KEY: {{ .Values.externalTencentVectorDB.apiKey | b64enc | 
 {{- else if .Values.externalMyScaleDB.enabled}}
 MYSCALE_USER: {{ .Values.externalMyScaleDB.username | b64enc | quote }}
 MYSCALE_PASSWORD: {{ .Values.externalMyScaleDB.password | b64enc | quote }}
+{{- else if .Values.externalTableStore.enabled}}
+TABLESTORE_ACCESS_KEY_ID: {{ .Values.externalTableStore.accessKeyId | b64enc | quote }}
+TABLESTORE_ACCESS_KEY_SECRET: {{ .Values.externalTableStore.accessKeySecret | b64enc | quote }}
 {{- else if .Values.weaviate.enabled }}
 # The Weaviate API key.
   {{- if .Values.weaviate.authentication.apikey }}
