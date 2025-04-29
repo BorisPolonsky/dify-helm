@@ -99,7 +99,7 @@ REDIS_PASSWORD: {{ .auth.password | b64enc | quote }}
     {{- if .useSSL }}
       {{- $scheme = "rediss" }}
     {{- end }}
-CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/1" $scheme .username .password .host .port }}
+CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/1" $scheme .username .password .host .port | b64enc | quote }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
 {{- $redisHost := printf "%s-redis-master" .Release.Name -}}
