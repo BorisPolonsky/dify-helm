@@ -61,6 +61,10 @@ spec:
         {{- if .Values.ssrfProxy.customStartupProbe }}
         startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.customStartupProbe "context" $) | nindent 10 }}
         {{- end }}
+        {{- if .Values.ssrfProxy.containerSecurityContext }}
+        securityContext:
+{{ toYaml .Values.ssrfProxy.containerSecurityContext | indent 10 }}
+        {{- end }}
         env:
         {{- if .Values.ssrfProxy.extraEnv }}
           {{- toYaml .Values.ssrfProxy.extraEnv | nindent 8 }}
@@ -81,11 +85,6 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.ssrfProxy.resources | nindent 12 }}
-        securityContext:
-          allowPrivilegeEscalation: {{ .Values.ssrfProxy.privileged }}
-          {{- if .Values.ssrfProxy.containerSecurityContext }}
-{{ toYaml .Values.ssrfProxy.containerSecurityContext | indent 10 }}
-          {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.ssrfProxy.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}

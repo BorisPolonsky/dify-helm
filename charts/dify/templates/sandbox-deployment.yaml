@@ -76,6 +76,10 @@ spec:
           tcpSocket:
             port: sandbox
         {{- end }}
+         {{- if .Values.sandbox.containerSecurityContext }}
+        securityContext:
+{{ toYaml .Values.sandbox.containerSecurityContext | indent 10 }}
+        {{- end }}
         env:
         {{- if .Values.sandbox.extraEnv }}
           {{- toYaml .Values.sandbox.extraEnv | nindent 8 }}
@@ -91,11 +95,6 @@ spec:
             protocol: TCP
         resources:
           {{- toYaml .Values.sandbox.resources | nindent 12 }}
-        securityContext:
-          allowPrivilegeEscalation: {{ .Values.sandbox.privileged }}
-          {{- if .Values.sandbox.containerSecurityContext }}
-{{ toYaml .Values.sandbox.containerSecurityContext | indent 10 }}
-          {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.sandbox.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
