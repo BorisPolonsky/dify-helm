@@ -2995,6 +2995,7 @@ externalPostgres:
 externalS3:
   enabled: false
   endpoint: "https://xxx.r2.cloudflarestorage.com"
+  path_style: "false"
   accessKey: "ak-difyai"
   secretKey: "sk-difyai"
   useSSL: false

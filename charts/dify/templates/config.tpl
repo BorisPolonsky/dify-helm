@@ -571,7 +571,7 @@ MARKETPLACE_ENABLED: "false"
 {{- define "dify.pluginDaemon.storage.config" -}}
 {{- if and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: aws_s3
-S3_USE_PATH_STYLE: "true"
+S3_USE_PATH_STYLE: {{ .Values.externalS3.path_style | toString | quote }}
 S3_ENDPOINT: {{ .Values.externalS3.endpoint }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalS3.bucketName.pluginDaemon | quote }}
 AWS_REGION: {{ .Values.externalS3.region }}
