@@ -76,7 +76,7 @@ spec:
           tcpSocket:
             port: sandbox
         {{- end }}
-         {{- if .Values.sandbox.containerSecurityContext }}
+        {{- if .Values.sandbox.containerSecurityContext }}
         securityContext:
 {{ toYaml .Values.sandbox.containerSecurityContext | indent 10 }}
         {{- end }}
