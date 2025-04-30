@@ -95,7 +95,11 @@ REDIS_PASSWORD: {{ .auth.password | b64enc | quote }}
 # Use redis as the broker, and redis db 1 for celery broker.
 {{- if .Values.externalRedis.enabled }}
   {{- with .Values.externalRedis }}
-CELERY_BROKER_URL: {{ printf "redis://%s:%s@%s:%v/1" .username .password .host .port | b64enc | quote }}
+    {{- $scheme := "redis" }}
+    {{- if .useSSL }}
+      {{- $scheme = "rediss" }}
+    {{- end }}
+CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/1" $scheme .username .password .host .port | b64enc | quote }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
 {{- $redisHost := printf "%s-redis-master" .Release.Name -}}
