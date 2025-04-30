@@ -246,7 +246,11 @@ REDIS_DB: "0"
 # Use redis as the broker, and redis db 1 for celery broker.
 {{- if .Values.externalRedis.enabled }}
   {{- with .Values.externalRedis }}
-# CELERY_BROKER_URL: {{ printf "redis://%s:%s@%s:%v/1" .username .password .host .port }}
+    {{- $scheme := "redis" }}
+    {{- if .useSSL }}
+      {{- $scheme = "rediss" }}
+    {{- end }}
+# CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/1" $scheme .username .password .host .port }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
 {{- $redisHost := printf "%s-redis-master" .Release.Name -}}
@@ -567,7 +571,7 @@ MARKETPLACE_ENABLED: "false"
 {{- define "dify.pluginDaemon.storage.config" -}}
 {{- if and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: aws_s3
-S3_USE_PATH_STYLE: "true"
+S3_USE_PATH_STYLE: {{ .Values.externalS3.path_style | toString | quote }}
 S3_ENDPOINT: {{ .Values.externalS3.endpoint }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalS3.bucketName.pluginDaemon | quote }}
 AWS_REGION: {{ .Values.externalS3.region }}
