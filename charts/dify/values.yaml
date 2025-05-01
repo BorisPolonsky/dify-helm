@@ -502,7 +502,6 @@ sandbox:
     clusterIP: ""
   auth:
     apiKey: "dify-sandbox"
-  privileged: false
   ## Sandbox ServiceAccount configuration
   ##
   serviceAccount:

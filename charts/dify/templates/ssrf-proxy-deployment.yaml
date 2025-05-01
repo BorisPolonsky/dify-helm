@@ -85,8 +85,6 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.ssrfProxy.resources | nindent 12 }}
-        securityContext:
-          allowPrivilegeEscalation: {{ .Values.ssrfProxy.privileged }}
     {{- if and (.Values.nodeSelector) (not .Values.ssrfProxy.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
