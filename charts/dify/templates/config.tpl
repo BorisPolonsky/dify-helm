@@ -2,7 +2,7 @@
 # Startup mode, 'api' starts the API server.
 MODE: api
 # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
-LOG_LEVEL: {{ .Values.api.logLevel }}
+LOG_LEVEL: {{ .Values.api.logLevel | quote }}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 # SECRET_KEY: {{ .Values.api.secretKey }}
 # The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
@@ -136,8 +136,8 @@ MARKETPLACE_URL: {{ .Values.api.url.marketplace | quote }}
 
 {{- define "dify.db.config" -}}
 {{- if .Values.externalPostgres.enabled }}
-# DB_USERNAME: {{ .Values.externalPostgres.username }}
-# DB_PASSWORD: {{ .Values.externalPostgres.password }}
+# DB_USERNAME: {{ .Values.externalPostgres.username | quote }}
+# DB_PASSWORD: {{ .Values.externalPostgres.password | quote }}
 DB_HOST: {{ .Values.externalPostgres.address }}
 DB_PORT: {{ .Values.externalPostgres.port | toString | quote }}
 DB_DATABASE: {{ .Values.externalPostgres.database.api | quote }}
@@ -145,10 +145,10 @@ DB_DATABASE: {{ .Values.externalPostgres.database.api | quote }}
   {{ with .Values.postgresql.global.postgresql.auth }}
   {{- if empty .username }}
 # DB_USERNAME: postgres
-# DB_PASSWORD: {{ .postgresPassword }}
+# DB_PASSWORD: {{ .postgresPassword | quote }}
   {{- else }}
-# DB_USERNAME: {{ .username }}
-# DB_PASSWORD: {{ .password }}
+# DB_USERNAME: {{ .username | quote }}
+# DB_PASSWORD: {{ .password | quote }}
   {{- end }}
   {{- end }}
   {{- if eq .Values.postgresql.architecture "replication" }}
@@ -166,11 +166,11 @@ DB_DATABASE: {{ .Values.postgresql.global.postgresql.auth.database }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss` and `google-storage`, Default: `local`
 STORAGE_TYPE: s3
 # The S3 storage configurations, only available when STORAGE_TYPE is `s3`.
-S3_ENDPOINT: {{ .Values.externalS3.endpoint }}
-S3_BUCKET_NAME: {{ .Values.externalS3.bucketName.api }}
-# S3_ACCESS_KEY: {{ .Values.externalS3.accessKey }}
-# S3_SECRET_KEY: {{ .Values.externalS3.secretKey }}
-S3_REGION: {{ .Values.externalS3.region }}
+S3_ENDPOINT: {{ .Values.externalS3.endpoint | quote }}
+S3_BUCKET_NAME: {{ .Values.externalS3.bucketName.api | quote }}
+# S3_ACCESS_KEY: {{ .Values.externalS3.accessKey | quote }}
+# S3_SECRET_KEY: {{ .Values.externalS3.secretKey | quote }}
+S3_REGION: {{ .Values.externalS3.region | quote }}
 {{- else if .Values.externalAzureBlobStorage.enabled }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss` and `google-storage`, Default: `local`
 STORAGE_TYPE: azure-blob
@@ -185,35 +185,35 @@ STORAGE_TYPE: aliyun-oss
 # The OSS storage configurations, only available when STORAGE_TYPE is `aliyun-oss`.
 ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint | quote }}
 ALIYUN_OSS_BUCKET_NAME: {{ .Values.externalOSS.bucketName | quote }}
-# ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey }}
-# ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey }}
+# ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey | quote }}
+# ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey | quote }}
 ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}
 ALIYUN_OSS_AUTH_VERSION: {{ .Values.externalOSS.authVersion | quote }}
 ALIYUN_OSS_PATH: {{ .Values.externalOSS.path | quote }}
 {{- else if .Values.externalGCS.enabled }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss` and `google-storage`, Default: `local`
 STORAGE_TYPE: google-storage
-GOOGLE_STORAGE_BUCKET_NAME: {{ .Values.externalGCS.bucketName }}
-GOOGLE_STORAGE_SERVICE_ACCOUNT_JSON_BASE64: {{ .Values.externalGCS.serviceAccountJsonBase64 }}
+GOOGLE_STORAGE_BUCKET_NAME: {{ .Values.externalGCS.bucketName | quote }}
+GOOGLE_STORAGE_SERVICE_ACCOUNT_JSON_BASE64: {{ .Values.externalGCS.serviceAccountJsonBase64 | quote }}
 {{- else if .Values.externalCOS.enabled }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss`, `google-storage` and `tencent-cos`, Default: `local`
 STORAGE_TYPE: tencent-cos
 # The name of the Tencent COS bucket to use for storing files.
-TENCENT_COS_BUCKET_NAME: {{ .Values.externalCOS.bucketName.api }}
+TENCENT_COS_BUCKET_NAME: {{ .Values.externalCOS.bucketName.api | quote }}
 # The secret key to use for authenticating with the Tencent COS service.
-# TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey }}
+# TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey | quote }}
 # The secret id to use for authenticating with the Tencent COS service.
-TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId }}
+TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId | quote }}
 # The region of the Tencent COS service.
-TENCENT_COS_REGION: {{ .Values.externalCOS.region }}
+TENCENT_COS_REGION: {{ .Values.externalCOS.region | quote }}
 # The scheme of the Tencent COS service.
-TENCENT_COS_SCHEME: {{ .Values.externalCOS.scheme }}
+TENCENT_COS_SCHEME: {{ .Values.externalCOS.scheme | quote }}
 {{- else }}
 # The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob`, Default: `local`
 STORAGE_TYPE: local
 # The path to the local storage directory, the directory relative the root path of API service codes or absolute path. Default: `storage` or `/home/john/storage`.
 # only available when STORAGE_TYPE is `local`.
-STORAGE_LOCAL_PATH: {{ .Values.api.persistence.mountPath }}
+STORAGE_LOCAL_PATH: {{ .Values.api.persistence.mountPath | quote }}
 {{- end }}
 {{- end }}
 
@@ -271,9 +271,9 @@ WEAVIATE_ENDPOINT: {{ .Values.externalWeaviate.endpoint | quote }}
 {{- else if .Values.externalQdrant.enabled }}
 VECTOR_STORE: qdrant
 # The Qdrant endpoint URL. Only available when VECTOR_STORE is `qdrant`.
-QDRANT_URL: {{ .Values.externalQdrant.endpoint }}
+QDRANT_URL: {{ .Values.externalQdrant.endpoint | quote }}
 # The Qdrant API key.
-# QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey }}
+# QDRANT_API_KEY: {{ .Values.externalQdrant.apiKey | quote }}
 # The Qdrant clinet timeout setting.
 QDRANT_CLIENT_TIMEOUT: {{ .Values.externalQdrant.timeout | quote }}
 # The Qdrant client enable gRPC mode.
@@ -281,7 +281,7 @@ QDRANT_GRPC_ENABLED: {{ .Values.externalQdrant.grpc.enabled | toString | quote }
 # The Qdrant server gRPC mode PORT.
 QDRANT_GRPC_PORT: {{ .Values.externalQdrant.grpc.port | quote }}
 # The DSN for Sentry error reporting. If not set, Sentry error reporting will be disabled.
-{{- else if .Values.externalMilvus.enabled}}
+{{- else if .Values.externalMilvus.enabled }}
 # Milvus configuration Only available when VECTOR_STORE is `milvus`.
 VECTOR_STORE: milvus
 # Milvus endpoint
@@ -294,9 +294,9 @@ VECTOR_STORE: pgvector
 PGVECTOR_HOST: {{ .Values.externalPgvector.address }}
 PGVECTOR_PORT: {{ .Values.externalPgvector.port | toString | quote }}
 PGVECTOR_DATABASE: {{ .Values.externalPgvector.dbName }}
-# DB_USERNAME: {{ .Values.externalPgvector.username }}
-# DB_PASSWORD: {{ .Values.externalPgvector.password }}
-{{- else if .Values.externalTencentVectorDB.enabled}}
+# DB_USERNAME: {{ .Values.externalPgvector.username | quote }}
+# DB_PASSWORD: {{ .Values.externalPgvector.password | quote }}
+{{- else if .Values.externalTencentVectorDB.enabled }}
 # tencent vector configurations, only available when VECTOR_STORE is `tencent`
 VECTOR_STORE: tencent
 TENCENT_VECTOR_DB_URL: {{ .Values.externalTencentVectorDB.url | quote }}
@@ -535,7 +535,7 @@ cache_store_log none
 
 {{- define "dify.pluginDaemon.db.config" -}}
 {{- if .Values.externalPostgres.enabled }}
-DB_HOST: {{ .Values.externalPostgres.address }}
+DB_HOST: {{ .Values.externalPostgres.address | quote }}
 DB_PORT: {{ .Values.externalPostgres.port | toString | quote }}
 DB_DATABASE: {{ .Values.externalPostgres.database.pluginDaemon | quote }}
 {{- else if .Values.postgresql.enabled }}
@@ -572,9 +572,9 @@ MARKETPLACE_ENABLED: "false"
 {{- if and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: aws_s3
 S3_USE_PATH_STYLE: {{ .Values.externalS3.path_style | toString | quote }}
-S3_ENDPOINT: {{ .Values.externalS3.endpoint }}
+S3_ENDPOINT: {{ .Values.externalS3.endpoint | quote }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalS3.bucketName.pluginDaemon | quote }}
-AWS_REGION: {{ .Values.externalS3.region }}
+AWS_REGION: {{ .Values.externalS3.region | quote }}
 {{- else if and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: "tencent_cos"
 TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId | quote }}
