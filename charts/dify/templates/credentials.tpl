@@ -48,7 +48,7 @@ INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quo
 DB_USERNAME: {{ .Values.externalPostgres.username | b64enc | quote }}
 DB_PASSWORD: {{ .Values.externalPostgres.password | b64enc | quote }}
 {{- else if .Values.postgresql.enabled }}
-  {{ with .Values.postgresql.global.postgresql.auth}}
+  {{ with .Values.postgresql.global.postgresql.auth }}
   {{- if empty .username }}
 DB_USERNAME: {{ print "postgres" | b64enc | quote }}
 DB_PASSWORD: {{ .postgresPassword | b64enc | quote }}
