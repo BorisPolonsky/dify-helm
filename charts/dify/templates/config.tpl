@@ -199,7 +199,7 @@ GOOGLE_STORAGE_SERVICE_ACCOUNT_JSON_BASE64: {{ .Values.externalGCS.serviceAccoun
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss`, `google-storage` and `tencent-cos`, Default: `local`
 STORAGE_TYPE: tencent-cos
 # The name of the Tencent COS bucket to use for storing files.
-TENCENT_COS_BUCKET_NAME: {{ .Values.externalCOS.bucketName }}
+TENCENT_COS_BUCKET_NAME: {{ .Values.externalCOS.bucketName.api }}
 # The secret key to use for authenticating with the Tencent COS service.
 # TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey }}
 # The secret id to use for authenticating with the Tencent COS service.
