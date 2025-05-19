@@ -159,7 +159,7 @@ api:
       ##   set, choosing the default provisioner.
       ## ReadWriteMany access mode required for `api` and `worker`
       ##
-      storageClass: standard
+      storageClass: standard-rwx
       accessModes: ReadWriteMany
       size: 5Gi
       subPath: ""
