@@ -3061,10 +3061,10 @@ externalCOS:
 ###################################
 externalOBS:
   enabled: false
+  endpoint: "https://your-endpoint"
+  asscessKey: "your-secret-id"
   secretKey: "your-secret-key"
-  secretId: "your-secret-id"
   bucketName: "your-bucket-name"
-  server: "your-server"
 
 ###################################
 # External Redis
