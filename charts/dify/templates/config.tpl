@@ -208,6 +208,12 @@ TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId | quote }}
 TENCENT_COS_REGION: {{ .Values.externalCOS.region | quote }}
 # The scheme of the Tencent COS service.
 TENCENT_COS_SCHEME: {{ .Values.externalCOS.scheme | quote }}
+{{- else if .Values.externalOBS.enabled }}
+STORAGE_TYPE: huawei-obs
+HUAWEI_OBS_SERVER: {{ .Values.externalOBS.endpoint | quote }}
+HUAWEI_OBS_BUCKET_NAME: {{ .Values.externalOBS.bucketName | quote }}
+# HUAWEI_OBS_ACCESS_KEY: {{ .Values.externalOBS.asscessKey | quote }}
+# HUAWEI_OBS_SECRET_KEY: {{ .Values.externalOBS.secretKey | quote }}
 {{- else }}
 # The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob`, Default: `local`
 STORAGE_TYPE: local

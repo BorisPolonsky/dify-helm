@@ -72,6 +72,9 @@ ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey | b64enc | quote }}
 ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey | b64enc | quote }}
 {{- else if .Values.externalCOS.enabled }}
 TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey| b64enc | quote }}
+{{- else if .Values.externalOBS.enabled }}
+HUAWEI_OBS_ACCESS_KEY: {{ .Values.externalOBS.asscessKey| b64enc | quote }}
+HUAWEI_OBS_SECRET_KEY: {{ .Values.externalOBS.secretKey | b64enc | quote }}
 {{- else }}
 {{- end }}
 {{- end }}
