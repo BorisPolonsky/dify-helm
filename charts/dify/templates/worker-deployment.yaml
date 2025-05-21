@@ -21,7 +21,7 @@ spec:
       {{/*
       # Required labels for istio
       # app: {{ template "dify.worker.fullname" . }}
-      # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+      # version: {{ .Values.istioServiceMesh.version | quote }}
       */}}
   template:
     metadata:
@@ -35,7 +35,7 @@ spec:
         {{/*
         # Required labels for istio
         # app: {{ template "dify.worker.fullname" . }}
-        # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+        # version: {{ .Values.istioServiceMesh.version | quote }}
         */}}
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
