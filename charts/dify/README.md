@@ -9,13 +9,14 @@ helm install my-release dify/dify
 ```
 
 ## Customized Installation
-Apply the `-f` option upon `helm install` with your own `values.yaml` file. Fear not the extensive content as they can be broken down in three sections:
-1. `dify` components
-2. Built-in middlewares (`redis`, `postgresql` and `weaviate`)
-1. External services (external database, object storage, etc.)
-
-### 1. Dify components
-#### Apply Custom Images
+Apply the `-f` option upon `helm install`/`helm upgrade` with your own `values.yaml`.
+Fear not its extensive content as they are arranged in sections below:
+1. Image: Adjust images of all Dify components
+2. Dify Service: Customize configurations of each Dify components
+3. Middleware: Specifies the configuration of built-in middlewares
+4. External services: Subtitute external services for built-in data persistence
+ 
+### 1. Adjust Images
 You can specify custom images for different components:
 ```yaml
 # values.yaml
@@ -32,8 +33,30 @@ images:
     repository: your-registry/dify-sandbox
 ```
 
+### 2. Customize Dify Components
+#### Data persistence
+To customize built-in data persistence, set `enabled: true` in the `persistence` section of `values.yaml` and specify the storage class and size, for instance:
+```yaml
+# values.yaml
+api:
+  persistence:
+    enabled: true
+    storageClass: your-storage-class
+    accessMode: ReadWriteMany
+    size: 10Gi
+
+```
+or desginate an existing `PersistentVolumeClaim`:
+```yaml
+# values.yaml
+api:
+  persistence:
+    enabled: true
+    persistentVolumeClaim:
+      existingClaim: "your-pvc-name"
+```
 #### Environment Variables
-This chart automatically supplies envrionment variables for service discovery and authentication under the hood. To apply additional environment variables or override existing, refer to `extraEnv` section for each component:
+This chart automatically manages envrionment variables for data persistence, service discovery and database connection etc. under the hood. To apply additional environment variables or override existing ones, refer to `extraEnv` section for each component:
 ```yaml
 # values.yaml
 ...
@@ -56,21 +79,27 @@ api:
         key: MY_SECRET
 ```
 
-### 2. Built-in middlewares
-Built-in `Redis` and `PostgreSQL` and `weaviate` are supplied by third-party helm charts. To customize these components, refer to the documents of the corresponding helm charts.
-- [bitnami/redis](https://github.com/bitnami/charts/tree/main/bitnami/redis)
-- [bitnami/postgresql](https://github.com/bitnami/charts/tree/main/bitnami/postgresql)
-- [weaviate](https://github.com/weaviate/weaviate-helm)
+### 3. Working with Built-in Middlewares
+Built-in `Redis` and `PostgreSQL` and `weaviate` allows users to spool up a self-contained `Dify` enviroment for a quick start. These components are supplied by third party helm charts. To customize built-in middlewares, refer to the section name and the official documents:
 
-Note that these components are optional and can be disabled by setting `enabled: false` in the corresponding section of `values.yaml`. For example, to disable the built-in `Redis`:
+| Section | Document |
+----- | --- |
+`redis` | [bitnami/redis](https://github.com/bitnami/charts/tree/main/bitnami/redis)
+`postgresql` |[bitnami/postgresql](https://github.com/bitnami/charts/tree/main/bitnami/postgresql)
+`weaviate`| [weaviate](https://github.com/weaviate/weaviate-helm)
+
+To disable them, set `enabled: false` in the corresponding section of `values.yaml` and apply external service providers:
 ```yaml
 # values.yaml
 redis:
   enabled: false  # Disable built-in Redis
 ```
-### 3. External services
-External services like `Redis`, `PostgreSQL`, vector database, object storage etc., are arraged in sections in `external<ServiceName>` pattern. For example, to customize the `Redis` service:
+
+
+### 4. Opt in External Services
+It's advised to utilize services from enterprise level providers over the built-in middlewares for production use. To take over built-in `Redis` for instance:
 ```yaml
+# values.yaml
 externalRedis:
   enabled: true
   host: "redis.example"
@@ -79,4 +108,4 @@ externalRedis:
   password: "difyai123456"
   useSSL: false
 ```
-
+Refer to `external<Service>` sections for more details. 
