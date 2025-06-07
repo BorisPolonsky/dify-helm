@@ -3027,7 +3027,10 @@ externalOSS:
   accessKey: "ak-difyai"
   secretKey: "sk-difyai"
   region: "ap-southeast-1"
-  bucketName: "difyai"
+  bucketName:
+    api: "difyai"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOSS.enabled` is set to `true`).
+    pluginDaemon:
   authVersion: v4
   path: "your-path"
 
