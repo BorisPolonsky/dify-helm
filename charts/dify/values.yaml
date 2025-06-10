@@ -109,7 +109,7 @@ api:
     failureThreshold: 5
     successThreshold: 1
   ## @param api.updateStrategy Update strategy type and configuration parameters
-  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
   ## @param api.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
@@ -262,7 +262,7 @@ worker:
   ## @param worker.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
   ## @param worker.updateStrategy Update strategy type and configuration parameters
-  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
   # Configure Pods Security Context
   podSecurityContext: {}
@@ -317,7 +317,7 @@ proxy:
   ## @param proxy.clientMaxBodySize Custom client_max_body_size param nginx default: 15m
   clientMaxBodySize: ""
   ## @param proxy.updateStrategy Update strategy type and configuration parameters
-  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
   # Configure Pods Security Context
   podSecurityContext: {}
@@ -411,7 +411,7 @@ web:
     failureThreshold: 5
     successThreshold: 1
   ## @param web.updateStrategy Update strategy type and configuration parameters
-  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
   ## @param web.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
@@ -492,7 +492,7 @@ sandbox:
     failureThreshold: 2
     successThreshold: 1
   ## @param sandbox.updateStrategy Update strategy type and configuration parameters
-  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
   ## @param sandbox.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
@@ -550,7 +550,7 @@ ssrfProxy:
   ## @param ssrfProxy.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
   ## @param ssrfProxy.updateStrategy Update strategy type and configuration parameters
-  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
   # Configure Pods Security Context
   podSecurityContext: {}
@@ -619,6 +619,9 @@ pluginDaemon:
   customReadinessProbe: {}
   ## @param pluginDaemon.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  ## @param ssrfProxy.updateStrategy Update strategy type and configuration parameters
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  updateStrategy: {}
   # Configure Pods Security Context
   podSecurityContext: {}
   # Configure Container Security Context

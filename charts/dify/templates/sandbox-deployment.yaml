@@ -23,7 +23,7 @@ spec:
       # version: {{ .Values.istioServiceMesh.version | quote }}
       */}}
   {{- if .Values.sandbox.updateStrategy }}
-  updateStrategy: {{- toYaml .Values.sandbox.updateStrategy | nindent 4 }}
+  strategy: {{- toYaml .Values.sandbox.updateStrategy | nindent 4 }}
   {{- end }}
   template:
     metadata:

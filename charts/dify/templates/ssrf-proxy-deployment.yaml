@@ -23,7 +23,7 @@ spec:
       # version: {{ .Values.istioServiceMesh.version | quote }}
       */}}
   {{- if .Values.ssrfProxy.updateStrategy }}
-  updateStrategy: {{- toYaml .Values.ssrfProxy.updateStrategy | nindent 4 }}
+  strategy: {{- toYaml .Values.ssrfProxy.updateStrategy | nindent 4 }}
   {{- end }}
   template:
     metadata:
