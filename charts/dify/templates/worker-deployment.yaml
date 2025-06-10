@@ -23,6 +23,9 @@ spec:
       # app: {{ template "dify.worker.fullname" . }}
       # version: {{ .Values.istioServiceMesh.version | quote }}
       */}}
+  {{- if .Values.worker.updateStrategy }}
+  strategy: {{- toYaml .Values.worker.updateStrategy | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       annotations:
