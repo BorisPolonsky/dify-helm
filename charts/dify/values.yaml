@@ -619,7 +619,7 @@ pluginDaemon:
   customReadinessProbe: {}
   ## @param pluginDaemon.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
-  ## @param ssrfProxy.updateStrategy Update strategy type and configuration parameters
+  ## @param pluginDaemon.updateStrategy Update strategy type and configuration parameters
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
   # Configure Pods Security Context
