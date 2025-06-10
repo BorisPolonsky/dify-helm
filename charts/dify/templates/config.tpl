@@ -184,7 +184,7 @@ AZURE_BLOB_ACCOUNT_URL: {{ .Values.externalAzureBlobStorage.url | quote }}
 STORAGE_TYPE: aliyun-oss
 # The OSS storage configurations, only available when STORAGE_TYPE is `aliyun-oss`.
 ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint | quote }}
-ALIYUN_OSS_BUCKET_NAME: {{ .Values.externalOSS.bucketName | quote }}
+ALIYUN_OSS_BUCKET_NAME: {{ .Values.externalOSS.bucketName.api | quote }}
 # ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey | quote }}
 # ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey | quote }}
 ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}
@@ -586,6 +586,14 @@ PLUGIN_STORAGE_TYPE: "tencent_cos"
 TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId | quote }}
 TENCENT_COS_REGION: {{ .Values.externalCOS.region | quote }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalCOS.bucketName.pluginDaemon | quote }}
+{{- else if and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon }}
+PLUGIN_STORAGE_TYPE: "aliyun_oss"
+ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}
+ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint | quote }}
+ALIYUN_OSS_ACCESS_KEY_ID: {{ .Values.externalOSS.accessKey | quote }}
+# ALIYUN_OSS_ACCESS_KEY_SECRET: {{ .Values.externalOSS.secretKey | quote }}
+ALIYUN_OSS_AUTH_VERSION: {{ .Values.externalOSS.authVersion | quote }}
+ALIYUN_OSS_PATH: {{ .Values.externalOSS.path | quote }}
 {{- else }}
 PLUGIN_STORAGE_TYPE: local
 STORAGE_LOCAL_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}

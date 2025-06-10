@@ -95,6 +95,7 @@ spec:
 {{- if not (or
   (and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon)
   (and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon)
+  (and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon)
 )
 }}
 ---
