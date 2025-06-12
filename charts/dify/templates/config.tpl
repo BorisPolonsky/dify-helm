@@ -184,7 +184,7 @@ AZURE_BLOB_ACCOUNT_URL: {{ .Values.externalAzureBlobStorage.url | quote }}
 STORAGE_TYPE: aliyun-oss
 # The OSS storage configurations, only available when STORAGE_TYPE is `aliyun-oss`.
 ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint | quote }}
-ALIYUN_OSS_BUCKET_NAME: {{ .Values.externalOSS.bucketName | quote }}
+ALIYUN_OSS_BUCKET_NAME: {{ .Values.externalOSS.bucketName.api | quote }}
 # ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey | quote }}
 # ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey | quote }}
 ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}
@@ -208,6 +208,12 @@ TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId | quote }}
 TENCENT_COS_REGION: {{ .Values.externalCOS.region | quote }}
 # The scheme of the Tencent COS service.
 TENCENT_COS_SCHEME: {{ .Values.externalCOS.scheme | quote }}
+{{- else if .Values.externalOBS.enabled }}
+STORAGE_TYPE: huawei-obs
+HUAWEI_OBS_SERVER: {{ .Values.externalOBS.endpoint | quote }}
+HUAWEI_OBS_BUCKET_NAME: {{ .Values.externalOBS.bucketName | quote }}
+# HUAWEI_OBS_ACCESS_KEY: {{ .Values.externalOBS.asscessKey | quote }}
+# HUAWEI_OBS_SECRET_KEY: {{ .Values.externalOBS.secretKey | quote }}
 {{- else }}
 # The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob`, Default: `local`
 STORAGE_TYPE: local
@@ -571,7 +577,7 @@ MARKETPLACE_ENABLED: "false"
 {{- define "dify.pluginDaemon.storage.config" -}}
 {{- if and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: aws_s3
-S3_USE_PATH_STYLE: {{ .Values.externalS3.path_style | toString | quote }}
+S3_USE_PATH_STYLE: {{ .Values.externalS3.pathStyle | toString | quote }}
 S3_ENDPOINT: {{ .Values.externalS3.endpoint | quote }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalS3.bucketName.pluginDaemon | quote }}
 AWS_REGION: {{ .Values.externalS3.region | quote }}
@@ -580,6 +586,14 @@ PLUGIN_STORAGE_TYPE: "tencent_cos"
 TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId | quote }}
 TENCENT_COS_REGION: {{ .Values.externalCOS.region | quote }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalCOS.bucketName.pluginDaemon | quote }}
+{{- else if and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon }}
+PLUGIN_STORAGE_TYPE: "aliyun_oss"
+ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}
+ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint | quote }}
+ALIYUN_OSS_ACCESS_KEY_ID: {{ .Values.externalOSS.accessKey | quote }}
+# ALIYUN_OSS_ACCESS_KEY_SECRET: {{ .Values.externalOSS.secretKey | quote }}
+ALIYUN_OSS_AUTH_VERSION: {{ .Values.externalOSS.authVersion | quote }}
+ALIYUN_OSS_PATH: {{ .Values.externalOSS.path | quote }}
 {{- else }}
 PLUGIN_STORAGE_TYPE: local
 STORAGE_LOCAL_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
