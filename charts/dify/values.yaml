@@ -220,7 +220,7 @@ api:
       ## ReadWriteMany access mode required for `api` and `worker`
       ##
       storageClass:
-      accessModes: ReadWriteMany
+      accessModes: ReadWriteOnce
       size: 5Gi
       subPath: ""
   ## Dify API ServiceAccount configuration
@@ -346,7 +346,7 @@ proxy:
         ## ReadWriteMany access mode required for nginx
         ##
         storageClass:
-        accessModes: ReadWriteMany
+        accessModes: ReadWriteOnce
         size: 1Gi
         subPath: ""
   service:
@@ -579,7 +579,7 @@ ssrfProxy:
         ## ReadWriteMany access mode required for squid
         ##
         storageClass:
-        accessModes: ReadWriteMany
+        accessModes: ReadWriteOnce
         size: 1Gi
         subPath: ""
   service:
@@ -660,7 +660,7 @@ pluginDaemon:
       ## ReadWriteMany access mode required for `pluginDaemon`
       ##
       storageClass:
-      accessModes: ReadWriteMany
+      accessModes: ReadWriteOnce
       size: 5Gi
       subPath: ""
   marketplace:
