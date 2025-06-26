@@ -70,6 +70,8 @@ AZURE_BLOB_ACCOUNT_KEY: {{ .Values.externalAzureBlobStorage.key | b64enc | quote
 {{- else if .Values.externalOSS.enabled }}
 ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey | b64enc | quote }}
 ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey | b64enc | quote }}
+{{- else if .Values.externalGCS.enabled }}
+GCS_CREDENTIALS: {{ .Values.externalGCS.serviceAccountJsonBase64 | b64enc | quote }}
 {{- else if .Values.externalCOS.enabled }}
 TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey| b64enc | quote }}
 {{- else if .Values.externalOBS.enabled }}
