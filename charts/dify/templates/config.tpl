@@ -193,7 +193,7 @@ ALIYUN_OSS_PATH: {{ .Values.externalOSS.path | quote }}
 {{- else if .Values.externalGCS.enabled }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss` and `google-storage`, Default: `local`
 STORAGE_TYPE: google-storage
-GOOGLE_STORAGE_BUCKET_NAME: {{ .Values.externalGCS.bucketName | quote }}
+GOOGLE_STORAGE_BUCKET_NAME: {{ .Values.externalGCS.bucketName.api | quote }}
 GOOGLE_STORAGE_SERVICE_ACCOUNT_JSON_BASE64: {{ .Values.externalGCS.serviceAccountJsonBase64 | quote }}
 {{- else if .Values.externalCOS.enabled }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss`, `google-storage` and `tencent-cos`, Default: `local`
@@ -581,11 +581,6 @@ S3_USE_PATH_STYLE: {{ .Values.externalS3.pathStyle | toString | quote }}
 S3_ENDPOINT: {{ .Values.externalS3.endpoint | quote }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalS3.bucketName.pluginDaemon | quote }}
 AWS_REGION: {{ .Values.externalS3.region | quote }}
-{{- else if and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon }}
-PLUGIN_STORAGE_TYPE: "tencent_cos"
-TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId | quote }}
-TENCENT_COS_REGION: {{ .Values.externalCOS.region | quote }}
-PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalCOS.bucketName.pluginDaemon | quote }}
 {{- else if and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: "aliyun_oss"
 ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}
@@ -594,6 +589,15 @@ ALIYUN_OSS_ACCESS_KEY_ID: {{ .Values.externalOSS.accessKey | quote }}
 # ALIYUN_OSS_ACCESS_KEY_SECRET: {{ .Values.externalOSS.secretKey | quote }}
 ALIYUN_OSS_AUTH_VERSION: {{ .Values.externalOSS.authVersion | quote }}
 ALIYUN_OSS_PATH: {{ .Values.externalOSS.path | quote }}
+{{- else if and .Values.externalGCS.enabled .Values.externalGCS.bucketName.pluginDaemon }}
+PLUGIN_STORAGE_TYPE: "google-storage"
+PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalGCS.bucketName.pluginDaemon | quote }}
+# GCS_CREDENTIALS: {{ .Values.externalGCS.serviceAccountJsonBase64 | quote }}
+{{- else if and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon }}
+PLUGIN_STORAGE_TYPE: "tencent_cos"
+TENCENT_COS_SECRET_ID: {{ .Values.externalCOS.secretId | quote }}
+TENCENT_COS_REGION: {{ .Values.externalCOS.region | quote }}
+PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalCOS.bucketName.pluginDaemon | quote }}
 {{- else if and .Values.externalOBS.enabled .Values.externalOBS.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: "huawei-obs"
 HUAWEI_OBS_SERVER: {{ .Values.externalOBS.endpoint | quote }}

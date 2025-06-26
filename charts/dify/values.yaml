@@ -3061,7 +3061,10 @@ externalOSS:
 ###################################
 externalGCS:
   enabled: false
-  bucketName: "difyai"
+  bucketName:
+    api: "difyai"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalGCS.enabled` is set to `true`).
+    pluginDaemon:
   serviceAccountJsonBase64: ""
 
 ###################################
