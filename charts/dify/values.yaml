@@ -3086,10 +3086,12 @@ externalCOS:
 externalOBS:
   enabled: false
   endpoint: "https://your-endpoint"
-  asscessKey: "your-secret-id"
+  accessKey: "your-secret-id"
   secretKey: "your-secret-key"
-  bucketName: "your-bucket-name"
-
+  bucketName:
+    api: "your-bucket-name"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOBS.enabled` is set to `true`).
+    pluginDaemon:
 ###################################
 # External Redis
 # - these configs are only used when `externalRedis.enabled` is true
