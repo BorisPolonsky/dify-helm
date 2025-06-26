@@ -42,6 +42,9 @@ spec:
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
       serviceAccountName: {{ include "dify.sandbox.serviceAccountName" . }}
+      {{- if .Values.sandbox.priorityClassName }}
+      priorityClassName: {{ .Values.sandbox.priorityClassName | quote }}
+      {{- end }}
       {{- if .Values.image.sandbox.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.sandbox.pullSecrets }}
