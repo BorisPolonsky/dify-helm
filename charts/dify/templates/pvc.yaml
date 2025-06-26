@@ -1,4 +1,12 @@
-{{- if not (or .Values.externalS3.enabled .Values.externalAzureBlobStorage.enabled .Values.externalOSS.enabled .Values.externalGCS.enabled .Values.externalCOS.enabled .Values.externalOBS.enabled) }}
+{{- if not (or
+  .Values.externalS3.enabled
+  .Values.externalAzureBlobStorage.enabled
+  .Values.externalOSS.enabled
+  .Values.externalGCS.enabled
+  .Values.externalCOS.enabled
+  .Values.externalOBS.enabled
+  .Values.externalTOS.enabled
+  ) }}
 {{- $pvc := .Values.api.persistence.persistentVolumeClaim -}}
 {{- if (not $pvc.existingClaim) }}
 apiVersion: v1
@@ -98,6 +106,7 @@ spec:
   (and .Values.externalGCS.enabled .Values.externalGCS.bucketName.pluginDaemon)
   (and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon)
   (and .Values.externalOBS.enabled .Values.externalOBS.bucketName.pluginDaemon)
+  (and .Values.externalTOS.enabled .Values.externalTOS.bucketName.pluginDaemon)
 )
 }}
 ---

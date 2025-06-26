@@ -3095,6 +3095,23 @@ externalOBS:
     api: "your-bucket-name"
     # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOBS.enabled` is set to `true`).
     pluginDaemon:
+
+###################################
+# External Tinder Object Storage (TOS) from volcengine
+# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` and `externalOBS.enabled` are false and `externalTOS.enabled` is true
+###################################
+externalTOS:
+  enabled: false
+  endpoint: "https://tos-cn-beijing.volces.com"
+  accessKey: "your-access-key"
+  secretKey: "your-secret-key"
+  bucketName:
+    # Shared storage for `api` and `worker`
+    api: "your-bucket-name"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalTOS.enabled` is set to `true`).
+    pluginDaemon:
+  region: "cn-beijing"
+
 ###################################
 # External Redis
 # - these configs are only used when `externalRedis.enabled` is true
