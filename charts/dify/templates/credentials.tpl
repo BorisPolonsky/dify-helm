@@ -73,7 +73,7 @@ ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey | b64enc | quote }}
 {{- else if .Values.externalCOS.enabled }}
 TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey| b64enc | quote }}
 {{- else if .Values.externalOBS.enabled }}
-HUAWEI_OBS_ACCESS_KEY: {{ .Values.externalOBS.asscessKey| b64enc | quote }}
+HUAWEI_OBS_ACCESS_KEY: {{ .Values.externalOBS.accessKey | b64enc | quote }}
 HUAWEI_OBS_SECRET_KEY: {{ .Values.externalOBS.secretKey | b64enc | quote }}
 {{- else }}
 {{- end }}
@@ -175,5 +175,7 @@ AWS_SECRET_KEY: {{ .Values.externalS3.secretKey | b64enc | quote }}
 TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey | b64enc | quote }}
 {{- else if and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon }}
 ALIYUN_OSS_ACCESS_KEY_SECRET: {{ .Values.externalOSS.secretKey | b64enc | quote }}
+{{- else if and .Values.externalOBS.enabled .Values.externalOBS.bucketName.pluginDaemon }}
+HUAWEI_OBS_SECRET_KEY: {{ .Values.externalOBS.secretKey | b64enc | quote }}
 {{- end }}
 {{- end }}
