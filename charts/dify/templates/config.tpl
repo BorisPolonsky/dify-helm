@@ -194,7 +194,7 @@ ALIYUN_OSS_PATH: {{ .Values.externalOSS.path | quote }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss` and `google-storage`, Default: `local`
 STORAGE_TYPE: google-storage
 GOOGLE_STORAGE_BUCKET_NAME: {{ .Values.externalGCS.bucketName.api | quote }}
-GOOGLE_STORAGE_SERVICE_ACCOUNT_JSON_BASE64: {{ .Values.externalGCS.serviceAccountJsonBase64 | quote }}
+# GOOGLE_STORAGE_SERVICE_ACCOUNT_JSON_BASE64: {{ .Values.externalGCS.serviceAccountJsonBase64 | quote }}
 {{- else if .Values.externalCOS.enabled }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss`, `google-storage` and `tencent-cos`, Default: `local`
 STORAGE_TYPE: tencent-cos
