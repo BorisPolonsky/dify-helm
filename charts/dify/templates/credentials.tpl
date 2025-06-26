@@ -71,7 +71,7 @@ AZURE_BLOB_ACCOUNT_KEY: {{ .Values.externalAzureBlobStorage.key | b64enc | quote
 ALIYUN_OSS_ACCESS_KEY: {{ .Values.externalOSS.accessKey | b64enc | quote }}
 ALIYUN_OSS_SECRET_KEY: {{ .Values.externalOSS.secretKey | b64enc | quote }}
 {{- else if .Values.externalGCS.enabled }}
-GCS_CREDENTIALS: {{ .Values.externalGCS.serviceAccountJsonBase64 | b64enc | quote }}
+GOOGLE_STORAGE_SERVICE_ACCOUNT_JSON_BASE64: {{ .Values.externalGCS.serviceAccountJsonBase64 | b64enc | quote }}
 {{- else if .Values.externalCOS.enabled }}
 TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey| b64enc | quote }}
 {{- else if .Values.externalOBS.enabled }}
@@ -173,10 +173,12 @@ DIFY_INNER_API_KEY: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
 {{- if and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon }}
 AWS_ACCESS_KEY: {{ .Values.externalS3.accessKey | b64enc | quote }}
 AWS_SECRET_KEY: {{ .Values.externalS3.secretKey | b64enc | quote }}
-{{- else if and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon }}
-TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey | b64enc | quote }}
 {{- else if and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon }}
 ALIYUN_OSS_ACCESS_KEY_SECRET: {{ .Values.externalOSS.secretKey | b64enc | quote }}
+{{- else if and .Values.externalGCS.enabled .Values.externalGCS.bucketName.pluginDaemon }}
+GCS_CREDENTIALS: {{ .Values.externalGCS.serviceAccountJsonBase64 | b64enc | quote }}
+{{- else if and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon }}
+TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey | b64enc | quote }}
 {{- else if and .Values.externalOBS.enabled .Values.externalOBS.bucketName.pluginDaemon }}
 HUAWEI_OBS_SECRET_KEY: {{ .Values.externalOBS.secretKey | b64enc | quote }}
 {{- end }}
