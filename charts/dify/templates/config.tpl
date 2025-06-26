@@ -214,6 +214,13 @@ HUAWEI_OBS_SERVER: {{ .Values.externalOBS.endpoint | quote }}
 HUAWEI_OBS_BUCKET_NAME: {{ .Values.externalOBS.bucketName.api | quote }}
 # HUAWEI_OBS_ACCESS_KEY: {{ .Values.externalOBS.accessKey | quote }}
 # HUAWEI_OBS_SECRET_KEY: {{ .Values.externalOBS.secretKey | quote }}
+{{- else if .Values.externalTOS.enabled }}
+STORAGE_TYPE: "volcengine-tos"
+VOLCENGINE_TOS_ENDPOINT: {{ .Values.externalTOS.endpoint | quote }}
+VOLCENGINE_TOS_REGION: {{ .Values.externalTOS.region | quote }}
+VOLCENGINE_TOS_BUCKET_NAME: {{ .Values.externalTOS.bucketName.api | quote }}
+VOLCENGINE_TOS_ACCESS_KEY: {{ .Values.externalTOS.accessKey | quote }}
+# VOLCENGINE_TOS_SECRET_KEY: {{ .Values.externalTOS.secretKey | quote }}
 {{- else }}
 # The type of storage to use for storing user files. Supported values are `local` and `s3` and `azure-blob`, Default: `local`
 STORAGE_TYPE: local
@@ -604,6 +611,13 @@ HUAWEI_OBS_SERVER: {{ .Values.externalOBS.endpoint | quote }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalOBS.bucketName.pluginDaemon | quote }}
 HUAWEI_OBS_ACCESS_KEY: {{ .Values.externalOBS.accessKey | quote }}
 # HUAWEI_OBS_SECRET_KEY: {{ .Values.externalOBS.secretKey | quote }}
+{{- else if and .Values.externalTOS.enabled .Values.externalTOS.bucketName.pluginDaemon }}
+PLUGIN_STORAGE_TYPE: "volcengine-tos"
+PLUGIN_VOLCENGINE_TOS_ENDPOINT: {{ .Values.externalTOS.endpoint | quote }}
+PLUGIN_VOLCENGINE_TOS_REGION: {{ .Values.externalTOS.region | quote }}
+PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalTOS.bucketName.pluginDaemon | quote }}
+PLUGIN_VOLCENGINE_TOS_ACCESS_KEY: {{ .Values.externalTOS.accessKey | quote }}
+# PLUGIN_VOLCENGINE_TOS_SECRET_KEY: {{ .Values.externalTOS.secretKey | quote }}
 {{- else }}
 PLUGIN_STORAGE_TYPE: local
 STORAGE_LOCAL_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
