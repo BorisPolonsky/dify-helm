@@ -41,6 +41,9 @@ spec:
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
       serviceAccountName: {{ include "dify.web.serviceAccountName" . }}
+      {{- if .Values.web.priorityClassName }}
+      priorityClassName: {{ .Values.web.priorityClassName | quote }}
+      {{- end }}
       enableServiceLinks: {{ .Values.web.enableServiceLinks }}
       {{- if .Values.image.web.pullSecrets }}
       imagePullSecrets:

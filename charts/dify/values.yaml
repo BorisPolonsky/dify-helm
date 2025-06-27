@@ -76,6 +76,7 @@ api:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -247,6 +248,7 @@ worker:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -306,6 +308,7 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   ## Configure extra options for proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param proxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -378,6 +381,7 @@ web:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -459,6 +463,7 @@ sandbox:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -541,6 +546,7 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   ## Configure extra options for ssrf proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param ssrfProxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -611,6 +617,7 @@ pluginDaemon:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   ## Configure extra options for plugin daemon containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param pluginDaemon.customLivenessProbe Custom livenessProbe that overrides the default one
