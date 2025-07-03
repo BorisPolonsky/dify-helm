@@ -1,0 +1,321 @@
+name: CI - External Secrets Operator Tests
+
+on:
+  push:
+    branches: [ main, develop, feat/support-externa-secret ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Stage 1: Pre-pull all images and prepare infrastructure
+  prepare-images:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-hit: ${{ steps.cache-check.outputs.cache-hit }}
+      image-cache-key: ${{ steps.cache-key.outputs.key }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Generate unified cache key
+      - name: Generate cache key
+        id: cache-key
+        run: |
+          CACHE_KEY="${{ runner.os }}-minikube-images-${{ hashFiles('ci/values/*.yaml', 'charts/dify/Chart.yaml', 'charts/dify/Chart.lock') }}"
+          echo "key=$CACHE_KEY" >> $GITHUB_OUTPUT
+          echo "Generated cache key: $CACHE_KEY"
+
+      # Check image cache with optimized restore strategy
+      - name: Check Docker images cache
+        id: cache-check
+        uses: actions/cache@v4
+        with:
+          path: ~/.minikube/cache/images
+          key: ${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            ${{ runner.os }}-minikube-images-${{ hashFiles('charts/dify/Chart.yaml', 'charts/dify/Chart.lock') }}-
+            ${{ runner.os }}-minikube-images-${{ hashFiles('charts/dify/Chart.yaml') }}-
+            ${{ runner.os }}-minikube-images-
+
+      # Only run if cache miss
+      - name: Setup minikube for image caching
+        if: steps.cache-check.outputs.cache-hit != 'true'
+        uses: medyagh/setup-minikube@latest
+        with:
+          cache: true
+
+      # Cache all images (unified list for all scenarios)
+      - name: Cache all Docker images
+        if: steps.cache-check.outputs.cache-hit != 'true'
+        run: |
+          echo "Pre-pulling all Docker images to minikube cache..."
+
+          # Complete image list for all scenarios
+          ALL_IMAGES="langgenius/dify-api:1.2.0 langgenius/dify-web:1.2.0 langgenius/dify-sandbox:0.2.11 nginx:latest ubuntu/squid:latest langgenius/dify-plugin-daemon:0.0.7-local bitnami/postgresql:15.3.0-debian-11-r7 bitnami/redis:7.0.11-debian-11-r12 bitnami/redis-sentinel:7.0.11-debian-11-r10 bitnami/redis-exporter:1.50.0-debian-11-r13 bitnami/bitnami-shell:11-debian-11-r118 busybox:latest curlimages/curl:latest hashicorp/vault:latest"
+
+          echo "ALL_IMAGES=$ALL_IMAGES" >> $GITHUB_ENV
+
+          # Display image categories
+          echo "Dify Application Images:"
+          echo "  - langgenius/dify-api:1.2.0"
+          echo "  - langgenius/dify-web:1.2.0"
+          echo "  - langgenius/dify-sandbox:0.2.11"
+          echo "  - nginx:latest"
+          echo "  - ubuntu/squid:latest"
+          echo "  - langgenius/dify-plugin-daemon:0.0.7-local"
+          echo ""
+          echo "Database Images:"
+          echo "  - bitnami/postgresql:15.3.0-debian-11-r7"
+          echo "  - bitnami/redis:7.0.11-debian-11-r12"
+          echo "  - bitnami/redis-sentinel:7.0.11-debian-11-r10"
+          echo "  - bitnami/redis-exporter:1.50.0-debian-11-r13"
+          echo ""
+          echo "Utility Images:"
+          echo "  - bitnami/bitnami-shell:11-debian-11-r118"
+          echo "  - busybox:latest"
+          echo "  - curlimages/curl:latest"
+          echo "  - hashicorp/vault:latest"
+
+          IMAGE_COUNT=$(echo "$ALL_IMAGES" | wc -w)
+          echo "Total images to cache: $IMAGE_COUNT"
+
+          # Pull images in parallel (limit to 3 concurrent)
+          echo "$ALL_IMAGES" | tr ' ' '\n' | grep -v '^[[:space:]]*$' | while read -r image; do
+            {
+              echo "Pulling $image..."
+              if minikube image pull "$image" 2>/dev/null; then
+                echo "Successfully cached $image"
+              else
+                echo "Failed to cache $image (might already exist)"
+              fi
+            } &
+
+            # Limit concurrent pulls
+            if (( $(jobs -r | wc -l) >= 3 )); then
+              wait -n
+            fi
+          done
+
+          # Wait for all remaining jobs
+          wait
+
+          echo "Image caching completed"
+
+          # Show cached images
+          echo "Cached images in minikube:"
+          minikube image ls --format table | head -20 || true
+
+  # Stage 2: Matrix testing with cached images
+  test-matrix:
+    needs: prepare-images
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - config_name: "legacy: using built-in PostgreSQL and built-in Redis"
+            values_file: "values-legacy.yaml"
+            use_eso: false
+            use_external_pg: false
+
+          - config_name: "legacy: using external PostgreSQL and built-in Redis"
+            values_file: "values-legacy-external-pg.yaml"
+            use_eso: false
+            use_external_pg: true
+
+          - config_name: "external-secrets: built-in PostgreSQL and built-in Redis(use existing secret)"
+            values_file: "values-eso.yaml"
+            use_eso: true
+            use_external_pg: false
+
+          - config_name: "external-secrets: using external PostgreSQL and built-in Redis(use exsting secret)"
+            values_file: "values-eso-external-pg.yaml"
+            use_eso: true
+            use_external_pg: true
+
+    name: ${{ matrix.config_name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Restore all caches with optimized restore strategies
+      - name: Restore Docker images cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.minikube/cache/images
+          key: ${{ needs.prepare-images.outputs.image-cache-key }}
+          restore-keys: |
+            ${{ runner.os }}-minikube-images-${{ hashFiles('charts/dify/Chart.yaml', 'charts/dify/Chart.lock') }}-
+            ${{ runner.os }}-minikube-images-${{ hashFiles('charts/dify/Chart.yaml') }}-
+            ${{ runner.os }}-minikube-images-
+
+      - name: Restore Helm repositories cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/helm/repository
+          key: ${{ runner.os }}-helm-repos-${{ hashFiles('charts/dify/Chart.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-helm-repos-
+
+      - name: Restore Helm chart dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: charts/dify/charts
+          key: ${{ runner.os }}-helm-deps-${{ hashFiles('charts/dify/Chart.lock', 'charts/dify/Chart.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-helm-deps-${{ hashFiles('charts/dify/Chart.yaml') }}-
+            ${{ runner.os }}-helm-deps-
+
+      # Each job runs in its own VM, so we need to setup minikube and helm again
+      - name: Setup minikube
+        uses: medyagh/setup-minikube@latest
+        with:
+          cache: true
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'v3.13.0'
+
+      # Add Helm repositories (leveraging cache from prepare-images stage)
+      - name: Add Helm repositories
+        run: |
+          echo "Adding Helm repositories..."
+          helm repo add external-secrets https://charts.external-secrets.io || true
+          helm repo add hashicorp https://helm.releases.hashicorp.com || true
+          helm repo add bitnami https://charts.bitnami.com/bitnami || true
+          helm repo update
+
+      - name: Verify cached images
+        run: |
+          echo "Verifying cached images for scenario: ${{ matrix.config_name }}"
+          echo "Images available in minikube:"
+          minikube image ls --format table | head -20 || true
+
+      - name: Install chart dependencies
+        run: |
+          cd charts/dify
+          if [ ! -d "charts" ] || [ ! "$(ls -A charts)" ]; then
+            echo "Installing Helm chart dependencies..."
+            helm dependency update
+          else
+            echo "Helm chart dependencies already cached"
+          fi
+
+      - name: Install External Secrets Operator
+        if: matrix.use_eso
+        run: |
+          echo "Installing External Secrets Operator..."
+          helm install external-secrets external-secrets/external-secrets \
+            --namespace external-secrets-system \
+            --create-namespace \
+            --wait \
+            --timeout 120s
+
+      - name: Install Vault
+        if: matrix.use_eso
+        run: |
+          echo "Installing Vault..."
+          helm install vault hashicorp/vault \
+            --set "server.dev.enabled=true" \
+            --set "server.dev.devRootToken=dev-only-token" \
+            --wait \
+            --timeout 120s
+
+      - name: Wait for External Secrets and Vault to be ready
+        if: matrix.use_eso
+        run: |
+          echo "Waiting for External Secrets Operator components..."
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=external-secrets -n external-secrets-system --timeout=120s
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=external-secrets-webhook -n external-secrets-system --timeout=120s
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=external-secrets-cert-controller -n external-secrets-system --timeout=120s
+
+          echo "Waiting for Vault to be ready..."
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=vault --timeout=120s
+
+          echo "All components are ready!"
+
+      - name: Setup Vault secrets
+        if: matrix.use_eso
+        run: |
+          chmod +x ci/scripts/setup-vault-secrets.sh
+          ci/scripts/setup-vault-secrets.sh
+
+      - name: Validate Vault secret paths
+        if: matrix.use_eso
+        run: |
+          chmod +x ci/scripts/validate-vault-paths.sh
+          ci/scripts/validate-vault-paths.sh
+
+      - name: Create test ClusterSecretStore
+        if: matrix.use_eso
+        run: |
+          chmod +x ci/scripts/create-test-clustersecretstore.sh
+          ci/scripts/create-test-clustersecretstore.sh
+
+      - name: Install external PostgreSQL
+        if: matrix.use_external_pg
+        run: |
+          echo "Installing external PostgreSQL..."
+          helm install external-postgres bitnami/postgresql \
+            --set auth.postgresPassword="difyai123456" \
+            --set auth.database="dify" \
+            --set primary.service.type="ClusterIP" \
+            --set primary.service.ports.postgresql=5432 \
+            --wait \
+            --timeout 300s
+
+      - name: Setup external PostgreSQL DNS
+        if: matrix.use_external_pg
+        run: |
+          chmod +x ci/scripts/setup-external-postgres-dns.sh
+          ci/scripts/setup-external-postgres-dns.sh
+
+      - name: Test Helm template rendering
+        run: |
+          chmod +x ci/scripts/test-helm-template.sh
+          ci/scripts/test-helm-template.sh "${{ matrix.values_file }}" "${{ matrix.config_name }}"
+
+      - name: Deploy and test
+        env:
+          HELM_TIMEOUT: "420s"
+          POD_READY_TIMEOUT: "180s"
+        run: |
+          chmod +x ci/scripts/deploy-and-test.sh
+          ci/scripts/deploy-and-test.sh "${{ matrix.values_file }}"
+
+      - name: Cache cleanup on failure
+        if: failure()
+        run: |
+          echo "Cleaning up caches due to job failure..."
+          rm -rf charts/dify/charts
+
+  # Summary job
+  test-summary:
+    runs-on: ubuntu-latest
+    name: Test Summary
+    needs: test-matrix
+    if: always()
+    steps:
+      - name: Check test results
+        run: |
+          echo "Test Results Summary"
+          echo "===================="
+
+          if [[ "${{ needs.test-matrix.result }}" != "success" ]]; then
+            echo "One or more test configurations failed"
+            echo "Please check the individual job logs for details"
+            exit 1
+          else
+            echo "All test configurations passed successfully!"
+          fi
+
+          echo ""
+          echo "Tested Configurations:"
+          echo "- ESO + Built-in PostgreSQL"
+          echo "- ESO + External PostgreSQL"
+          echo "- Legacy + Built-in PostgreSQL"
+          echo "- Legacy + External PostgreSQL"
+          echo ""
+          echo "CI Pipeline completed successfully!"

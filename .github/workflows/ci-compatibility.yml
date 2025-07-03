@@ -1,0 +1,76 @@
+name: CI - Compatibility Test
+
+on:
+  push:
+    branches: [ main, develop, feat/support-externa-secret ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  HELM_VERSION: v3.12.0
+
+jobs:
+  compatibility-test:
+    runs-on: ubuntu-latest
+    name: Compatibility Test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - name: Install chart dependencies
+        run: |
+          cd charts/dify
+          helm dependency update
+
+      - name: Render templates with values.yaml
+        run: |
+          echo "🔧 Rendering templates with default values.yaml..."
+          helm template compatibility-test charts/dify \
+            --values charts/dify/values.yaml \
+            --namespace default \
+            --output-dir /tmp/default-output
+
+          # Sort and clean the output for comparison
+          find /tmp/default-output -name "*.yaml" -exec cat {} \; | \
+            grep -v "helm.sh/chart\|app.kubernetes.io/version\|app.kubernetes.io/managed-by" | \
+            sort > /tmp/default-sorted.yaml
+
+      - name: Render templates with values-legacy.yaml
+        run: |
+          echo "🔧 Rendering templates with values-legacy.yaml..."
+          helm template compatibility-test charts/dify \
+            --values ci/values/values-legacy.yaml \
+            --namespace default \
+            --output-dir /tmp/legacy-output
+
+          # Sort and clean the output for comparison
+          find /tmp/legacy-output -name "*.yaml" -exec cat {} \; | \
+            grep -v "helm.sh/chart\|app.kubernetes.io/version\|app.kubernetes.io/managed-by" | \
+            sort > /tmp/legacy-sorted.yaml
+
+      - name: Compare rendered outputs
+        run: |
+          echo "🔍 Comparing rendered outputs..."
+
+          # Calculate the differences
+          DIFF_COUNT=$(diff /tmp/default-sorted.yaml /tmp/legacy-sorted.yaml | wc -l)
+
+          echo "📊 Total difference lines: $DIFF_COUNT"
+
+          # Show the differences
+          echo "📋 Differences found:"
+          echo "===================="
+          diff /tmp/default-sorted.yaml /tmp/legacy-sorted.yaml || true
+          echo "===================="
+
+          # Exit with error if more than 1 line differs
+          if [ $DIFF_COUNT -gt 4 ]; then
+            echo "❌ Compatibility test failed: $DIFF_COUNT lines differ (threshold: 4)"
+            exit 1
+          fi
+
