@@ -3214,3 +3214,166 @@ externalTableStore:
   instanceName: "instance-name"
   accessKeyId: "your-secret-id"
   accessKeySecret: "your-secret-key"
+
+###################################
+# External Secret (External Secrets Operator)
+# - these configs are used when `externalSecret.enabled` is true
+# - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
+###################################
+externalSecret:
+  enabled: false
+
+  # External secret store backend provider (e.g., vault, aws, azure, gcp, etc.)
+  secretStore:
+    # SecretStore or ClusterSecretStore name to reference
+    name: "default-secret-store"
+    # kind: SecretStore or ClusterSecretStore
+    kind: "SecretStore"
+
+  # Configuration for api secret
+  api:
+    # Whether to create ExternalSecret for api
+    enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    # Only specify the fields you want to include - all possible fields are defined in the template
+    remoteRefs:
+      SECRET_KEY:
+        key: "dify/api"
+        property: "secret_key"
+      CODE_EXECUTION_API_KEY:
+        key: "dify/sandbox"
+        property: "api_key"
+      DB_USERNAME:
+        key: "dify/database"
+        property: "username"
+      DB_PASSWORD:
+        key: "dify/database"
+        property: "password"
+      REDIS_USERNAME:
+        key: "dify/redis"
+        property: "username"
+      REDIS_PASSWORD:
+        key: "dify/redis"
+        property: "password"
+      CELERY_BROKER_URL:
+        key: "dify/redis"
+        property: "celery_broker_url"
+      WEAVIATE_API_KEY:
+        key: "dify/weaviate"
+        property: "api_key"
+      RESEND_API_KEY:
+        key: "dify/mail"
+        property: "resend_api_key"
+      PLUGIN_DAEMON_KEY:
+        key: "dify/plugin-daemon"
+        property: "server_key"
+      INNER_API_KEY_FOR_PLUGIN:
+        key: "dify/plugin-daemon"
+        property: "dify_api_key"
+
+  # Configuration for worker secret
+  worker:
+    # Whether to create ExternalSecret for worker
+    enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    remoteRefs:
+      SECRET_KEY:
+        key: "dify/api"
+        property: "secret_key"
+      DB_USERNAME:
+        key: "dify/database"
+        property: "username"
+      DB_PASSWORD:
+        key: "dify/database"
+        property: "password"
+      REDIS_USERNAME:
+        key: "dify/redis"
+        property: "username"
+      REDIS_PASSWORD:
+        key: "dify/redis"
+        property: "password"
+      CELERY_BROKER_URL:
+        key: "dify/redis"
+        property: "celery_broker_url"
+      WEAVIATE_API_KEY:
+        key: "dify/weaviate"
+        property: "api_key"
+      RESEND_API_KEY:
+        key: "dify/mail"
+        property: "resend_api_key"
+      PLUGIN_DAEMON_KEY:
+        key: "dify/plugin-daemon"
+        property: "server_key"
+      INNER_API_KEY_FOR_PLUGIN:
+        key: "dify/plugin-daemon"
+        property: "dify_api_key"
+
+  # Configuration for sandbox secret
+  sandbox:
+    # Whether to create ExternalSecret for sandbox
+    enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    remoteRefs:
+      API_KEY:
+        key: "dify/sandbox"
+        property: "api_key"
+
+  # Configuration for plugin daemon secret
+  pluginDaemon:
+    # Whether to create ExternalSecret for plugin daemon
+    enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    remoteRefs:
+      DB_USERNAME:
+        key: "dify/database"
+        property: "username"
+      DB_PASSWORD:
+        key: "dify/database"
+        property: "password"
+      REDIS_USERNAME:
+        key: "dify/redis"
+        property: "username"
+      REDIS_PASSWORD:
+        key: "dify/redis"
+        property: "password"
+      SERVER_KEY:
+        key: "dify/plugin-daemon"
+        property: "server_key"
+      DIFY_INNER_API_KEY:
+        key: "dify/plugin-daemon"
+        property: "dify_api_key"
+
+  # Configuration for PostgreSQL secret (for built-in PostgreSQL with ExternalSecret)
+  postgresql:
+    # Whether to create ExternalSecret for built-in PostgreSQL
+    enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    remoteRefs:
+      postgres-password:
+        key: "dify/postgresql"
+        property: "postgres_password"
+      replication-password:
+        key: "dify/postgresql"
+        property: "replication_password"
+
+  # Configuration for Redis secret (for built-in Redis with ExternalSecret)
+  redis:
+    # Whether to create ExternalSecret for built-in Redis
+    enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    remoteRefs:
+      redis-password:
+        key: "dify/redis"
+        property: "redis_password"
