@@ -1,5 +1,13 @@
 {{- if and .Values.pluginDaemon.enabled}}
-{{- $usePvc := not (or (and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon)) -}}
+{{- $usePvc := not (or
+  (and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon)
+  (and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon)
+  (and .Values.externalGCS.enabled .Values.externalGCS.bucketName.pluginDaemon)
+  (and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon)
+  (and .Values.externalOBS.enabled .Values.externalOBS.bucketName.pluginDaemon)
+  (and .Values.externalTOS.enabled .Values.externalTOS.bucketName.pluginDaemon)
+)
+}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
