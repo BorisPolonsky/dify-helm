@@ -64,6 +64,25 @@ spec:
       securityContext:
 {{ toYaml .Values.pluginDaemon.podSecurityContext | indent 8 }}
       {{- end }}
+      initContainers:
+      - name: wait-for-redis
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          {{- if .Values.externalRedis.enabled }}
+          until nc -z {{ .Values.externalRedis.host }} {{ .Values.externalRedis.port }}; do
+            echo "Waiting for Redis at {{ .Values.externalRedis.host }}:{{ .Values.externalRedis.port }}..."
+            sleep 5
+          done
+          {{- else if .Values.redis.enabled }}
+          until nc -z {{ .Release.Name }}-redis-master {{ .Values.redis.master.service.ports.redis }}; do
+            echo "Waiting for Redis at {{ .Release.Name }}-redis-master:{{ .Values.redis.master.service.ports.redis }}..."
+            sleep 5
+          done
+          {{- end }}
+          echo "Redis is ready!"
       containers:
       - image: "{{ .Values.image.pluginDaemon.repository }}:{{ default .Chart.AppVersion .Values.image.pluginDaemon.tag }}"
         imagePullPolicy: "{{ .Values.image.pluginDaemon.pullPolicy }}"

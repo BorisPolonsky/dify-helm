@@ -63,6 +63,10 @@ check_vault_secret "dify/sandbox" "api_key"
 check_vault_secret "dify/postgresql" "postgres_password"
 check_vault_secret "dify/postgresql" "replication_password"
 
+# Check S3 secrets
+check_vault_secret "dify/s3" "access_key"
+check_vault_secret "dify/s3" "secret_key"
+
 echo ""
 echo "🧪 Testing secret retrieval..."
 
@@ -75,5 +79,11 @@ kubectl exec $VAULT_POD -- vault kv get -field=password secret/dify/database
 
 echo "🔑 Testing Redis password retrieval:"
 kubectl exec $VAULT_POD -- vault kv get -field=redis_password secret/dify/redis
+
+echo "🔑 Testing S3 access key retrieval:"
+kubectl exec $VAULT_POD -- vault kv get -field=access_key secret/dify/s3
+
+echo "🔑 Testing S3 secret key retrieval:"
+kubectl exec $VAULT_POD -- vault kv get -field=secret_key secret/dify/s3
 
 echo "✅ All secret paths validated successfully!"

@@ -706,7 +706,7 @@ postgresql:
     pullPolicy: IfNotPresent
   ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
   ##
-  architecture: replication
+  architecture: standalone
   ## Replication configuration
   ## Ignored if `architecture` is `standalone`
   ##
@@ -1323,7 +1323,7 @@ redis:
 
   ## @param architecture Redis&reg; architecture. Allowed values: `standalone` or `replication`
   ##
-  architecture: replication
+  architecture: standalone
   ## Redis&reg; Authentication parameters
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/redis#setting-the-server-password-on-first-run
   ##
@@ -3014,12 +3014,16 @@ externalPostgres:
 # External S3
 # - these configs are only used when `externalS3.enabled` is true
 ###################################
+###################################
+# External S3
+# - these configs are only used when `externalS3.enabled` is true
+###################################
 externalS3:
-  enabled: false
-  endpoint: "https://xxx.r2.cloudflarestorage.com"
-  pathStyle: false
-  accessKey: "ak-difyai"
-  secretKey: "sk-difyai"
+  enabled: true
+  endpoint: "http://minio:9000"
+  pathStyle: true
+  accessKey: "minio-root"
+  secretKey: "minio123456"
   useSSL: false
   bucketName:
     # Shared storage for `api` and `worker`
@@ -3027,7 +3031,7 @@ externalS3:
     # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalS3.enabled` is set to `true`).
     pluginDaemon:
   useIAM: false
-  region: "us-east-1"
+  region: "auto"
 
 ###################################
 # External Azure Blob Storage

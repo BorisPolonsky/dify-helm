@@ -2,9 +2,9 @@ name: CI - External Secrets Operator Tests
 
 on:
   push:
-    branches: [ main, develop, feat/support-externa-secret ]
+    branches: [main, develop, feat/support-externa-secret]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   # Stage 1: Pre-pull all images and prepare infrastructure
@@ -51,7 +51,7 @@ jobs:
           echo "Pre-pulling all Docker images to minikube cache..."
 
           # Complete image list for all scenarios
-          ALL_IMAGES="langgenius/dify-api:1.2.0 langgenius/dify-web:1.2.0 langgenius/dify-sandbox:0.2.11 nginx:latest ubuntu/squid:latest langgenius/dify-plugin-daemon:0.0.7-local bitnami/postgresql:15.3.0-debian-11-r7 bitnami/redis:7.0.11-debian-11-r12 bitnami/redis-sentinel:7.0.11-debian-11-r10 bitnami/redis-exporter:1.50.0-debian-11-r13 bitnami/bitnami-shell:11-debian-11-r118 busybox:latest curlimages/curl:latest hashicorp/vault:latest"
+          ALL_IMAGES="langgenius/dify-api:1.2.0 langgenius/dify-web:1.2.0 langgenius/dify-sandbox:0.2.11 nginx:latest ubuntu/squid:latest langgenius/dify-plugin-daemon:0.0.7-local bitnami/postgresql:15.3.0-debian-11-r7 bitnami/redis:7.0.11-debian-11-r12 bitnami/redis-sentinel:7.0.11-debian-11-r10 bitnami/redis-exporter:1.50.0-debian-11-r13 bitnami/bitnami-shell:11-debian-11-r118 busybox:latest curlimages/curl:latest hashicorp/vault:latest bitnami/minio:2024-debian-12-r2"
 
           echo "ALL_IMAGES=$ALL_IMAGES" >> $GITHUB_ENV
 
@@ -75,6 +75,7 @@ jobs:
           echo "  - busybox:latest"
           echo "  - curlimages/curl:latest"
           echo "  - hashicorp/vault:latest"
+          echo "  - bitnami/minio:2024-debian-12-r2"
 
           IMAGE_COUNT=$(echo "$ALL_IMAGES" | wc -w)
           echo "Total images to cache: $IMAGE_COUNT"
@@ -117,21 +118,37 @@ jobs:
             values_file: "values-legacy.yaml"
             use_eso: false
             use_external_pg: false
+            use_external_s3: false
 
           - config_name: "legacy: using external PostgreSQL and built-in Redis"
             values_file: "values-legacy-external-pg.yaml"
             use_eso: false
             use_external_pg: true
+            use_external_s3: false
+
+          - config_name: "legacy: using external S3 and built-in PostgreSQL and Redis"
+            values_file: "values-legacy-external-s3.yaml"
+            use_eso: false
+            use_external_pg: false
+            use_external_s3: true
 
           - config_name: "external-secrets: built-in PostgreSQL and built-in Redis(use existing secret)"
             values_file: "values-eso.yaml"
             use_eso: true
             use_external_pg: false
+            use_external_s3: false
 
           - config_name: "external-secrets: using external PostgreSQL and built-in Redis(use exsting secret)"
             values_file: "values-eso-external-pg.yaml"
             use_eso: true
             use_external_pg: true
+            use_external_s3: false
+
+          - config_name: "external-secrets: using external S3 with built-in PostgreSQL and Redis"
+            values_file: "values-eso-s3-external.yaml"
+            use_eso: true
+            use_external_pg: false
+            use_external_s3: true
 
     name: ${{ matrix.config_name }}
 
@@ -176,7 +193,7 @@ jobs:
       - name: Setup Helm
         uses: azure/setup-helm@v4
         with:
-          version: 'v3.13.0'
+          version: "v3.13.0"
 
       # Add Helm repositories (leveraging cache from prepare-images stage)
       - name: Add Helm repositories
@@ -272,6 +289,19 @@ jobs:
           chmod +x ci/scripts/setup-external-postgres-dns.sh
           ci/scripts/setup-external-postgres-dns.sh
 
+      - name: Install MinIO
+        if: matrix.use_external_s3
+        run: |
+          echo "Installing MinIO for S3 testing..."
+          helm install minio bitnami/minio \
+            --set auth.rootUser="minio-root" \
+            --set auth.rootPassword="minio123456" \
+            --set defaultBuckets="difyai" \
+            --set service.type="ClusterIP" \
+            --set service.ports.api=9000 \
+            --wait \
+            --timeout 300s
+
       - name: Test Helm template rendering
         run: |
           chmod +x ci/scripts/test-helm-template.sh
@@ -279,11 +309,17 @@ jobs:
 
       - name: Deploy and test
         env:
-          HELM_TIMEOUT: "420s"
-          POD_READY_TIMEOUT: "180s"
+          HELM_TIMEOUT: "700s"
+          POD_READY_TIMEOUT: "200s"
         run: |
           chmod +x ci/scripts/deploy-and-test.sh
           ci/scripts/deploy-and-test.sh "${{ matrix.values_file }}"
+
+      - name: Cache cleanup on failure
+        if: failure()
+        run: |
+          echo "Cleaning up caches due to job failure..."
+          rm -rf charts/dify/charts
 
       - name: Cache cleanup on failure
         if: failure()
@@ -302,7 +338,6 @@ jobs:
         run: |
           echo "Test Results Summary"
           echo "===================="
-
           if [[ "${{ needs.test-matrix.result }}" != "success" ]]; then
             echo "One or more test configurations failed"
             echo "Please check the individual job logs for details"
@@ -310,11 +345,11 @@ jobs:
           else
             echo "All test configurations passed successfully!"
           fi
-
           echo ""
           echo "Tested Configurations:"
           echo "- ESO + Built-in PostgreSQL"
           echo "- ESO + External PostgreSQL"
+          echo "- ESO + External S3 bucket"
           echo "- Legacy + Built-in PostgreSQL"
           echo "- Legacy + External PostgreSQL"
           echo ""

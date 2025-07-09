@@ -154,7 +154,24 @@ show_deployment_progress() {
         echo "ERROR: Failed pods: $failed_pods"
         for pod in $failed_pods; do
             echo "INFO: Logs for failed pod: $pod"
-            kubectl logs "$pod" -n "$NAMESPACE" --tail=20 || true
+            kubectl logs "$pod" -n "$NAMESPACE" --tail=50 || true
+        done
+    fi
+
+    # Show CrashLoopBackOff pods (these are critical for debugging)
+    local crashloop_pods=$(kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.status.containerStatuses[0].state.waiting.reason}{"\n"}{end}' 2>/dev/null | grep CrashLoopBackOff | awk '{print $1}' || echo "")
+    if [[ -n "$crashloop_pods" ]]; then
+        echo "ERROR: CrashLoopBackOff pods: $crashloop_pods"
+        for pod in $crashloop_pods; do
+            echo "INFO: ========================================"
+            echo "INFO: Logs for CrashLoopBackOff pod: $pod"
+            echo "INFO: ========================================"
+            kubectl logs "$pod" -n "$NAMESPACE" --tail=100 || true
+            echo "INFO: Previous container logs for pod: $pod"
+            kubectl logs "$pod" -n "$NAMESPACE" --previous --tail=50 2>/dev/null || echo "No previous logs available"
+            echo "INFO: Pod description for: $pod"
+            kubectl describe pod "$pod" -n "$NAMESPACE" | grep -A 20 "Events:" || true
+            echo "INFO: ========================================"
         done
     fi
 }
@@ -380,6 +397,16 @@ if ! kubectl wait --for=condition=ready pod \
     --timeout="$POD_READY_TIMEOUT"; then
 
     echo "ERROR: Pods did not become ready within timeout"
+    echo "INFO: Gathering detailed failure information for debugging..."
+    
+    # Show current pod status with more details
+    echo "INFO: Current pod status:"
+    kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o wide || true
+    
+    # Show container statuses for all pods
+    echo "INFO: Container statuses:"
+    kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.phase}{"\t"}{.status.containerStatuses[0].state}{"\n"}{end}' 2>/dev/null || true
+    
     show_deployment_progress
     diagnose_deployment_issues
     exit 1
@@ -408,8 +435,12 @@ check_pod_health() {
         kubectl describe pod "$pod_name" -n "$NAMESPACE" | grep -A 20 "Events:" || true
 
         # Show container logs if available
-        echo "INFO: Container logs:"
-        kubectl logs "$pod_name" -n "$NAMESPACE" --tail=50 || true
+        echo "INFO: Current container logs:"
+        kubectl logs "$pod_name" -n "$NAMESPACE" --tail=100 || true
+        
+        # Show previous container logs if available
+        echo "INFO: Previous container logs:"
+        kubectl logs "$pod_name" -n "$NAMESPACE" --previous --tail=50 2>/dev/null || echo "No previous logs available"
 
         return 1
     fi
@@ -425,44 +456,52 @@ check_pod_health() {
     return 0
 }
 
-# Simple connectivity test using curl -I (HEAD request)
-test_connectivity() {
-    local service_fqdn=$1
-    local component=$2
-
-    echo "INFO: Testing $component connectivity to $service_fqdn"
-
-    local test_name="test-$component-$(date +%s)"
-
+# Fast batch connectivity test using single curl pod
+test_connectivity_batch() {
+    local services_and_components="$1"
+    
+    echo "INFO: Testing connectivity to all services in parallel..."
+    
+    local test_name="connectivity-test-$(date +%s)"
+    
     set +e  # Temporarily disable exit on error
-
-    # Run curl test
-    kubectl run "$test_name" --image=curlimages/curl --restart=Never -- \
-        curl -I -v -m 10 --connect-timeout 5 "$service_fqdn"
-
-    # Wait for completion - either success or failure
-    echo "INFO: Waiting for curl test to complete..."
-    kubectl wait --for=condition=Ready pod/"$test_name" -n "$NAMESPACE" --timeout=60s
-
+    
+    # Build curl commands for parallel execution
+    local curl_commands=""
+    local service_list=""
+    
+    # Parse services and components
+    while IFS='|' read -r service component; do
+        [[ -n "$service" && -n "$component" ]] || continue
+        curl_commands+="echo 'Testing $component ($service)...' && curl -I -s -m 5 --connect-timeout 2 '$service' && echo 'SUCCESS: $component reachable' || echo 'FAILED: $component unreachable' &"$'\n'
+        service_list+="$component "
+    done <<< "$services_and_components"
+    
+    # Add wait command to wait for all background processes
+    curl_commands+="wait"
+    
+    echo "INFO: Running connectivity tests for: $service_list"
+    
+    # Create single pod with all curl tests
+    kubectl run "$test_name" --image=curlimages/curl --restart=Never -- sh -c "$curl_commands"
+    
+    # Wait for pod to complete (much faster than individual waits)
+    echo "INFO: Waiting for batch connectivity test to complete..."
+    kubectl wait --for=condition=Ready pod/"$test_name" -n "$NAMESPACE" --timeout=30s 2>/dev/null || true
+    
+    # Give a moment for the curl commands to execute
+    sleep 3
+    
     # Get the curl output
-    echo "INFO: Curl output:"
-    echo "================="
-    kubectl logs "$test_name" -n "$NAMESPACE"
-    echo "================="
-
-    # Check if it succeeded
-    local curl_exit_code=$(kubectl get pod "$test_name" -n "$NAMESPACE" -o jsonpath='{.status.containerStatuses[0].state.terminated.exitCode}' 2>/dev/null || echo "1")
-
-    if [[ "$curl_exit_code" == "0" ]]; then
-        echo "SUCCESS: $component is reachable at $service_fqdn"
-    else
-        echo "WARNING: $component connectivity failed (exit code: $curl_exit_code)"
-    fi
-
+    echo "INFO: Connectivity test results:"
+    echo "================================"
+    kubectl logs "$test_name" -n "$NAMESPACE" 2>/dev/null || echo "Could not retrieve logs"
+    echo "================================"
+    
     # Clean up
     kubectl delete pod "$test_name" -n "$NAMESPACE" --ignore-not-found=true
     set -e
-
+    
     return 0
 }
 
@@ -574,14 +613,17 @@ echo "==================================="
 echo "Cluster DNS:"
 kubectl get service kube-dns -n kube-system 2>/dev/null || echo "DNS service not found"
 
-# Test basic connectivity using curl -I
+# Test basic connectivity using optimized batch curl
 echo ""
-echo "INFO: Testing basic connectivity with curl -I..."
-echo "==============================================="
+echo "INFO: Testing basic connectivity with batch curl..."
+echo "================================================="
 
-test_connectivity "${RELEASE_NAME}.${NAMESPACE}.svc.cluster.local" "main"
-test_connectivity "${RELEASE_NAME}-api.${NAMESPACE}.svc.cluster.local:5001" "api"
-test_connectivity "${RELEASE_NAME}-web.${NAMESPACE}.svc.cluster.local:3000" "web"
+# Define services and components for batch testing
+SERVICES_TO_TEST="${RELEASE_NAME}.${NAMESPACE}.svc.cluster.local|main
+${RELEASE_NAME}-api.${NAMESPACE}.svc.cluster.local:5001|api
+${RELEASE_NAME}-web.${NAMESPACE}.svc.cluster.local:3000|web"
+
+test_connectivity_batch "$SERVICES_TO_TEST"
 
 # Check secrets and configs
 check_secrets_and_configs

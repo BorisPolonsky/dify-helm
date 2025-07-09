@@ -71,6 +71,11 @@ kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault kv put secret/di
   postgres_password="difyai123456" \
   replication_password="repl123456"
 
+echo "Adding S3 secrets..."
+kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault kv put secret/dify/s3 \
+  access_key="minio-root" \
+  secret_key="minio123456"
+
 # Enable AppRole auth method for External Secrets Operator
 echo "Checking if AppRole auth method is enabled..."
 if kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault auth list | grep -q "approle/"; then
@@ -110,8 +115,10 @@ echo "Testing Vault connectivity..."
 VAULT_IP=$(kubectl get service vault -o jsonpath='{.spec.clusterIP}')
 echo "Vault service IP: $VAULT_IP"
 
-# Test if we can read a secret
+# Test if we can read secrets
 kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault kv get secret/dify/api
+echo "Testing S3 secrets..."
+kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault kv get secret/dify/s3
 
 echo "Vault secrets setup completed successfully!"
 echo "Vault available at: http://vault:8200"
