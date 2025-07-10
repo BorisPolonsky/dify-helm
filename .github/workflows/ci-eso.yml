@@ -145,9 +145,15 @@ jobs:
             use_external_s3: false
 
           - config_name: "external-secrets: using external S3 with built-in PostgreSQL and Redis"
-            values_file: "values-eso-s3-external.yaml"
+            values_file: "values-eso-external-s3.yaml"
             use_eso: true
             use_external_pg: false
+            use_external_s3: true
+
+          - config_name: "external-secrets: using external S3 and external PostgreSQL"
+            values_file: "values-eso-external-s3-pg.yaml"
+            use_eso: true
+            use_external_pg: true
             use_external_s3: true
 
     name: ${{ matrix.config_name }}
@@ -350,7 +356,9 @@ jobs:
           echo "- ESO + Built-in PostgreSQL"
           echo "- ESO + External PostgreSQL"
           echo "- ESO + External S3 bucket"
+          echo "- ESO + External S3 + External PostgreSQL"
           echo "- Legacy + Built-in PostgreSQL"
           echo "- Legacy + External PostgreSQL"
+          echo "- Legacy + External S3"
           echo ""
           echo "CI Pipeline completed successfully!"
