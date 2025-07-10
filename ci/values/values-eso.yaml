@@ -190,7 +190,8 @@ api:
     type: "resend"
     resend:
       # Resend API Key
-      apiKey: "xxxx"
+      # Note: When using ExternalSecret, this value is managed externally
+      apiKey: ""
       # Resend API URL
       apiUrl: https://api.resend.com
     # SMTP Configuration
@@ -198,14 +199,16 @@ api:
       server: "smtp.server.com"
       port: 465
       username: "YOUR EMAIL"
-      password: "YOUR EMAIL PASSWORD"
+      # Note: When using ExternalSecret, this value is managed externally
+      password: ""
       tls:
         enabled: true
         optimistic: false
   # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
   migration: true
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-  secretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
+  # Note: When using ExternalSecret, this value is managed externally
+  secretKey: ""
   ## Storage for `api` and `worker`
   ## Ignored if `.Values.externalS3.enabled` is true
   ##
@@ -519,7 +522,8 @@ sandbox:
     labels: {}
     clusterIP: ""
   auth:
-    apiKey: "dify-sandbox"
+    # Note: When using ExternalSecret, this value is managed externally
+    apiKey: ""
   ## Sandbox ServiceAccount configuration
   ##
   serviceAccount:
@@ -903,7 +907,7 @@ weaviate:
       enabled: true
       # Any number of allowed API Keys as plain text
       allowed_keys:
-        - "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
+        - ""
       # You can either set a single user for all the listed Allowed API keys OR
       # one user per API Key, i.e. length(apikey.allowed_keys) == length(apikey.users) OR
       # length(apikey.users) == 1
@@ -984,7 +988,8 @@ weaviate:
     # NOTE: Make sure to add the users to the authorization above overwise they will not be allowed to interact with Weaviate.
     # AUTHENTICATION_APIKEY_USERS: 'jane@doe.com,ian-smith'
     AUTHENTICATION_APIKEY_ENABLED: "true"
-    AUTHENTICATION_APIKEY_ALLOWED_KEYS: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
+    # Note: When using ExternalSecret, this value is managed externally
+    # AUTHENTICATION_APIKEY_ALLOWED_KEYS: ""
     AUTHENTICATION_APIKEY_USERS: "hello@dify.ai"
     AUTHORIZATION_ADMINLIST_ENABLED: "true"
     AUTHORIZATION_ADMINLIST_USERS: "hello@dify.ai"
@@ -3001,8 +3006,9 @@ redis:
 ###################################
 externalPostgres:
   enabled: false
-  username: "postgres"
-  password: "difyai123456"
+  # Note: When using ExternalSecret, these values are managed externally
+  username: ""
+  password: ""
   address: localhost
   port: 5432
   database:
@@ -3019,8 +3025,9 @@ externalS3:
   enabled: false
   endpoint: "http://minio:9000"
   pathStyle: true
-  accessKey: "minio-root"
-  secretKey: "minio123456"
+  # Note: When using ExternalSecret, these values are managed externally
+  accessKey: ""
+  secretKey: ""
   useSSL: false
   bucketName:
     # Shared storage for `api` and `worker`
@@ -3048,8 +3055,9 @@ externalAzureBlobStorage:
 externalOSS:
   enabled: false
   endpoint: "https://oss-ap-southeast-1-internal.aliyuncs.com"
-  accessKey: "ak-difyai"
-  secretKey: "sk-difyai"
+  # Note: When using ExternalSecret, these values are managed externally
+  accessKey: ""
+  secretKey: ""
   region: "ap-southeast-1"
   bucketName:
     api: "difyai"
@@ -3073,7 +3081,7 @@ externalGCS:
 ###################################
 externalCOS:
   enabled: false
-  secretKey: "your-secret-key"
+  secretKey: ""
   secretId: "your-secret-id"
   region: "your-region"
   bucketName:
@@ -3090,7 +3098,7 @@ externalOBS:
   enabled: false
   endpoint: "https://your-endpoint"
   asscessKey: "your-secret-id"
-  secretKey: "your-secret-key"
+  secretKey: ""
   bucketName: "your-bucket-name"
 
 ###################################
@@ -3102,7 +3110,7 @@ externalRedis:
   host: "redis.example"
   port: 6379
   username: ""
-  password: "difyai123456"
+  password: ""
   useSSL: false
 
 ###################################
@@ -3112,7 +3120,8 @@ externalRedis:
 externalWeaviate:
   enabled: false
   endpoint: "http://weaviate:8080"
-  apiKey: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
+  # Note: When using ExternalSecret, this value is managed externally
+  apiKey: ""
 
 ###################################
 # External Qdrant
@@ -3121,7 +3130,8 @@ externalWeaviate:
 externalQdrant:
   enabled: false
   endpoint: "https://your-qdrant-cluster-url.qdrant.tech/"
-  apiKey: "ak-difyai"
+  # Note: When using ExternalSecret, this value is managed externally
+  apiKey: ""
   timeout: 20
   grpc:
     enabled: false
@@ -3145,8 +3155,9 @@ externalMilvus:
 ###################################
 externalPgvector:
   enabled: false
-  username: "postgres"
-  password: "difyai123456"
+  # Note: When using ExternalSecret, these values are managed externally
+  username: ""
+  password: ""
   address: "pgvector"
   port: 5432
   dbName: dify
@@ -3158,7 +3169,8 @@ externalPgvector:
 externalTencentVectorDB:
   enabled: false
   url: "your-tencent-vector-db-url"
-  apiKey: "your-tencent-vector-db-api-key"
+  # Note: When using ExternalSecret, this value is managed externally
+  apiKey: ""
   timeout: 30
   username: "root"
   database: "dify"
@@ -3186,8 +3198,9 @@ externalTableStore:
   enabled: false
   endpoint: "endpoint"
   instanceName: "instance-name"
-  accessKeyId: "your-secret-id"
-  accessKeySecret: "your-secret-key"
+  # Note: When using ExternalSecret, these values are managed externally
+  accessKeyId: ""
+  accessKeySecret: ""
 
 ###################################
 # External Secret (External Secrets Operator)
@@ -3363,3 +3376,15 @@ externalSecret:
       redis-password:
         key: "dify/redis"
         property: "redis_password"
+
+  # Configuration for Weaviate secret (for built-in Weaviate with ExternalSecret)
+  weaviate:
+    # Whether to create ExternalSecret for built-in Weaviate
+    enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    remoteRefs:
+      AUTHENTICATION_APIKEY_ALLOWED_KEYS:
+        key: "dify/weaviate"
+        property: "api_key"

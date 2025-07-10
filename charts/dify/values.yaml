@@ -3389,3 +3389,15 @@ externalSecret:
       redis-password:
         key: "dify/redis"
         property: "redis_password"
+
+  # Configuration for Weaviate secret (for built-in Weaviate with ExternalSecret)
+  weaviate:
+    # Whether to create ExternalSecret for built-in Weaviate
+    enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    remoteRefs:
+      AUTHENTICATION_APIKEY_ALLOWED_KEYS:
+        key: "dify/weaviate"
+        property: "api_key"
