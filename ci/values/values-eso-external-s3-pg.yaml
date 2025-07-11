@@ -1,17 +1,17 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.2.0"
+    tag: "1.5.0"
     pullPolicy: IfNotPresent
 
   web:
     repository: langgenius/dify-web
-    tag: "1.2.0"
+    tag: "1.5.0"
     pullPolicy: IfNotPresent
 
   sandbox:
     repository: langgenius/dify-sandbox
-    tag: "0.2.11"
+    tag: "0.2.12"
     pullPolicy: IfNotPresent
 
   proxy:
@@ -26,7 +26,7 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.0.7-local
+    tag: 0.1.2-local
     pullPolicy: IfNotPresent
 
 api:
@@ -54,18 +54,6 @@ api:
     failureThreshold: 5
     successThreshold: 1
   extraEnv:
-    # Apply your own Environment Variables if necessary.
-    # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
-    # The direct approach
-    # - name: LANG
-    #   value: "C.UTF-8"
-    #   - name: SECRET_KEY
-    # Use existing k8s secrets
-    #  - name: DB_PASSWORD
-    #    valueFrom:
-    #      secretKeyRef:
-    #        name: my-secret
-    #        key: DB_PASSWORD
     - name: CHECK_UPDATE_URL
       # Won't check for updates if left empty
       #   value: https://updates.dify.ai

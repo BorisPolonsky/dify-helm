@@ -1,5 +1,3 @@
-# Nothing is modified and the previous values.yaml is copied directly
-
 # Default values for dify.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -7,7 +5,7 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.2.0"
+    tag: "1.5.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -18,7 +16,7 @@ image:
 
   web:
     repository: langgenius/dify-web
-    tag: "1.2.0"
+    tag: "1.5.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -29,7 +27,7 @@ image:
 
   sandbox:
     repository: langgenius/dify-sandbox
-    tag: "0.2.11"
+    tag: "0.2.12"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -62,7 +60,7 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.0.7-local
+    tag: 0.1.2-local
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -78,6 +76,7 @@ api:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -249,6 +248,7 @@ worker:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -308,6 +308,7 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   ## Configure extra options for proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param proxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -380,6 +381,7 @@ web:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -461,6 +463,7 @@ sandbox:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -543,6 +546,7 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   ## Configure extra options for ssrf proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param ssrfProxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -613,6 +617,7 @@ pluginDaemon:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   ## Configure extra options for plugin daemon containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param pluginDaemon.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -3063,7 +3068,10 @@ externalOSS:
 ###################################
 externalGCS:
   enabled: false
-  bucketName: "difyai"
+  bucketName:
+    api: "difyai"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalGCS.enabled` is set to `true`).
+    pluginDaemon:
   serviceAccountJsonBase64: ""
 
 ###################################
@@ -3088,9 +3096,28 @@ externalCOS:
 externalOBS:
   enabled: false
   endpoint: "https://your-endpoint"
-  asscessKey: "your-secret-id"
+  accessKey: "your-secret-id"
   secretKey: "your-secret-key"
-  bucketName: "your-bucket-name"
+  bucketName:
+    api: "your-bucket-name"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOBS.enabled` is set to `true`).
+    pluginDaemon:
+
+###################################
+# External Tinder Object Storage (TOS) from volcengine
+# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` and `externalOBS.enabled` are false and `externalTOS.enabled` is true
+###################################
+externalTOS:
+  enabled: false
+  endpoint: "https://tos-cn-beijing.volces.com"
+  accessKey: "your-access-key"
+  secretKey: "your-secret-key"
+  bucketName:
+    # Shared storage for `api` and `worker`
+    api: "your-bucket-name"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalTOS.enabled` is set to `true`).
+    pluginDaemon:
+  region: "cn-beijing"
 
 ###################################
 # External Redis
