@@ -286,6 +286,18 @@ pluginDaemon:
     # https://github.com/BorisPolonsky/dify-helm/pull/131
     apiProxyEnabled: false
 
+postgresql:
+  enabled: false
+  name: postgres
+  global:
+    storageClass: ""
+    postgresql:
+      auth:
+        existingSecret: "postgresql-secret"
+        username: ""
+        password: ""
+        database: "dify"
+
 weaviate:
   enabled: true
   image:
