@@ -470,7 +470,7 @@ weaviate:
     # The User/s can be a simple name or an email, no matter if it exists or not.
     # NOTE: Make sure to add the users to the authorization above overwise they will not be allowed to interact with Weaviate.
     # AUTHENTICATION_APIKEY_USERS: 'jane@doe.com,ian-smith'
-    AUTHENTICATION_APIKEY_ENABLED: "false"
+    AUTHENTICATION_APIKEY_ENABLED: "true"
     # Note: When using ExternalSecret, this value is managed externally
     # AUTHENTICATION_APIKEY_ALLOWED_KEYS: ""
     AUTHENTICATION_APIKEY_USERS: "hello@dify.ai"
@@ -811,15 +811,3 @@ externalSecret:
       redis-password:
         key: "dify/redis"
         property: "redis_password"
-
-  # Configuration for Weaviate secret (for built-in Weaviate with ExternalSecret)
-  weaviate:
-    # Whether to create ExternalSecret for built-in Weaviate
-    enabled: false
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
-    # Remote references for external secret store
-    remoteRefs:
-      AUTHENTICATION_APIKEY_ALLOWED_KEYS:
-        key: "dify/weaviate"
-        property: "api_key"
