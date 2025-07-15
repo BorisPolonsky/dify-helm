@@ -470,7 +470,7 @@ weaviate:
     # The User/s can be a simple name or an email, no matter if it exists or not.
     # NOTE: Make sure to add the users to the authorization above overwise they will not be allowed to interact with Weaviate.
     # AUTHENTICATION_APIKEY_USERS: 'jane@doe.com,ian-smith'
-    AUTHENTICATION_APIKEY_ENABLED: "true"
+    AUTHENTICATION_APIKEY_ENABLED: "false"
     # Note: When using ExternalSecret, this value is managed externally
     # AUTHENTICATION_APIKEY_ALLOWED_KEYS: ""
     AUTHENTICATION_APIKEY_USERS: "hello@dify.ai"
@@ -479,7 +479,7 @@ weaviate:
   envSecrets:
     # create a Kubernetes secret with AUTHENTICATION_APIKEY_ALLOWED_KEYS key and its respective value
     # When using ExternalSecret, reference the secret created by ExternalSecret
-    AUTHENTICATION_APIKEY_ALLOWED_KEYS: dify-weaviate
+    # AUTHENTICATION_APIKEY_ALLOWED_KEYS: dify-weaviate
 
   # modules are extensions to Weaviate, they can be used to support various
   # ML-models, but also other features unrelated to model inference.
@@ -815,7 +815,7 @@ externalSecret:
   # Configuration for Weaviate secret (for built-in Weaviate with ExternalSecret)
   weaviate:
     # Whether to create ExternalSecret for built-in Weaviate
-    enabled: true
+    enabled: false
     # Refresh interval for the ExternalSecret
     refreshInterval: "15m"
     # Remote references for external secret store
