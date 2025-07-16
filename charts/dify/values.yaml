@@ -3255,15 +3255,9 @@ externalSecret:
       DB_PASSWORD:
         key: "dify/database"
         property: "password"
-      REDIS_USERNAME:
-        key: "dify/redis"
-        property: "username"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
-      CELERY_BROKER_URL:
-        key: "dify/redis"
-        property: "celery_broker_url"
       WEAVIATE_API_KEY:
         key: "dify/weaviate"
         property: "api_key"
@@ -3282,6 +3276,8 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
+    data:
+      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
   # Configuration for worker secret
   worker:
@@ -3298,15 +3294,9 @@ externalSecret:
       DB_PASSWORD:
         key: "dify/database"
         property: "password"
-      REDIS_USERNAME:
-        key: "dify/redis"
-        property: "username"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
-      CELERY_BROKER_URL:
-        key: "dify/redis"
-        property: "celery_broker_url"
       WEAVIATE_API_KEY:
         key: "dify/weaviate"
         property: "api_key"
@@ -3325,12 +3315,12 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
+    data:
+      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
   # Configuration for sandbox secret
   sandbox:
-    # Whether to create ExternalSecret for sandbox
     enabled: true
-    # Remote references for external secret store
     remoteRefs:
       API_KEY:
         key: "dify/sandbox"
@@ -3348,9 +3338,6 @@ externalSecret:
       DB_PASSWORD:
         key: "dify/database"
         property: "password"
-      REDIS_USERNAME:
-        key: "dify/redis"
-        property: "username"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"

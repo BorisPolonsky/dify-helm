@@ -43,7 +43,6 @@ check_vault_secret "dify/database" "password"
 # Check Redis secrets
 check_vault_secret "dify/redis" "username"
 check_vault_secret "dify/redis" "password"
-check_vault_secret "dify/redis" "celery_broker_url"
 check_vault_secret "dify/redis" "redis_password"
 
 # Check Weaviate secrets

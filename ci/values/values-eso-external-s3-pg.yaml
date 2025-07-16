@@ -673,15 +673,9 @@ externalSecret:
       DB_PASSWORD:
         key: "dify/database"
         property: "password"
-      REDIS_USERNAME:
-        key: "dify/redis"
-        property: "username"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
-      CELERY_BROKER_URL:
-        key: "dify/redis"
-        property: "celery_broker_url"
       WEAVIATE_API_KEY:
         key: "dify/weaviate"
         property: "api_key"
@@ -718,15 +712,9 @@ externalSecret:
       DB_PASSWORD:
         key: "dify/database"
         property: "password"
-      REDIS_USERNAME:
-        key: "dify/redis"
-        property: "username"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
-      CELERY_BROKER_URL:
-        key: "dify/redis"
-        property: "celery_broker_url"
       WEAVIATE_API_KEY:
         key: "dify/weaviate"
         property: "api_key"
@@ -772,9 +760,6 @@ externalSecret:
       DB_PASSWORD:
         key: "dify/database"
         property: "password"
-      REDIS_USERNAME:
-        key: "dify/redis"
-        property: "username"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"

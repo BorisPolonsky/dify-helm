@@ -46,7 +46,6 @@ echo "Adding Redis secrets..."
 kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault kv put secret/dify/redis \
   username="" \
   password="difyai123456" \
-  celery_broker_url="redis://:difyai123456@redis:6379/1" \
   redis_password="difyai123456"
 
 echo "Adding Weaviate secrets..."

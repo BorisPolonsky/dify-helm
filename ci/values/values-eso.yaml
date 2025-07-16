@@ -633,24 +633,6 @@ pluginDaemon:
   podSecurityContext: {}
   # Configure Container Security Context
   containerSecurityContext: {}
-  ## Init containers configuration
-  ## @param pluginDaemon.initContainers.waitForRedis.image.repository Init container image repository for wait-for-redis
-  ## @param pluginDaemon.initContainers.waitForRedis.image.tag Init container image tag for wait-for-redis
-  ## @param pluginDaemon.initContainers.waitForRedis.image.pullPolicy Init container image pull policy for wait-for-redis
-  ## @param pluginDaemon.initContainers.waitForRedis.resources Init container resource limits and requests for wait-for-redis
-  initContainers:
-    waitForRedis:
-      image:
-        repository: busybox
-        tag: "1.36"
-        pullPolicy: IfNotPresent
-      resources:
-        limits:
-          cpu: 100m
-          memory: 128Mi
-        requests:
-          cpu: 50m
-          memory: 64Mi
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
@@ -3256,15 +3238,9 @@ externalSecret:
       DB_PASSWORD:
         key: "dify/database"
         property: "password"
-      REDIS_USERNAME:
-        key: "dify/redis"
-        property: "username"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
-      CELERY_BROKER_URL:
-        key: "dify/redis"
-        property: "celery_broker_url"
       WEAVIATE_API_KEY:
         key: "dify/weaviate"
         property: "api_key"
@@ -3283,6 +3259,8 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
+    data:
+      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
   # Configuration for worker secret
   worker:
@@ -3301,15 +3279,9 @@ externalSecret:
       DB_PASSWORD:
         key: "dify/database"
         property: "password"
-      REDIS_USERNAME:
-        key: "dify/redis"
-        property: "username"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
-      CELERY_BROKER_URL:
-        key: "dify/redis"
-        property: "celery_broker_url"
       WEAVIATE_API_KEY:
         key: "dify/weaviate"
         property: "api_key"
@@ -3328,6 +3300,8 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
+    data:
+      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
   # Configuration for sandbox secret
   sandbox:
@@ -3355,9 +3329,6 @@ externalSecret:
       DB_PASSWORD:
         key: "dify/database"
         property: "password"
-      REDIS_USERNAME:
-        key: "dify/redis"
-        property: "username"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
