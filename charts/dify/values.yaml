@@ -3225,17 +3225,21 @@ externalSecret:
 
   # External secret store backend provider (e.g., vault, aws, azure, gcp, etc.)
   secretStore:
-    # SecretStore or ClusterSecretStore name to reference
     name: "default-secret-store"
-    # kind: SecretStore or ClusterSecretStore
     kind: "SecretStore"
+
+  # Global refresh interval for all ExternalSecrets
+  refreshInterval: "15m"
+
+  # Global ExternalSecret configuration options
+  # Default decoding strategy for secret data
+  # Options: Auto, Base64, Base64URL, None
+  decodingStrategy: "None"
 
   # Configuration for api secret
   api:
     # Whether to create ExternalSecret for api
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
     # Remote references for external secret store
     # Only specify the fields you want to include - all possible fields are defined in the template
     remoteRefs:
@@ -3283,8 +3287,6 @@ externalSecret:
   worker:
     # Whether to create ExternalSecret for worker
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       SECRET_KEY:
@@ -3328,8 +3330,6 @@ externalSecret:
   sandbox:
     # Whether to create ExternalSecret for sandbox
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       API_KEY:
@@ -3340,8 +3340,6 @@ externalSecret:
   pluginDaemon:
     # Whether to create ExternalSecret for plugin daemon
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       DB_USERNAME:
@@ -3367,8 +3365,6 @@ externalSecret:
   postgresql:
     # Whether to create ExternalSecret for built-in PostgreSQL
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       postgres-password:
@@ -3382,8 +3378,6 @@ externalSecret:
   redis:
     # Whether to create ExternalSecret for built-in Redis
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       redis-password:
