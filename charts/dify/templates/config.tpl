@@ -104,7 +104,8 @@ LOG_LEVEL: {{ .Values.worker.logLevel | quote }}
 {{ include "dify.redis.config" . }}
 # The configurations of celery broker.
 {{ include "dify.celery.config" . }}
-
+# The configurations of celery backend
+CELERY_BACKEND: redis
 {{ include "dify.storage.config" . }}
 # The Vector store configurations.
 {{ include "dify.vectordb.config" . }}
