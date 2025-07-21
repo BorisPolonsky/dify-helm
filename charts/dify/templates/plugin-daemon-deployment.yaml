@@ -64,39 +64,6 @@ spec:
       securityContext:
 {{ toYaml .Values.pluginDaemon.podSecurityContext | indent 8 }}
       {{- end }}
-      initContainers:
-        - name: check-postgres
-          image: "{{ .Values.postgresql.image.registry }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
-          command:
-            - sh
-            - -c
-            - |
-              until PGPASSWORD=$DB_PASSWORD pg_isready -h $DB_HOST -U $DB_USERNAME -d $DB_DATABASE ; do
-                echo "Waiting for PostgreSQL sequence to be available..."
-                sleep 1
-              done
-              echo "PostgreSQL is ready."
-          envFrom:
-          - configMapRef:
-              name: {{ template "dify.pluginDaemon.fullname" . }}
-          - secretRef:
-              name: {{ template "dify.pluginDaemon.fullname" . }}
-        - name: check-redis
-          image: "{{ .Values.redis.image.registry }}/{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
-          command:
-            - sh
-            - -c
-            - |
-              until redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping | grep -q PONG; do
-                echo "Waiting for Redis service to be available..."
-                sleep 1
-              done
-              echo "Redis is ready."
-          envFrom:
-          - configMapRef:
-              name: {{ template "dify.pluginDaemon.fullname" . }}
-          - secretRef:
-              name: {{ template "dify.pluginDaemon.fullname" . }}
       containers:
       - image: "{{ .Values.image.pluginDaemon.repository }}:{{ default .Chart.AppVersion .Values.image.pluginDaemon.tag }}"
         imagePullPolicy: "{{ .Values.image.pluginDaemon.pullPolicy }}"

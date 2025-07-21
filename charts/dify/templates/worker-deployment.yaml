@@ -56,37 +56,24 @@ spec:
       securityContext:
 {{ toYaml .Values.worker.podSecurityContext | indent 8 }}
       {{- end }}
+      {{- if .Values.api.migration }}
       initContainers:
-        - name: check-api
-          image: "{{ .Values.image.proxy.repository }}:{{ .Values.image.proxy.tag }}"
-          command:
-            - sh
-            - -c
-            - |
-              until curl http://{{ template "dify.api.fullname" . }}:{{ .Values.api.service.port }}/health; do
-                echo "Waiting for API service to be available..."
-                sleep 1
-              done
-          envFrom:
-          - configMapRef:
-              name: {{ template "dify.worker.fullname" . }}
-          - secretRef:
-              name: {{ template "dify.worker.fullname" . }}
-        - name: check-psql
-          image: "{{ .Values.postgresql.image.registry }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
-          command:
-            - sh
-            - -c
-            - |
-              until PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -U $DB_USERNAME -d $DB_DATABASE -c "SELECT 1 FROM information_schema.sequences WHERE sequence_name='task_id_sequence';" | grep -q 1; do
-                echo "Waiting for PostgreSQL sequence to be available..."
-                sleep 1
-              done
-          envFrom:
-          - configMapRef:
-              name: {{ template "dify.worker.fullname" . }}
-          - secretRef:
-              name: {{ template "dify.worker.fullname" . }}              
+      - name: check-api
+        image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
+        command:
+          - sh
+          - -c
+          - |
+            until curl http://{{ template "dify.api.fullname" . }}:{{ .Values.api.service.port }}/health; do
+              echo "Waiting for API service to be available..."
+              sleep 1
+            done
+        envFrom:
+        - configMapRef:
+            name: {{ template "dify.worker.fullname" . }}
+        - secretRef:
+            name: {{ template "dify.worker.fullname" . }}
+      {{- end }}
       containers:
       - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
         imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
