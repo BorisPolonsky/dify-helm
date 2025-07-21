@@ -55,7 +55,23 @@ spec:
       {{- if .Values.worker.podSecurityContext }}
       securityContext:
 {{ toYaml .Values.worker.podSecurityContext | indent 8 }}
-      {{- end }}         
+      {{- end }}
+      initContainers:
+      - name: check-api
+        image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
+        command:
+          - sh
+          - -c
+          - |
+            until curl http://{{ template "dify.api.fullname" . }}:{{ .Values.api.service.port }}/health; do
+              echo "Waiting for API service to be available..."
+              sleep 1
+            done
+        envFrom:
+        - configMapRef:
+            name: {{ template "dify.worker.fullname" . }}
+        - secretRef:
+            name: {{ template "dify.worker.fullname" . }}
       containers:
       - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
         imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
