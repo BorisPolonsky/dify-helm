@@ -1,0 +1,37 @@
+{{- if and .Values.api.enabled .Values.api.migration }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ template "dify.api.fullname" . }}-auto-migration
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+  annotations:
+{{ include "dify.ud.annotations" . | indent 4 }}
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+    descriptions: api-migration
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: check-postgres
+          image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
+          imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
+          envFrom:
+          - configMapRef:
+              name: {{ template "dify.api.fullname" . }}
+          - secretRef:
+              name: {{ template "dify.api.fullname" . }}
+          env:
+          - name: MODE
+            value: migration
+          - name: MIGRATION_ENABLED
+            value: "true"
+          command:
+          - sh
+          - -c
+          - |
+            flask upgrade-db
+{{- end }}

@@ -26,8 +26,12 @@ APP_WEB_URL: {{ .Values.api.url.appWeb | quote }}
 # Url is signed and has expiration time.
 FILES_URL: {{ .Values.api.url.files | quote }}
 {{- include "dify.marketplace.config" . }}
+{{/*
+`MIGRATION_ENABLED` option will be disabled for `api` and `worker` containers when deployed as "Deployment",
+such logic were moved a separate `Job` upon `pre-install` hook to avoid simutaneous execution
+*/}}
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
-MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
+MIGRATION_ENABLED: "false"
 
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
