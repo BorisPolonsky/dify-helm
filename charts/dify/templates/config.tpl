@@ -596,6 +596,7 @@ PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalS3.bucketName.pluginDaemon | quote
 AWS_REGION: {{ .Values.externalS3.region | quote }}
 {{- else if and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: "aliyun_oss"
+PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalOSS.bucketName.pluginDaemon | quote }}
 ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}
 ALIYUN_OSS_ENDPOINT: {{ .Values.externalOSS.endpoint | quote }}
 ALIYUN_OSS_ACCESS_KEY_ID: {{ .Values.externalOSS.accessKey | quote }}
