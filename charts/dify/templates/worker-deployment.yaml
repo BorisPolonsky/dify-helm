@@ -73,6 +73,10 @@ spec:
             name: {{ template "dify.worker.fullname" . }}
         - secretRef:
             name: {{ template "dify.worker.fullname" . }}
+        {{- if and .Values.externalSecret.enabled .Values.externalSecret.elasticsearch.enabled .Values.externalElasticsearch.enabled }}
+        - secretRef:
+            name: {{ template "dify.elasticsearch.secretname" . }}
+        {{- end }}
       {{- end }}
       containers:
       - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
@@ -100,6 +104,10 @@ spec:
             name: {{ template "dify.worker.fullname" . }}
         - secretRef:
             name: {{ template "dify.worker.fullname" . }}
+        {{- if and .Values.externalSecret.enabled .Values.externalSecret.elasticsearch.enabled .Values.externalElasticsearch.enabled }}
+        - secretRef:
+            name: {{ template "dify.elasticsearch.secretname" . }}
+        {{- end }}
         resources:
           {{- toYaml .Values.worker.resources | nindent 12 }}
         volumeMounts:

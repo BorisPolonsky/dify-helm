@@ -110,6 +110,10 @@ spec:
             name: {{ template "dify.api.fullname" . }}
         - secretRef:
             name: {{ template "dify.api.fullname" . }}
+        {{- if and .Values.externalSecret.enabled .Values.externalSecret.elasticsearch.enabled .Values.externalElasticsearch.enabled }}
+        - secretRef:
+            name: {{ template "dify.elasticsearch.secretname" . }}
+        {{- end }}
         ports:
           - name: api
             containerPort: 5001

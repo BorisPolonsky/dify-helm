@@ -90,6 +90,10 @@ spec:
             name: {{ template "dify.pluginDaemon.fullname" . }}
         - secretRef:
             name: {{ template "dify.pluginDaemon.fullname" . }}
+        {{- if and .Values.externalSecret.enabled .Values.externalSecret.elasticsearch.enabled .Values.externalElasticsearch.enabled }}
+        - secretRef:
+            name: {{ template "dify.elasticsearch.secretname" . }}
+        {{- end }}
         ports:
         - name: daemon
           containerPort: 5002

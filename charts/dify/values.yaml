@@ -3216,6 +3216,18 @@ externalTableStore:
   accessKeySecret: "your-secret-key"
 
 ###################################
+# External Elasticsearch
+# - these configs take effect only if all other vector databases are disabled and `externalElasticsearch.enabled` is `true`
+###################################
+externalElasticsearch:
+  enabled: false
+  host: "elasticsearch.example.com"
+  port: 9200
+  # Note: When using ExternalSecret, these values are managed externally
+  username: ""
+  password: ""
+
+###################################
 # External Secret (External Secrets Operator)
 # - these configs are used when `externalSecret.enabled` is true
 # - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
@@ -3370,3 +3382,20 @@ externalSecret:
       redis-password:
         key: "dify/redis"
         property: "redis_password"
+
+  # Configuration for Elasticsearch secret (for external Elasticsearch with ExternalSecret)
+  elasticsearch:
+    # Whether to create ExternalSecret for external Elasticsearch
+    enabled: false
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    # Only sensitive data (username/password) are fetched from external store
+    # Static values (host/port) are taken from values.yaml
+    remoteRefs:
+      ELASTICSEARCH_USERNAME:
+        key: "dify/elasticsearch"
+        property: "username"
+      ELASTICSEARCH_PASSWORD:
+        key: "dify/elasticsearch"
+        property: "password"
