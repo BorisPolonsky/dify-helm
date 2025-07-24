@@ -2,17 +2,13 @@
 set -euo pipefail
 
 VALUES_FILE="${1:-values-eso.yaml}"
-
-echo "🔍 Extracting images from $VALUES_FILE..."
+OUTPUT_FORMAT="${2:-github-actions}"
 
 # Check if values file exists
 if [[ ! -f "ci/values/$VALUES_FILE" ]]; then
-    echo "❌ Values file ci/values/$VALUES_FILE not found"
+    echo "Values file ci/values/$VALUES_FILE not found" >&2
     exit 1
 fi
-
-# Extract Dify application images using grep/awk parsing
-echo "📦 Extracting Dify application images..."
 
 # Extract application images from the image section
 API_REPO=$(grep -A1 "api:" "ci/values/$VALUES_FILE" | grep "repository:" | awk '{print $2}' | head -1)
@@ -49,7 +45,7 @@ DIFY_IMAGES=(
     "$PLUGIN_DAEMON_IMAGE"
 )
 
-# Common dependency images (these are consistent across all values files)
+# Common dependency images
 DEPENDENCY_IMAGES=(
     "bitnami/postgresql:15.3.0-debian-11-r7"
     "bitnami/redis:7.0.11-debian-11-r12"
@@ -70,54 +66,22 @@ ALL_IMAGES=("${DIFY_IMAGES[@]}" "${DEPENDENCY_IMAGES[@]}" "${UTILITY_IMAGES[@]}"
 # Remove empty entries and duplicates
 UNIQUE_IMAGES=($(printf '%s\n' "${ALL_IMAGES[@]}" | grep -v '^[[:space:]]*$' | sort -u))
 
-echo ""
-echo "📋 Extracted images from $VALUES_FILE:"
-echo "======================================"
-echo "🚀 Dify Application Images:"
-for image in "${DIFY_IMAGES[@]}"; do
-    [[ -n "$image" ]] && echo "  🐳 $image"
-done
-
-echo ""
-echo "📦 Dependency Images:"
-for image in "${DEPENDENCY_IMAGES[@]}"; do
-    echo "  🐳 $image"
-done
-
-echo ""
-echo "🔧 Utility Images:"
-for image in "${UTILITY_IMAGES[@]}"; do
-    echo "  🐳 $image"
-done
-
-# Output images in different formats based on the second parameter
-OUTPUT_FORMAT="${2:-list}"
-
 case "$OUTPUT_FORMAT" in
+    "github-actions")
+        echo "${UNIQUE_IMAGES[*]}"
+        ;;
     "list")
-        # Default: just print the list
+        printf '%s\n' "${UNIQUE_IMAGES[@]}"
         ;;
     "space-separated")
-        # Output as space-separated string for use in scripts
-        echo ""
         echo "IMAGES_LIST=\"${UNIQUE_IMAGES[*]}\""
         ;;
     "cache-commands")
-        # Output as minikube cache commands
-        echo ""
-        echo "# Minikube image cache commands:"
         for image in "${UNIQUE_IMAGES[@]}"; do
             echo "minikube image pull $image"
         done
         ;;
-    "export")
-        # Export for use in CI
-        echo ""
-        for image in "${UNIQUE_IMAGES[@]}"; do
-            echo "$image"
-        done
+    *)
+        echo "${UNIQUE_IMAGES[*]}"
         ;;
 esac
-
-echo ""
-echo "✅ Found ${#UNIQUE_IMAGES[@]} unique images"

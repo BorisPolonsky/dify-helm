@@ -50,32 +50,26 @@ jobs:
         run: |
           echo "Pre-pulling all Docker images to minikube cache..."
 
-          # Complete image list for all scenarios
-          ALL_IMAGES="langgenius/dify-api:1.2.0 langgenius/dify-web:1.2.0 langgenius/dify-sandbox:0.2.11 nginx:latest ubuntu/squid:latest langgenius/dify-plugin-daemon:0.0.7-local bitnami/postgresql:15.3.0-debian-11-r7 bitnami/redis:7.0.11-debian-11-r12 bitnami/redis-sentinel:7.0.11-debian-11-r10 bitnami/redis-exporter:1.50.0-debian-11-r13 bitnami/bitnami-shell:11-debian-11-r118 busybox:latest curlimages/curl:latest hashicorp/vault:latest bitnami/minio:2024-debian-12-r2 semitechnologies/weaviate:1.19.1"
+          # Extract images from values files using script
+          chmod +x ci/scripts/extract-images.sh
+          EXTRACTED_IMAGES=$(ci/scripts/extract-images.sh values-eso.yaml github-actions 2>/dev/null)
+
+          # Add additional images for ESO scenarios
+          ADDITIONAL_IMAGES="hashicorp/vault:latest bitnami/minio:2024-debian-12-r2 semitechnologies/weaviate:1.19.1"
+
+          # Combine extracted and additional images
+          ALL_IMAGES="$EXTRACTED_IMAGES $ADDITIONAL_IMAGES"
 
           echo "ALL_IMAGES=$ALL_IMAGES" >> $GITHUB_ENV
 
-          # Display image categories
-          echo "Dify Application Images:"
-          echo "  - langgenius/dify-api:1.2.0"
-          echo "  - langgenius/dify-web:1.2.0"
-          echo "  - langgenius/dify-sandbox:0.2.11"
-          echo "  - nginx:latest"
-          echo "  - ubuntu/squid:latest"
-          echo "  - langgenius/dify-plugin-daemon:0.0.7-local"
+          # Display extracted images for verification
+          echo "Extracted Images from values-eso.yaml:"
+          ci/scripts/extract-images.sh values-eso.yaml list
           echo ""
-          echo "Database Images:"
-          echo "  - bitnami/postgresql:15.3.0-debian-11-r7"
-          echo "  - bitnami/redis:7.0.11-debian-11-r12"
-          echo "  - bitnami/redis-sentinel:7.0.11-debian-11-r10"
-          echo "  - bitnami/redis-exporter:1.50.0-debian-11-r13"
-          echo ""
-          echo "Utility Images:"
-          echo "  - bitnami/bitnami-shell:11-debian-11-r118"
-          echo "  - busybox:latest"
-          echo "  - curlimages/curl:latest"
-          echo "  - hashicorp/vault:latest"
-          echo "  - bitnami/minio:2024-debian-12-r2"
+          echo "Additional ESO-specific Images:"
+          echo "hashicorp/vault:latest"
+          echo "bitnami/minio:2024-debian-12-r2"
+          echo "semitechnologies/weaviate:1.19.1"
 
           IMAGE_COUNT=$(echo "$ALL_IMAGES" | wc -w)
           echo "Total images to cache: $IMAGE_COUNT"
