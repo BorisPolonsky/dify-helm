@@ -133,6 +133,9 @@ MARKETPLACE_API_URL: "/marketplace"
 {{- include "dify.marketplace.config" . }}
 {{- end }}
 MARKETPLACE_URL: {{ .Values.api.url.marketplace | quote }}
+{{- if semverCompare ">=1.6.0" .Values.image.api.tag }}
+ALLOW_UNSAFE_DATA_SCHEME: "false"
+{{- end }}
 {{- end }}
 
 {{- define "dify.db.config" -}}
