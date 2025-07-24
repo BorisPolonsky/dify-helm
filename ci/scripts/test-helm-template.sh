@@ -54,7 +54,7 @@ EXTERNAL_SECRETS=$(find /tmp/helm-output -name "*.yaml" -exec grep -l "kind: Ext
 echo "🔐 ExternalSecret resources: $EXTERNAL_SECRETS"
 
 # Check for traditional Secret resources
-SECRETS=$(find /tmp/helm-output -name "*.yaml" -exec grep -l "kind: Secret" {} \; | wc -l)
+SECRETS=$(find /tmp/helm-output -name "*.yaml" -exec grep -l "^kind: Secret$" {} \; | wc -l)
 echo "🔑 Secret resources: $SECRETS"
 
 # Check for PostgreSQL resources

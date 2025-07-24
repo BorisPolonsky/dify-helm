@@ -55,7 +55,7 @@ jobs:
           EXTRACTED_IMAGES=$(ci/scripts/extract-images.sh values-eso.yaml github-actions 2>/dev/null)
 
           # Add additional images for ESO scenarios
-          ADDITIONAL_IMAGES="hashicorp/vault:latest bitnami/minio:2024-debian-12-r2 semitechnologies/weaviate:1.19.1"
+          ADDITIONAL_IMAGES="hashicorp/vault:latest bitnami/minio:2024-debian-12-r2 semitechnologies/weaviate:1.19.1 bitnami/elasticsearch:8.11.0"
 
           # Combine extracted and additional images
           ALL_IMAGES="$EXTRACTED_IMAGES $ADDITIONAL_IMAGES"
@@ -70,6 +70,7 @@ jobs:
           echo "hashicorp/vault:latest"
           echo "bitnami/minio:2024-debian-12-r2"
           echo "semitechnologies/weaviate:1.19.1"
+          echo "bitnami/elasticsearch:8.11.0"
 
           IMAGE_COUNT=$(echo "$ALL_IMAGES" | wc -w)
           echo "Total images to cache: $IMAGE_COUNT"
@@ -113,42 +114,56 @@ jobs:
             use_eso: false
             use_external_pg: false
             use_external_s3: false
+            use_external_es: false
 
           - config_name: "legacy: using external PostgreSQL and built-in Redis"
             values_file: "values-legacy-external-pg.yaml"
             use_eso: false
             use_external_pg: true
             use_external_s3: false
+            use_external_es: false
 
           - config_name: "legacy: using external S3 and built-in PostgreSQL and Redis"
             values_file: "values-legacy-external-s3.yaml"
             use_eso: false
             use_external_pg: false
             use_external_s3: true
+            use_external_es: false
 
           - config_name: "external-secrets: built-in PostgreSQL and built-in Redis(use existing secret)"
             values_file: "values-eso.yaml"
             use_eso: true
             use_external_pg: false
             use_external_s3: false
+            use_external_es: false
 
           - config_name: "external-secrets: using external PostgreSQL and built-in Redis(use exsting secret)"
             values_file: "values-eso-external-pg.yaml"
             use_eso: true
             use_external_pg: true
             use_external_s3: false
+            use_external_es: false
 
           - config_name: "external-secrets: using external S3 with built-in PostgreSQL and Redis"
             values_file: "values-eso-external-s3.yaml"
             use_eso: true
             use_external_pg: false
             use_external_s3: true
+            use_external_es: false
 
           - config_name: "external-secrets: using external S3 and external PostgreSQL"
             values_file: "values-eso-external-s3-pg.yaml"
             use_eso: true
             use_external_pg: true
             use_external_s3: true
+            use_external_es: false
+
+          - config_name: "external-secrets: using external Elasticsearch"
+            values_file: "values-eso-external-es.yaml"
+            use_eso: true
+            use_external_pg: false
+            use_external_s3: false
+            use_external_es: true
 
     name: ${{ matrix.config_name }}
 
@@ -299,6 +314,20 @@ jobs:
             --set defaultBuckets="difyai" \
             --set service.type="ClusterIP" \
             --set service.ports.api=9000 \
+            --wait \
+            --timeout 300s
+
+      - name: Install Elasticsearch
+        if: matrix.use_external_es
+        run: |
+          echo "Installing Elasticsearch for vector database testing..."
+          helm install external-elasticsearch bitnami/elasticsearch \
+            --set auth.elasticPassword="elasticsearch123456" \
+            --set master.replicaCount=1 \
+            --set data.replicaCount=1 \
+            --set coordinating.replicaCount=1 \
+            --set service.type="ClusterIP" \
+            --set service.ports.restAPI=9200 \
             --wait \
             --timeout 300s
 

@@ -75,6 +75,11 @@ kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault kv put secret/di
   access_key="minio-root" \
   secret_key="minio123456"
 
+echo "Adding Elasticsearch secrets..."
+kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault kv put secret/dify/elasticsearch \
+  elasticsearch_username="elastic" \
+  elasticsearch_password="elasticsearch123456"
+
 # Enable AppRole auth method for External Secrets Operator
 echo "Checking if AppRole auth method is enabled..."
 if kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault auth list | grep -q "approle/"; then
@@ -118,6 +123,8 @@ echo "Vault service IP: $VAULT_IP"
 kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault kv get secret/dify/api
 echo "Testing S3 secrets..."
 kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault kv get secret/dify/s3
+echo "Testing Elasticsearch secrets..."
+kubectl exec $VAULT_POD -- env VAULT_TOKEN=dev-only-token vault kv get secret/dify/elasticsearch
 
 echo "Vault secrets setup completed successfully!"
 echo "Vault available at: http://vault:8200"
