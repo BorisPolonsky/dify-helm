@@ -176,6 +176,7 @@ DIFY_INNER_API_KEY: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
 AWS_ACCESS_KEY: {{ .Values.externalS3.accessKey | b64enc | quote }}
 AWS_SECRET_KEY: {{ .Values.externalS3.secretKey | b64enc | quote }}
 {{- else if and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon }}
+ALIYUN_OSS_ACCESS_KEY_ID: {{ .Values.externalOSS.accessKey | quote }}
 ALIYUN_OSS_ACCESS_KEY_SECRET: {{ .Values.externalOSS.secretKey | b64enc | quote }}
 {{- else if and .Values.externalGCS.enabled .Values.externalGCS.bucketName.pluginDaemon }}
 GCS_CREDENTIALS: {{ .Values.externalGCS.serviceAccountJsonBase64 | b64enc | quote }}
