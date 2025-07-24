@@ -324,8 +324,10 @@ jobs:
           helm install external-elasticsearch bitnami/elasticsearch \
             --set auth.elasticPassword="elasticsearch123456" \
             --set master.replicaCount=1 \
-            --set data.replicaCount=1 \
-            --set coordinating.replicaCount=1 \
+            --set data.replicaCount=0 \
+            --set coordinating.replicaCount=0 \
+            --set ingest.replicaCount=0 \
+            --set master.persistence.enabled=false \
             --set service.type="ClusterIP" \
             --set service.ports.restAPI=9200 \
             --wait \

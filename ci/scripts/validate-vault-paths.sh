@@ -66,6 +66,10 @@ check_vault_secret "dify/postgresql" "replication_password"
 check_vault_secret "dify/s3" "access_key"
 check_vault_secret "dify/s3" "secret_key"
 
+# Check Elasticsearch secrets
+check_vault_secret "dify/elasticsearch" "elasticsearch_username"
+check_vault_secret "dify/elasticsearch" "elasticsearch_password"
+
 echo ""
 echo "🧪 Testing secret retrieval..."
 
@@ -84,5 +88,11 @@ kubectl exec $VAULT_POD -- vault kv get -field=access_key secret/dify/s3
 
 echo "🔑 Testing S3 secret key retrieval:"
 kubectl exec $VAULT_POD -- vault kv get -field=secret_key secret/dify/s3
+
+echo "🔑 Testing Elasticsearch username retrieval:"
+kubectl exec $VAULT_POD -- vault kv get -field=elasticsearch_username secret/dify/elasticsearch
+
+echo "🔑 Testing Elasticsearch password retrieval:"
+kubectl exec $VAULT_POD -- vault kv get -field=elasticsearch_password secret/dify/elasticsearch
 
 echo "✅ All secret paths validated successfully!"

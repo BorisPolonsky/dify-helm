@@ -1840,7 +1840,7 @@ redis:
 ###################################
 externalElasticsearch:
   enabled: true
-  host: "elasticsearch.example.com"
+  host: "external-elasticsearch"
   port: 9200
   # Note: When using ExternalSecret, these values are managed externally
   username: ""
@@ -1856,8 +1856,10 @@ externalSecret:
 
   # External secret store backend provider (e.g., vault, aws, azure, gcp, etc.)
   secretStore:
+    # SecretStore or ClusterSecretStore name to reference
     name: "default-secret-store"
-    kind: "SecretStore"
+    # kind: SecretStore or ClusterSecretStore
+    kind: "ClusterSecretStore"
 
   # Global refresh interval for all ExternalSecrets
   refreshInterval: "15m"
