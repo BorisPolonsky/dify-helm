@@ -112,6 +112,15 @@ jobs:
           - config_name: "legacy: using built-in PostgreSQL and built-in Redis"
             values_file: "values-legacy.yaml"
             use_eso: false
+            use_external_redis: false
+            use_external_pg: false
+            use_external_s3: false
+            use_external_es: false
+
+          - config_name: "legacy: using external redis and built-in(PostgreSQL)"
+            values_file: "values-legacy-external-redis.yaml"
+            use_eso: false
+            use_external_redis: true
             use_external_pg: false
             use_external_s3: false
             use_external_es: false
@@ -119,6 +128,7 @@ jobs:
           - config_name: "legacy: using external PostgreSQL and built-in Redis"
             values_file: "values-legacy-external-pg.yaml"
             use_eso: false
+            use_external_redis: false
             use_external_pg: true
             use_external_s3: false
             use_external_es: false
@@ -126,6 +136,7 @@ jobs:
           - config_name: "legacy: using external S3 and built-in PostgreSQL and Redis"
             values_file: "values-legacy-external-s3.yaml"
             use_eso: false
+            use_external_redis: false
             use_external_pg: false
             use_external_s3: true
             use_external_es: false
@@ -133,6 +144,7 @@ jobs:
           - config_name: "external-secrets: built-in PostgreSQL and built-in Redis(use existing secret)"
             values_file: "values-eso.yaml"
             use_eso: true
+            use_external_redis: false
             use_external_pg: false
             use_external_s3: false
             use_external_es: false
@@ -140,6 +152,7 @@ jobs:
           - config_name: "external-secrets: using external PostgreSQL and built-in Redis(use exsting secret)"
             values_file: "values-eso-external-pg.yaml"
             use_eso: true
+            use_external_redis: false
             use_external_pg: true
             use_external_s3: false
             use_external_es: false
@@ -147,6 +160,7 @@ jobs:
           - config_name: "external-secrets: using external S3 with built-in PostgreSQL and Redis"
             values_file: "values-eso-external-s3.yaml"
             use_eso: true
+            use_external_redis: false
             use_external_pg: false
             use_external_s3: true
             use_external_es: false
@@ -154,6 +168,7 @@ jobs:
           - config_name: "external-secrets: using external S3 and external PostgreSQL"
             values_file: "values-eso-external-s3-pg.yaml"
             use_eso: true
+            use_external_redis: false
             use_external_pg: true
             use_external_s3: true
             use_external_es: false
@@ -161,6 +176,7 @@ jobs:
           - config_name: "external-secrets: using external Elasticsearch"
             values_file: "values-eso-external-es.yaml"
             use_eso: true
+            use_external_redis: false
             use_external_pg: false
             use_external_s3: false
             use_external_es: true
@@ -168,6 +184,7 @@ jobs:
           - config_name: "external-secrets: using external (S3, PG, ES)"
             values_file: "values-eso-external-s3-pg-es.yaml"
             use_eso: true
+            use_external_redis: false
             use_external_pg: true
             use_external_s3: true
             use_external_es: true
@@ -321,6 +338,18 @@ jobs:
             --set defaultBuckets="difyai" \
             --set service.type="ClusterIP" \
             --set service.ports.api=9000 \
+            --wait \
+            --timeout 300s
+
+      - name: Install Redis
+        if: matrix.use_external_redis
+        run: |
+          echo "Installing Redis instance"
+          helm install test-redis bitnami/redis \
+            --set auth.password="difyai123456" \
+            --set master.persistence.enabled=false \
+            --set replica.replicaCount=0 \
+            --set fullnameOverride="redis" \
             --wait \
             --timeout 300s
 
