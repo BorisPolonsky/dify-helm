@@ -717,7 +717,7 @@ postgresql:
       limits: {}
       requests: {}
     persistence:
-      enabled: true
+      enabled: false
       storageClass: ""
       accessModes:
         - ReadWriteOnce
@@ -3257,7 +3257,7 @@ externalSecret:
         key: "dify/s3"
         property: "secret_key"
     data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-external-s3-redis-master:6379/1"
 
   # Configuration for worker secret
   worker:
@@ -3298,7 +3298,7 @@ externalSecret:
         key: "dify/s3"
         property: "secret_key"
     data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-external-s3-redis-master:6379/1"
 
   # Configuration for sandbox secret
   sandbox:

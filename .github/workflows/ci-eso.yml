@@ -165,6 +165,13 @@ jobs:
             use_external_s3: false
             use_external_es: true
 
+          - config_name: "external-secrets: using external (S3, PG, ES)"
+            values_file: "values-eso-external-s3-pg-es.yaml"
+            use_eso: true
+            use_external_pg: true
+            use_external_s3: true
+            use_external_es: true
+
     name: ${{ matrix.config_name }}
 
     steps:

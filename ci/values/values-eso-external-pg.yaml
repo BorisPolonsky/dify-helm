@@ -693,76 +693,6 @@ pluginDaemon:
     ##
     annotations: {}
 
-postgresql:
-  enabled: false
-  name: postgres
-  global:
-    storageClass: ""
-    postgresql:
-      auth:
-        existingSecret: "postgresql-secret"
-        username: ""
-        password: ""
-        database: "dify"
-  image:
-    registry: docker.io
-    repository: bitnami/postgresql
-    tag: 15.3.0-debian-11-r7
-    pullPolicy: IfNotPresent
-  ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
-  ##
-  architecture: replication
-  ## Replication configuration
-  ## Ignored if `architecture` is `standalone`
-  ##
-  primary:
-    resources:
-      limits: {}
-      requests: {}
-    persistence:
-      enabled: true
-      storageClass: ""
-      accessModes:
-        - ReadWriteOnce
-      size: 8Gi
-
-    ## @param primary.affinity Affinity for PostgreSQL primary pods assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-    ## Note: primary.podAffinityPreset, primary.podAntiAffinityPreset, and primary.nodeAffinityPreset will be ignored when it's set
-    ##
-    affinity: {}
-
-    ## @param primary.tolerations Tolerations for PostgreSQL primary pods assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-    ##
-    tolerations: []
-
-  ## @section PostgreSQL read only replica parameters (only used when `architecture` is set to `replication`)
-  ##
-  readReplicas:
-    name: read
-    replicaCount: 1
-    resources:
-      limits: {}
-      requests: {}
-    persistence:
-      enabled: true
-      storageClass: ""
-      accessModes:
-        - ReadWriteOnce
-      size: 8Gi
-
-    ## @param readReplicas.affinity Affinity for PostgreSQL read only pods assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-    ## Note: primary.podAffinityPreset, primary.podAntiAffinityPreset, and primary.nodeAffinityPreset will be ignored when it's set
-    ##
-    affinity: {}
-
-    ## @param readReplicas.tolerations Tolerations for PostgreSQL read only pods assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-    ##
-    tolerations: []
-
 weaviate:
   enabled: true
   image:
@@ -3018,190 +2948,6 @@ externalPostgres:
   maxIdleConns: 5
 
 ###################################
-# External S3
-# - these configs are only used when `externalS3.enabled` is true
-###################################
-externalS3:
-  enabled: false
-  endpoint: "http://minio:9000"
-  pathStyle: true
-  # Note: When using ExternalSecret, these values are managed externally
-  accessKey: ""
-  secretKey: ""
-  useSSL: false
-  bucketName:
-    # Shared storage for `api` and `worker`
-    api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalS3.enabled` is set to `true`).
-    pluginDaemon:
-  useIAM: false
-  region: "us-east-1"
-
-###################################
-# External Azure Blob Storage
-# - these configs are only used when `externalS3.enabled` is false and `externalAzureBlobStorage.enabled` is true
-###################################
-externalAzureBlobStorage:
-  enabled: false
-  url: "https://<your_account_name>.blob.core.windows.net"
-  account: "https://xxx.r2.cloudflarestorage.com"
-  key: "difyai"
-  container: "difyai-container"
-
-###################################
-# External OSS
-# - these configs are only used when both `externalS3.enabled` and `externalAzureBlobStorage.enabled` are false and `externalOSS.enabled` is true
-###################################
-externalOSS:
-  enabled: false
-  endpoint: "https://oss-ap-southeast-1-internal.aliyuncs.com"
-  # Note: When using ExternalSecret, these values are managed externally
-  accessKey: ""
-  secretKey: ""
-  region: "ap-southeast-1"
-  bucketName:
-    api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOSS.enabled` is set to `true`).
-    pluginDaemon:
-  authVersion: v4
-  path: "your-path"
-
-###################################
-# External Google Cloud Storage
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` are false and `externalGCS.enabled` is true
-###################################
-externalGCS:
-  enabled: false
-  bucketName: "difyai"
-  serviceAccountJsonBase64: ""
-
-###################################
-# External TENCENT COS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` are false and `externalCOS.enabled` is true
-###################################
-externalCOS:
-  enabled: false
-  secretKey: ""
-  secretId: "your-secret-id"
-  region: "your-region"
-  bucketName:
-    api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalCOS.enabled` is set to `true`).
-    pluginDaemon:
-  scheme: "your-scheme"
-
-###################################
-# External HUAWEI OBS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` are false and `externalOBS.enabled` is true
-###################################
-externalOBS:
-  enabled: false
-  endpoint: "https://your-endpoint"
-  asscessKey: "your-secret-id"
-  secretKey: ""
-  bucketName: "your-bucket-name"
-
-###################################
-# External Redis
-# - these configs are only used when `externalRedis.enabled` is true
-###################################
-externalRedis:
-  enabled: false
-  host: "redis.example"
-  port: 6379
-  username: ""
-  password: ""
-  useSSL: false
-
-###################################
-# External Weaviate
-# - these configs take effect when `externalWeaviate.enabled` is true
-###################################
-externalWeaviate:
-  enabled: false
-  endpoint: "http://weaviate:8080"
-  # Note: When using ExternalSecret, this value is managed externally
-  apiKey: ""
-
-###################################
-# External Qdrant
-# - these configs take effect only if `externalWeaviate.enabled` is `false` and `externalQdrant.enabled` is `true`
-###################################
-externalQdrant:
-  enabled: false
-  endpoint: "https://your-qdrant-cluster-url.qdrant.tech/"
-  # Note: When using ExternalSecret, this value is managed externally
-  apiKey: ""
-  timeout: 20
-  grpc:
-    enabled: false
-    port: 6334
-
-###################################
-# External Milvus
-# - these configs take effect only if both `externalWeaviate.enabled` and `externalQdrant.enabled` are set as `false` and `externalMilvus.enabled` is `true`
-###################################
-externalMilvus:
-  enabled: false
-  uri: "http://your-milvus.domain:19530"
-  database: "default"
-  token: ""
-  user: ""
-  password: ""
-
-###################################
-# External Pgvector
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` are set as `false` and `externalPgvector.enabled` is `true`
-###################################
-externalPgvector:
-  enabled: false
-  # Note: When using ExternalSecret, these values are managed externally
-  username: ""
-  password: ""
-  address: "pgvector"
-  port: 5432
-  dbName: dify
-
-###################################
-# External Tencent Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` are set as `false` and `externalTencentVectorDB.enabled` is `true`
-###################################
-externalTencentVectorDB:
-  enabled: false
-  url: "your-tencent-vector-db-url"
-  # Note: When using ExternalSecret, this value is managed externally
-  apiKey: ""
-  timeout: 30
-  username: "root"
-  database: "dify"
-  shard: 1
-  replicas: 2
-
-###################################
-# External MyScaleDB Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` are set as `false` and `externalMyScaleDB.enabled` is `true`
-###################################
-externalMyScaleDB:
-  enabled: false
-  host: "myscale"
-  port: 8123
-  user: "default"
-  password: ""
-  database: "dify"
-  ftsParams: ""
-
-###################################
-# External TableStore Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` and `externalMyScaleDB.enabled` are set as `false` and `externalTableStore.enabled` is `true`
-###################################
-externalTableStore:
-  enabled: false
-  endpoint: "endpoint"
-  instanceName: "instance-name"
-  accessKeyId: "your-secret-id"
-  accessKeySecret: "your-secret-key"
-
-###################################
 # External Secret (External Secrets Operator)
 # - these configs are used when `externalSecret.enabled` is true
 # - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
@@ -3259,7 +3005,7 @@ externalSecret:
         key: "dify/s3"
         property: "secret_key"
     data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-external-pg-redis-master:6379/1"
 
   # Configuration for worker secret
   worker:
@@ -3300,7 +3046,7 @@ externalSecret:
         key: "dify/s3"
         property: "secret_key"
     data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-external-pg-redis-master:6379/1"
 
   # Configuration for sandbox secret
   sandbox:
