@@ -141,7 +141,7 @@ jobs:
             use_external_s3: true
             use_external_es: false
 
-          - config_name: "external-secrets: built-in PostgreSQL and built-in Redis(use existing secret)"
+          - config_name: "external-secrets: using built-in (pg, redis)"
             values_file: "values-eso.yaml"
             use_eso: true
             use_external_redis: false
@@ -149,7 +149,7 @@ jobs:
             use_external_s3: false
             use_external_es: false
 
-          - config_name: "external-secrets: using external PostgreSQL and built-in Redis(use exsting secret)"
+          - config_name: "external-secrets: using external (pg)"
             values_file: "values-eso-external-pg.yaml"
             use_eso: true
             use_external_redis: false
@@ -157,7 +157,7 @@ jobs:
             use_external_s3: false
             use_external_es: false
 
-          - config_name: "external-secrets: using external S3 with built-in PostgreSQL and Redis"
+          - config_name: "external-secrets: using external (s3)"
             values_file: "values-eso-external-s3.yaml"
             use_eso: true
             use_external_redis: false
@@ -165,15 +165,15 @@ jobs:
             use_external_s3: true
             use_external_es: false
 
-          - config_name: "external-secrets: using external S3 and external PostgreSQL"
-            values_file: "values-eso-external-s3-pg.yaml"
+          - config_name: "external-secrets: using external (redis)"
+            values_file: "values-eso-external-redis.yaml"
             use_eso: true
-            use_external_redis: false
-            use_external_pg: true
-            use_external_s3: true
+            use_external_redis: true
+            use_external_pg: false
+            use_external_s3: false
             use_external_es: false
 
-          - config_name: "external-secrets: using external Elasticsearch"
+          - config_name: "external-secrets: using external (es)"
             values_file: "values-eso-external-es.yaml"
             use_eso: true
             use_external_redis: false
@@ -181,10 +181,10 @@ jobs:
             use_external_s3: false
             use_external_es: true
 
-          - config_name: "external-secrets: using external (S3, PG, ES)"
-            values_file: "values-eso-external-s3-pg-es.yaml"
+          - config_name: "external-secrets: using external (s3, pg, es, redis)"
+            values_file: "values-eso-external-s3-pg-es-redis.yaml"
             use_eso: true
-            use_external_redis: false
+            use_external_redis: true
             use_external_pg: true
             use_external_s3: true
             use_external_es: true

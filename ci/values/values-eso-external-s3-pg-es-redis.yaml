@@ -274,6 +274,9 @@ sandbox:
     # Note: When using ExternalSecret, this value is managed externally
     apiKey: ""
 
+postgresql:
+  enabled: false
+
 pluginDaemon:
   enabled: true
   replicas: 1
@@ -322,319 +325,24 @@ pluginDaemon:
     # https://github.com/BorisPolonsky/dify-helm/pull/131
     apiProxyEnabled: false
 
-postgresql:
-  enabled: false
-  name: postgres
-  global:
-    storageClass: ""
-    postgresql:
-      auth:
-        existingSecret: "postgresql-secret"
-        username: ""
-        password: ""
-        database: "dify"
-
-weaviate:
-  enabled: true
-  image:
-    # registry where weaviate image is stored
-    registry: docker.io
-    # Tag of weaviate image to deploy
-    # Note: We strongly recommend you overwrite this value in your own values.yaml.
-    # Otherwise a mere upgrade of the chart could lead to an unexpected upgrade
-    # of weaviate. In accordance with Infra-as-code, you should pin this value
-    # down and only change it if you explicitly want to upgrade the Weaviate
-    # version.
-    tag: 1.19.1
-    repo: semitechnologies/weaviate
-
-  # overwrite command and args if you want to run specific startup scripts, for
-  # example setting the nofile limit
-  command: ["/bin/weaviate"]
-  args:
-    - "--host"
-    - "0.0.0.0"
-    - "--port"
-    - "8080"
-    - "--scheme"
-    - "http"
-    - "--config-file"
-    - "/weaviate-config/conf.yaml"
-    - --read-timeout=60s
-    - --write-timeout=60s
-
-  initContainers:
-    sysctlInitContainer:
-      enabled: true
-      sysctlVmMaxMapCount: 524288
-      image:
-        registry: docker.io
-        repo: alpine
-        tag: latest
-        pullPolicy: IfNotPresent
-
-    extraInitContainers: {}
-
-  replicas: 1
-
-  # Add a service account ot the Weaviate pods if you need Weaviate to have permissions to
-  # access kubernetes resources or cloud provider resources. For example for it to have
-  # access to a backup up bucket, or if you want to restrict Weaviate pod in any way.
-  # By default, use the default ServiceAccount
-  serviceAccountName:
-
-  # The Persistent Volume Claim settings for Weaviate. If there's a
-  # storage.fullnameOverride field set, then the default pvc will not be
-  # created, instead the one defined in fullnameOverride will be used
-  storage:
-    size: 32Gi
-    storageClassName: ""
-
-  # The service controls how weaviate is exposed to the outside world. If you
-  # don't want a public load balancer, you can also choose 'ClusterIP' to make
-  # weaviate only accessible within your cluster.
-  service:
-    name: weaviate
-    type: ClusterIP
-
-  livenessProbe:
-    initialDelaySeconds: 900
-    periodSeconds: 10
-    failureThreshold: 30
-    successThreshold: 1
-    timeoutSeconds: 3
-
-  readinessProbe:
-    initialDelaySeconds: 3
-    periodSeconds: 10
-    failureThreshold: 3
-    successThreshold: 1
-    timeoutSeconds: 3
-
-  terminationGracePeriodSeconds: 600
-
-  # Weaviate Config
-  #
-  # The following settings allow you to customize Weaviate to your needs, for
-  # example set authentication and authorization options. See weaviate docs
-  # (https://www.weaviate.io/developers/weaviate/) for all
-  # configuration.
-  authentication:
-    anonymous_access:
-      enabled: false
-    # This configuration allows to add API keys to Weaviate. This configuration allows only
-    # plain text API Keys, if you want to store the API Keys in a Kubernetes secret you can
-    # configure the same configuration with ENV Vars. Read the `env` section below on what
-    # needs to be configured. If using ENV Vars over this make sure to comment out the whole
-    # `apikey` section (as it is by default). ENV Vars has priority over this config.
-    apikey:
-      enabled: true
-      # Any number of allowed API Keys as plain text
-      # Note: When using ExternalSecret, this value is managed externally
-      allowed_keys:
-        - ""
-      # You can either set a single user for all the listed Allowed API keys OR
-      # one user per API Key, i.e. length(apikey.allowed_keys) == length(apikey.users) OR
-      # length(apikey.users) == 1
-      # Only the first user-key pair will be used by `dify.api` and `dify-worker`
-      # NOTE: Make sure the lister Users are added to the Authorization as well.
-      users:
-        - hello@dify.ai
-
-  authorization:
-    admin_list:
-      enabled: true
-      users:
-        # Examples
-        # - admin_user1
-        # - admin_user2
-        # - api-key-user-admin
-        - hello@dify.ai
-      read_only_users:
-      # Examples
-      # - readonly_user1
-      # - readonly_user2
-      # - api-key-user-readOnly
-
-  query_defaults:
-    limit: 100
-  debug: false
-
-  # Insert any custom environment variables or envSecrets by putting the exact name
-  # and desired value into the settings below. Any env name passed will be automatically
-  # set for the statefulSet.
-  env:
-    CLUSTER_GOSSIP_BIND_PORT: 7000
-    CLUSTER_DATA_BIND_PORT: 7001
-    # The aggressiveness of the Go Garbage Collector. 100 is the default value.
-    GOGC: 100
-
-    # Expose metrics on port 2112 for Prometheus to scrape
-    PROMETHEUS_MONITORING_ENABLED: false
-
-    # Set a MEM limit for the Weaviate Pod so it can help you both increase GC-related
-    # performance as well as avoid GC-related out-of-memory (“OOM”) situations
-    # GOMEMLIMIT: 6GiB
-
-    # Maximum results Weaviate can query with/without pagination
-    # NOTE: Affects performance, do NOT set to a very high value.
-    # The default is 100K
-    QUERY_MAXIMUM_RESULTS: 100000
-
-    # whether to enable vector dimensions tracking metric
-    TRACK_VECTOR_DIMENSIONS: false
-
-    # whether to re-index/-compute the vector dimensions metric (needed if upgrading from weaviate < v1.16.0)
-    REINDEX_VECTOR_DIMENSIONS_AT_STARTUP: false
-
-    ##########################
-    # API Keys with ENV Vars #
-    ##########################
-    # If using ENV Vars to set up API Keys make sure to have `authentication.apikey` block commented out
-    # to avoid any future changes. ENV Vars has priority over the config above `authentication.apikey`.
-    # If using `authentication.apikey `the below ENV Vars will be used because they have priority,
-    # so comment them out to avoid any future changes.
-    # Enables API key authentication. If it is set to 'false' the AUTHENTICATION_APIKEY_ALLOWED_KEYS
-    # and AUTHENTICATION_APIKEY_USERS will not have any effect.
-    # AUTHENTICATION_APIKEY_ENABLED: 'true'
-
-    # List one or more keys, separated by commas. Each key corresponds to a specific user identity below.
-    # If you want to use a kubernetes secret for the API Keys comment out this Variable and use the one in `envSecrets` below
-    # AUTHENTICATION_APIKEY_ALLOWED_KEYS: 'jane-secret-key,ian-secret-key'  (plain text)
-
-    # List one or more user identities, separated by commas. You can have only one User for all the keys or one user per key.
-    # The User/s can be a simple name or an email, no matter if it exists or not.
-    # NOTE: Make sure to add the users to the authorization above overwise they will not be allowed to interact with Weaviate.
-    # AUTHENTICATION_APIKEY_USERS: 'jane@doe.com,ian-smith'
-    AUTHENTICATION_APIKEY_ENABLED: "true"
-    # Note: When using ExternalSecret, this value is managed externally
-    # AUTHENTICATION_APIKEY_ALLOWED_KEYS: ""
-    AUTHENTICATION_APIKEY_USERS: "hello@dify.ai"
-    AUTHORIZATION_ADMINLIST_ENABLED: "true"
-    AUTHORIZATION_ADMINLIST_USERS: "hello@dify.ai"
-  envSecrets:
-    # create a Kubernetes secret with AUTHENTICATION_APIKEY_ALLOWED_KEYS key and its respective value
-    # When using ExternalSecret, reference the secret created by ExternalSecret
-    # AUTHENTICATION_APIKEY_ALLOWED_KEYS: dify-weaviate
-
-  # modules are extensions to Weaviate, they can be used to support various
-  # ML-models, but also other features unrelated to model inference.
-  # An inference/vectorizer module is not required, you can also run without any
-  # modules and import your own vectors.
-  modules:
-    # by choosing the default vectorizer module, you can tell Weaviate to always
-    # use this module as the vectorizer if nothing else is specified. Can be
-    # overwritten on a per-class basis.
-    # set to text2vec-transformers if running with transformers instead
-    default_vectorizer_module: none
-
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            topologyKey: "kubernetes.io/hostname"
-            labelSelector:
-              matchExpressions:
-                - key: "app"
-                  operator: In
-                  values:
-                    - weaviate
-
 service:
   type: ClusterIP
   port: 80
 
 redis:
+  enabled: false
+
+###################################
+# External Redis
+# - these configs are only used when `externalRedis.enabled` is true
+###################################
+externalRedis:
   enabled: true
-  image:
-    registry: docker.io
-    repository: bitnami/redis
-    tag: 7.0.11-debian-11-r12
-    debug: false
-
-  architecture: standalone
-
-  auth:
-    enabled: true
-    sentinel: true
-    password:
-    existingSecret: "redis-secret"
-    existingSecretPasswordKey: ""
-    usePasswordFiles: false
-
-  commonConfiguration: |-
-    # Enable AOF https://redis.io/topics/persistence#append-only-file
-    appendonly yes
-    # Disable RDB persistence, AOF persistence already enabled.
-    save ""
-  existingConfigmap: ""
-  master:
-    count: 1
-    configuration: ""
-    disableCommands:
-      - FLUSHDB
-      - FLUSHALL
-    containerPorts:
-      redis: 6379
-    startupProbe:
-      enabled: false
-      initialDelaySeconds: 20
-      periodSeconds: 5
-      timeoutSeconds: 5
-      successThreshold: 1
-      failureThreshold: 5
-    livenessProbe:
-      enabled: true
-      initialDelaySeconds: 20
-      periodSeconds: 5
-      timeoutSeconds: 5
-      successThreshold: 1
-      failureThreshold: 5
-    readinessProbe:
-      enabled: true
-      initialDelaySeconds: 20
-      periodSeconds: 5
-      timeoutSeconds: 1
-      successThreshold: 1
-      failureThreshold: 5
-    podSecurityContext:
-      enabled: true
-      fsGroup: 1001
-    containerSecurityContext:
-      enabled: true
-      runAsUser: 1001
-    persistence:
-      enabled: false
-      path: /data
-      accessModes:
-        - ReadWriteOnce
-      size: 8Gi
-    service:
-      type: ClusterIP
-      ports:
-        redis: 6379
-      nodePorts:
-        redis: ""
-      externalTrafficPolicy: Cluster
-
-  serviceBindings:
-    enabled: false
-
-  ## ServiceAccount configuration
-  ##
-  serviceAccount:
-    ## @param serviceAccount.create Specifies whether a ServiceAccount should be created
-    ##
-    create: true
-    ## @param serviceAccount.name The name of the ServiceAccount to use.
-    ## If not set and create is true, a name is generated using the common.names.fullname template
-    ##
-    name: ""
-    ## @param serviceAccount.automountServiceAccountToken Whether to auto mount the service account token
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-the-default-service-account-to-access-the-api-server
-    ##
-    automountServiceAccountToken: true
+  host: "redis-master"
+  port: 6379
+  username: ""
+  password: ""
+  useSSL: false
 
 ###################################
 # External postgres
@@ -674,6 +382,18 @@ externalS3:
   region: "auto"
 
 ###################################
+# External Elasticsearch
+# - these configs take effect only if all other vector databases are disabled and `externalElasticsearch.enabled` is `true`
+###################################
+externalElasticsearch:
+  enabled: true
+  host: "external-elasticsearch"
+  port: 9200
+  # Note: When using ExternalSecret, these values are managed externally
+  username: ""
+  password: ""
+
+###################################
 # External Secret (External Secrets Operator)
 # - these configs are used when `externalSecret.enabled` is true
 # - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
@@ -709,45 +429,9 @@ externalSecret:
       DB_PASSWORD:
         key: "dify/database"
         property: "password"
-      REDIS_PASSWORD:
+      REDIS_USERNAME:
         key: "dify/redis"
-        property: "password"
-      WEAVIATE_API_KEY:
-        key: "dify/weaviate"
-        property: "api_key"
-      RESEND_API_KEY:
-        key: "dify/mail"
-        property: "resend_api_key"
-      PLUGIN_DAEMON_KEY:
-        key: "dify/plugin-daemon"
-        property: "server_key"
-      INNER_API_KEY_FOR_PLUGIN:
-        key: "dify/plugin-daemon"
-        property: "dify_api_key"
-      S3_ACCESS_KEY:
-        key: "dify/s3"
-        property: "access_key"
-      S3_SECRET_KEY:
-        key: "dify/s3"
-        property: "secret_key"
-
-  # Configuration for worker secret
-  worker:
-    # Whether to create ExternalSecret for worker
-    enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
-    # Remote references for external secret store
-    remoteRefs:
-      SECRET_KEY:
-        key: "dify/api"
-        property: "secret_key"
-      DB_USERNAME:
-        key: "dify/database"
         property: "username"
-      DB_PASSWORD:
-        key: "dify/database"
-        property: "password"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
@@ -770,7 +454,51 @@ externalSecret:
         key: "dify/s3"
         property: "secret_key"
     data:
-      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-external-s3-pg-redis-master:6379/1"
+      CELERY_BROKER_URL: "redis://{{ .REDIS_USERNAME }}:{{ .REDIS_PASSWORD }}@redis-master:6379/1"
+
+  # Configuration for worker secret
+  worker:
+    # Whether to create ExternalSecret for worker
+    enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    remoteRefs:
+      SECRET_KEY:
+        key: "dify/api"
+        property: "secret_key"
+      DB_USERNAME:
+        key: "dify/database"
+        property: "username"
+      DB_PASSWORD:
+        key: "dify/database"
+        property: "password"
+      REDIS_USERNAME:
+        key: "dify/redis"
+        property: "username"
+      REDIS_PASSWORD:
+        key: "dify/redis"
+        property: "password"
+      WEAVIATE_API_KEY:
+        key: "dify/weaviate"
+        property: "api_key"
+      RESEND_API_KEY:
+        key: "dify/mail"
+        property: "resend_api_key"
+      PLUGIN_DAEMON_KEY:
+        key: "dify/plugin-daemon"
+        property: "server_key"
+      INNER_API_KEY_FOR_PLUGIN:
+        key: "dify/plugin-daemon"
+        property: "dify_api_key"
+      S3_ACCESS_KEY:
+        key: "dify/s3"
+        property: "access_key"
+      S3_SECRET_KEY:
+        key: "dify/s3"
+        property: "secret_key"
+    data:
+      CELERY_BROKER_URL: "redis://{{ .REDIS_USERNAME }}:{{ .REDIS_PASSWORD }}@redis-master:6379/1"
 
   # Configuration for sandbox secret
   sandbox:
@@ -798,6 +526,9 @@ externalSecret:
       DB_PASSWORD:
         key: "dify/database"
         property: "password"
+      REDIS_USERNAME:
+        key: "dify/redis"
+        property: "username"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
@@ -834,3 +565,20 @@ externalSecret:
       redis-password:
         key: "dify/redis"
         property: "redis_password"
+
+  # Configuration for Elasticsearch secret (for external Elasticsearch with ExternalSecret)
+  elasticsearch:
+    # Whether to create ExternalSecret for external Elasticsearch
+    enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    # Only sensitive data (username/password) are fetched from external store
+    # Static values (host/port) are taken from values.yaml
+    remoteRefs:
+      ELASTICSEARCH_USERNAME:
+        key: "dify/elasticsearch"
+        property: "elasticsearch_username"
+      ELASTICSEARCH_PASSWORD:
+        key: "dify/elasticsearch"
+        property: "elasticsearch_password"

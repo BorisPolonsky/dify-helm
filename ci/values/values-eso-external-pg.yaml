@@ -1142,6 +1142,9 @@ tolerations: []
 # Individual components can be set to a different affinity
 affinity: {}
 
+postgresql:
+  enabled: false
+
 redis:
   enabled: true
   ## @section Global parameters
