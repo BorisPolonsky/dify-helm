@@ -77,6 +77,13 @@ spec:
         - secretRef:
             name: {{ template "dify.elasticsearch.secretname" . }}
         {{- end }}
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
       {{- end }}
       containers:
       - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
