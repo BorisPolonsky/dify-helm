@@ -318,7 +318,8 @@ beat:
   customStartupProbe: {}
   ## @param beat.updateStrategy Update strategy type and configuration parameters
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
-  updateStrategy: {}
+  updateStrategy:
+    type: Recreate
   # Configure Pods Security Context
   podSecurityContext: {}
   # Configure Container Security Context
