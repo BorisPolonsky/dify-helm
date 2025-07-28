@@ -325,6 +325,9 @@ pluginDaemon:
     # https://github.com/BorisPolonsky/dify-helm/pull/131
     apiProxyEnabled: false
 
+weaviate:
+  enabled: false
+
 service:
   type: ClusterIP
   port: 80
@@ -435,9 +438,6 @@ externalSecret:
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
-      WEAVIATE_API_KEY:
-        key: "dify/weaviate"
-        property: "api_key"
       RESEND_API_KEY:
         key: "dify/mail"
         property: "resend_api_key"
@@ -479,9 +479,6 @@ externalSecret:
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
-      WEAVIATE_API_KEY:
-        key: "dify/weaviate"
-        property: "api_key"
       RESEND_API_KEY:
         key: "dify/mail"
         property: "resend_api_key"
