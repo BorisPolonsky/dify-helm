@@ -5,12 +5,47 @@
 # helm install dify ./charts/dify -f charts/dify/values-azure.yaml
 
 # =============================================================================
+# 이미지 설정 (Azure Container Registry)
+# =============================================================================
+
+image:
+  # Azure Container Registry에서 커스텀 이미지 사용
+  api:
+    repository: "yourregistry.azurecr.io/dify/api"
+    tag: "latest"  # 또는 특정 태그
+    pullPolicy: "Always"
+
+  web:
+    repository: "yourregistry.azurecr.io/dify/web"
+    tag: "latest"  # 또는 특정 태그
+    pullPolicy: "Always"
+
+  # 다른 컴포넌트는 기본 이미지 사용하거나 필요시 변경
+  # worker:
+  #   repository: "yourregistry.azurecr.io/dify/api"  # worker는 api와 같은 이미지
+  #   tag: "latest"
+  #   pullPolicy: "Always"
+
+# ACR에 대한 접근 권한 설정 (필요시)
+# ACR 시크릿 생성 명령어:
+# kubectl create secret docker-registry acr-secret \
+#   --docker-server=yourregistry.azurecr.io \
+#   --docker-username=<service-principal-id> \
+#   --docker-password=<service-principal-password> \
+#   --namespace=dify
+#
+# 또는 AKS에서 ACR attach 사용:
+# az aks update -n dify-helm-prod -g demo --attach-acr yourregistry
+imagePullSecrets:
+  - name: acr-secret  # ACR 인증용 시크릿
+
+# =============================================================================
 # Azure 특화 설정
 # =============================================================================
 
 # 외부 PostgreSQL 사용 (Azure Database for PostgreSQL)
 externalPostgres:
-  enabled: true
+  enabled: false
   # Azure Database for PostgreSQL 엔드포인트 예시
   address: "dify-postgres.postgres.database.azure.com"
   port: 5432
@@ -23,7 +58,7 @@ externalPostgres:
 
 # 외부 Redis 사용 (Azure Cache for Redis)
 externalRedis:
-  enabled: true
+  enabled: false
   # Azure Cache for Redis 엔드포인트 예시
   host: "dify-redis.redis.cache.windows.net"
   port: 6380  # Azure Redis는 기본적으로 SSL 포트 사용
@@ -32,9 +67,9 @@ externalRedis:
   password: "your-redis-primary-key"
   useSSL: true  # Azure Redis는 SSL 필수
 
-# Azure Blob Storage 사용
+# Azure Blob Storage 사용 (PVC 문제 해결을 위해 일단 비활성화)
 externalAzureBlobStorage:
-  enabled: true
+  enabled: false
   # Azure Storage Account 엔드포인트 예시
   url: "https://difystorage.blob.core.windows.net"
   account: "difystorage"
@@ -44,11 +79,11 @@ externalAzureBlobStorage:
 
 # 내장 PostgreSQL 비활성화 (Azure Database 사용)
 postgresql:
-  enabled: false
+  enabled: true
 
 # 내장 Redis 비활성화 (Azure Cache 사용)
 redis:
-  enabled: false
+  enabled: true
 
 # 내장 Weaviate 사용 (또는 외부 벡터 DB 설정)
 weaviate:
@@ -58,18 +93,18 @@ weaviate:
     storageClassName: "managed-premium"  # Azure Premium SSD
   resources:
     requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
       memory: "2Gi"
       cpu: "1000m"
-    limits:
-      memory: "4Gi"
-      cpu: "2000m"
 
 # =============================================================================
 # 인그레스 설정 (Azure Application Gateway Ingress Controller)
 # =============================================================================
 
 ingress:
-  enabled: true
+  enabled: false  # 일단 비활성화하고 LoadBalancer 사용
   className: "azure/application-gateway"
   annotations:
     # Azure Application Gateway Ingress Controller 설정
@@ -102,7 +137,7 @@ ingress:
 api:
   enabled: true
   replicas: 2
-  
+
   # 자동 스케일링 설정
   autoscaling:
     enabled: true
@@ -120,9 +155,13 @@ api:
       memory: "2Gi"
       cpu: "1000m"
 
-  # PVC 비활성화 (Azure Blob Storage 사용)
+  # PVC 설정 (Azure Disk 사용, ReadWriteOnce 모드)
   persistence:
-    enabled: false
+    enabled: true
+    persistentVolumeClaim:
+      storageClass: "managed-premium"
+      accessModes: ReadWriteOnce  # Azure Disk는 ReadWriteOnce만 지원
+      size: 5Gi
 
   # 환경 변수
   extraEnv:
@@ -135,16 +174,16 @@ api:
     - name: CODE_MAX_STRING_LENGTH
       value: "80000"
 
-  # Azure 특화 설정
-  nodeSelector:
-    kubernetes.io/os: linux
-    agentpool: systempool  # Azure AKS 시스템 노드풀
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
+  #   agentpool: systempool  # Azure AKS 시스템 노드풀
 
 # Worker 컴포넌트 설정
 worker:
   enabled: true
   replicas: 2
-  
+
   # 자동 스케일링 설정
   autoscaling:
     enabled: true
@@ -159,19 +198,19 @@ worker:
       memory: "2Gi"
       cpu: "1000m"
     limits:
-      memory: "4Gi"
-      cpu: "2000m"
+      memory: "2Gi"
+      cpu: "1000m"
 
-  # Azure 특화 설정
-  nodeSelector:
-    kubernetes.io/os: linux
-    agentpool: workerpool  # Azure AKS 작업자 노드풀
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
+  #   agentpool: workerpool  # Azure AKS 작업자 노드풀
 
 # Web 컴포넌트 설정
 web:
   enabled: true
   replicas: 2
-  
+
   # 자동 스케일링 설정
   autoscaling:
     enabled: true
@@ -183,117 +222,139 @@ web:
   resources:
     requests:
       memory: "512Mi"
-      cpu: "250m"
+      cpu: "500m"
     limits:
-      memory: "1Gi"
+      memory: "512Mi"
       cpu: "500m"
 
-  # Azure 특화 설정
-  nodeSelector:
-    kubernetes.io/os: linux
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
 
 # Sandbox 컴포넌트 설정
 sandbox:
   enabled: true
   replicas: 2
-  
+
   # 리소스 설정
   resources:
     requests:
       memory: "1Gi"
       cpu: "500m"
     limits:
-      memory: "2Gi"
-      cpu: "1000m"
+      memory: "1Gi"
+      cpu: "500m"
 
-  # Azure 특화 설정
-  nodeSelector:
-    kubernetes.io/os: linux
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
 
 # Plugin Daemon 설정
 pluginDaemon:
   enabled: true
   replicas: 1
-  
+
   # 리소스 설정
   resources:
     requests:
       memory: "512Mi"
-      cpu: "250m"
+      cpu: "500m"
     limits:
       memory: "1Gi"
       cpu: "500m"
 
-  # PVC 비활성화 (Azure Blob Storage 사용)
+  # PVC 설정 (Azure Disk 사용, ReadWriteOnce 모드)
   persistence:
-    enabled: false
+    enabled: true
+    persistentVolumeClaim:
+      storageClass: "managed-premium"
+      accessModes: ReadWriteOnce
+      size: 2Gi
 
   # 마켓플레이스 설정
   marketplace:
     enabled: true
     apiProxyEnabled: true  # Azure에서는 프록시를 통한 API 호출 사용
 
-  # Azure 특화 설정
-  nodeSelector:
-    kubernetes.io/os: linux
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
 
 # Proxy 설정
 proxy:
   enabled: true
   replicas: 2
-  
+
   # 리소스 설정
   resources:
     requests:
       memory: "256Mi"
-      cpu: "100m"
+      cpu: "250m"
     limits:
-      memory: "512Mi"
+      memory: "256Mi"
       cpu: "250m"
 
   # 로그 저장용 Azure Disk
   log:
     persistence:
       enabled: true
-      storageClass: "managed-premium"
-      size: 10Gi
+      persistentVolumeClaim:
+        storageClass: "managed-premium"
+        accessModes: ReadWriteOnce
+        size: 10Gi
 
-  # Azure 특화 설정
-  nodeSelector:
-    kubernetes.io/os: linux
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
 
 # SSRF Proxy 설정 (Azure 환경에서는 활성화 권장)
 ssrfProxy:
   enabled: true
   replicas: 1
-  
+
+  # 보안 컨텍스트 설정 (로그 파일 권한 문제 해결)
+  podSecurityContext:
+    runAsNonRoot: false
+    runAsUser: 0
+    fsGroup: 0
+
+  containerSecurityContext:
+    runAsNonRoot: false
+    runAsUser: 0
+    allowPrivilegeEscalation: true
+
+  # 환경 변수 (로그 비활성화)
+  extraEnv:
+    - name: SQUID_ACCESS_LOG
+      value: "none"
+    - name: SQUID_CACHE_LOG
+      value: "/dev/null"
+
   # 리소스 설정
   resources:
     requests:
-      memory: "256Mi"
-      cpu: "100m"
+      memory: "512Mi"
+      cpu: "250m"
     limits:
       memory: "512Mi"
       cpu: "250m"
 
-  # 로그 저장용 Azure Disk
+  # 로그 저장 비활성화 (메모리에서만 동작)
   log:
     persistence:
-      enabled: true
-      storageClass: "managed-premium"
-      size: 5Gi
+      enabled: false
 
-  # Azure 특화 설정
-  nodeSelector:
-    kubernetes.io/os: linux
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
 
 # =============================================================================
 # 글로벌 설정
 # =============================================================================
 
-# Azure Availability Zones 지원
-nodeSelector:
-  kubernetes.io/os: linux
+# Azure Availability Zones 지원 (nodeSelector 제거)
+# nodeSelector:
+#   kubernetes.io/os: linux
 
 tolerations:
   # Azure Spot 인스턴스 사용 시 설정 예시
@@ -328,18 +389,15 @@ affinity:
 
 # 서비스 설정
 service:
-  type: ClusterIP  # Application Gateway를 통해 노출하므로 ClusterIP 사용
+  type: LoadBalancer  # LoadBalancer로 외부 접근 허용
   port: 80
-  annotations:
-    # Azure Load Balancer 설정 (필요 시)
-    # service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-    # service.beta.kubernetes.io/azure-load-balancer-resource-group: "your-resource-group"
+  annotations: {}  # 기본 Azure LoadBalancer 설정 사용
 
 # 리소스 기본값 (개별 컴포넌트에서 오버라이드)
 resources:
   requests:
     memory: "128Mi"
-    cpu: "100m"
+    cpu: "200m"
   limits:
     memory: "256Mi"
     cpu: "200m"
