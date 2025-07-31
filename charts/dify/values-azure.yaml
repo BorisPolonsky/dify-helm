@@ -1,0 +1,422 @@
+# Azure AKS 환경을 위한 Dify 설정
+# 이 파일은 Azure 클라우드 서비스와 통합하여 프로덕션 환경에서 사용하기 위한 설정입니다.
+#
+# 사용법:
+# helm install dify ./charts/dify -f charts/dify/values-azure.yaml
+
+# =============================================================================
+# 이미지 설정 (Azure Container Registry)
+# =============================================================================
+
+image:
+  # Azure Container Registry에서 커스텀 이미지 사용
+  api:
+    repository: "yourregistry.azurecr.io/dify/api"
+    tag: "latest"  # 또는 특정 태그
+    pullPolicy: "Always"
+
+  web:
+    repository: "yourregistry.azurecr.io/dify/web"
+    tag: "latest"  # 또는 특정 태그
+    pullPolicy: "Always"
+
+  # 다른 컴포넌트는 기본 이미지 사용하거나 필요시 변경
+  # worker:
+  #   repository: "yourregistry.azurecr.io/dify/api"  # worker는 api와 같은 이미지
+  #   tag: "latest"
+  #   pullPolicy: "Always"
+
+# ACR에 대한 접근 권한 설정 (필요시)
+# ACR 시크릿 생성 명령어:
+# kubectl create secret docker-registry acr-secret \
+#   --docker-server=yourregistry.azurecr.io \
+#   --docker-username=<service-principal-id> \
+#   --docker-password=<service-principal-password> \
+#   --namespace=dify
+#
+# 또는 AKS에서 ACR attach 사용:
+# az aks update -n dify-helm-prod -g demo --attach-acr yourregistry
+imagePullSecrets:
+  - name: acr-secret  # ACR 인증용 시크릿
+
+# =============================================================================
+# Azure 특화 설정
+# =============================================================================
+
+# 외부 PostgreSQL 사용 (Azure Database for PostgreSQL)
+externalPostgres:
+  enabled: false
+  # Azure Database for PostgreSQL 엔드포인트 예시
+  address: "dify-postgres.postgres.database.azure.com"
+  port: 5432
+  username: "dify_admin"
+  # Azure Key Vault 또는 Kubernetes Secret 사용 권장
+  password: "your-secure-password"
+  database:
+    api: "dify"
+    pluginDaemon: "dify_plugin"
+
+# 외부 Redis 사용 (Azure Cache for Redis)
+externalRedis:
+  enabled: false
+  # Azure Cache for Redis 엔드포인트 예시
+  host: "dify-redis.redis.cache.windows.net"
+  port: 6380  # Azure Redis는 기본적으로 SSL 포트 사용
+  username: ""
+  # Azure Key Vault 또는 Kubernetes Secret 사용 권장
+  password: "your-redis-primary-key"
+  useSSL: true  # Azure Redis는 SSL 필수
+
+# Azure Blob Storage 사용 (PVC 문제 해결을 위해 일단 비활성화)
+externalAzureBlobStorage:
+  enabled: false
+  # Azure Storage Account 엔드포인트 예시
+  url: "https://difystorage.blob.core.windows.net"
+  account: "difystorage"
+  # Azure Key Vault 또는 Kubernetes Secret 사용 권장
+  key: "your-storage-account-key"
+  container: "dify-storage"
+
+# 내장 PostgreSQL 비활성화 (Azure Database 사용)
+postgresql:
+  enabled: true
+
+# 내장 Redis 비활성화 (Azure Cache 사용)
+redis:
+  enabled: true
+
+# 내장 Weaviate 사용 (또는 외부 벡터 DB 설정)
+weaviate:
+  enabled: true
+  storage:
+    size: 50Gi
+    storageClassName: "managed-premium"  # Azure Premium SSD
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+# =============================================================================
+# 인그레스 설정 (Azure Application Gateway Ingress Controller)
+# =============================================================================
+
+ingress:
+  enabled: false  # 일단 비활성화하고 LoadBalancer 사용
+  className: "azure/application-gateway"
+  annotations:
+    # Azure Application Gateway Ingress Controller 설정
+    kubernetes.io/ingress.class: azure/application-gateway
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+    appgw.ingress.kubernetes.io/cookie-based-affinity: "true"
+    appgw.ingress.kubernetes.io/request-timeout: "300"
+    appgw.ingress.kubernetes.io/connection-draining: "true"
+    appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
+    appgw.ingress.kubernetes.io/backend-path-prefix: "/"
+    appgw.ingress.kubernetes.io/health-probe-path: "/health"
+    appgw.ingress.kubernetes.io/health-probe-interval: "30"
+    appgw.ingress.kubernetes.io/health-probe-timeout: "5"
+    appgw.ingress.kubernetes.io/health-probe-unhealthy-threshold: "3"
+  hosts:
+    - host: dify.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: dify-tls
+      hosts:
+        - dify.yourdomain.com
+
+# =============================================================================
+# 스토리지 클래스 설정 (Azure Disk)
+# =============================================================================
+
+# API 컴포넌트 설정
+api:
+  enabled: true
+  replicas: 2
+
+  # 자동 스케일링 설정
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+  # PVC 설정 (Azure Disk 사용, ReadWriteOnce 모드)
+  persistence:
+    enabled: true
+    persistentVolumeClaim:
+      storageClass: "managed-premium"
+      accessModes: ReadWriteOnce  # Azure Disk는 ReadWriteOnce만 지원
+      size: 5Gi
+
+  # 환경 변수
+  extraEnv:
+    - name: CHECK_UPDATE_URL
+      value: "https://updates.dify.ai"  # Azure 환경에서는 활성화
+    - name: CODE_MAX_NUMBER
+      value: "9223372036854775807"
+    - name: CODE_MIN_NUMBER
+      value: "-9223372036854775808"
+    - name: CODE_MAX_STRING_LENGTH
+      value: "80000"
+
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
+  #   agentpool: systempool  # Azure AKS 시스템 노드풀
+
+# Worker 컴포넌트 설정
+worker:
+  enabled: true
+  replicas: 2
+
+  # 자동 스케일링 설정
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 15
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  # 리소스 설정 (백그라운드 작업용으로 더 많은 리소스)
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
+  #   agentpool: workerpool  # Azure AKS 작업자 노드풀
+
+# Web 컴포넌트 설정
+web:
+  enabled: true
+  replicas: 2
+
+  # 자동 스케일링 설정
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
+
+# Sandbox 컴포넌트 설정
+sandbox:
+  enabled: true
+  replicas: 2
+
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
+
+# Plugin Daemon 설정
+pluginDaemon:
+  enabled: true
+  replicas: 1
+
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+  # PVC 설정 (Azure Disk 사용, ReadWriteOnce 모드)
+  persistence:
+    enabled: true
+    persistentVolumeClaim:
+      storageClass: "managed-premium"
+      accessModes: ReadWriteOnce
+      size: 2Gi
+
+  # 마켓플레이스 설정
+  marketplace:
+    enabled: true
+    apiProxyEnabled: true  # Azure에서는 프록시를 통한 API 호출 사용
+
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
+
+# Proxy 설정
+proxy:
+  enabled: true
+  replicas: 2
+
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "256Mi"
+      cpu: "250m"
+
+  # 로그 저장용 Azure Disk
+  log:
+    persistence:
+      enabled: true
+      persistentVolumeClaim:
+        storageClass: "managed-premium"
+        accessModes: ReadWriteOnce
+        size: 10Gi
+
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
+
+# SSRF Proxy 설정 (Azure 환경에서는 활성화 권장)
+ssrfProxy:
+  enabled: true
+  replicas: 1
+
+  # 보안 컨텍스트 설정 (로그 파일 권한 문제 해결)
+  podSecurityContext:
+    runAsNonRoot: false
+    runAsUser: 0
+    fsGroup: 0
+
+  containerSecurityContext:
+    runAsNonRoot: false
+    runAsUser: 0
+    allowPrivilegeEscalation: true
+
+  # 환경 변수 (로그 비활성화)
+  extraEnv:
+    - name: SQUID_ACCESS_LOG
+      value: "none"
+    - name: SQUID_CACHE_LOG
+      value: "/dev/null"
+
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "250m"
+
+  # 로그 저장 비활성화 (메모리에서만 동작)
+  log:
+    persistence:
+      enabled: false
+
+  # Azure 특화 설정 (nodeSelector 제거)
+  # nodeSelector:
+  #   kubernetes.io/os: linux
+
+# =============================================================================
+# 글로벌 설정
+# =============================================================================
+
+# Azure Availability Zones 지원 (nodeSelector 제거)
+# nodeSelector:
+#   kubernetes.io/os: linux
+
+tolerations:
+  # Azure Spot 인스턴스 사용 시 설정 예시
+  # - key: "kubernetes.azure.com/scalesetpriority"
+  #   operator: "Equal"
+  #   value: "spot"
+  #   effect: "NoSchedule"
+
+affinity:
+  # 멀티 가용 영역 배포를 위한 Anti-affinity 설정
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - dify
+        topologyKey: topology.kubernetes.io/zone
+    # Azure의 경우 Fault Domain도 고려
+    - weight: 50
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - dify
+        topologyKey: failure-domain.beta.kubernetes.io/zone
+
+# 서비스 설정
+service:
+  type: LoadBalancer  # LoadBalancer로 외부 접근 허용
+  port: 80
+  annotations: {}  # 기본 Azure LoadBalancer 설정 사용
+
+# 리소스 기본값 (개별 컴포넌트에서 오버라이드)
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "200m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
+
+# =============================================================================
+# Azure 특화 모니터링 및 로깅
+# =============================================================================
+
+# Azure Container Insights와 통합을 위한 라벨
+commonLabels:
+  azure.workload.identity/use: "true"  # Azure Workload Identity 사용 시
+
+# Azure 환경 변수 (필요 시)
+# 모든 컴포넌트에 적용될 공통 환경 변수
+extraEnv:
+  - name: AZURE_CLIENT_ID
+    value: "your-client-id"  # Azure Service Principal 사용 시
+  - name: AZURE_TENANT_ID
+    value: "your-tenant-id"
+  # Azure Key Vault 사용 시
+  # - name: AZURE_KEY_VAULT_URL
+  #   value: "https://your-keyvault.vault.azure.net/"

@@ -1,0 +1,308 @@
+# AWS EKS 환경을 위한 Dify 설정
+# 이 파일은 AWS 클라우드 서비스와 통합하여 프로덕션 환경에서 사용하기 위한 설정입니다.
+#
+# 사용법:
+# helm install dify ./charts/dify -f charts/dify/values-aws.yaml
+
+# =============================================================================
+# AWS 특화 설정
+# =============================================================================
+
+# 외부 PostgreSQL 사용 (Amazon RDS)
+externalPostgres:
+  enabled: true
+  # RDS 엔드포인트 예시
+  address: "dify-postgres.cluster-xxxxx.us-east-1.rds.amazonaws.com"
+  port: 5432
+  username: "dify_admin"
+  # AWS Secrets Manager 또는 Kubernetes Secret 사용 권장
+  password: "your-secure-password"
+  database:
+    api: "dify"
+    pluginDaemon: "dify_plugin"
+
+# 외부 Redis 사용 (Amazon ElastiCache)
+externalRedis:
+  enabled: true
+  # ElastiCache 엔드포인트 예시
+  host: "dify-redis.xxxxx.cache.amazonaws.com"
+  port: 6379
+  username: ""
+  # AWS Secrets Manager 또는 Kubernetes Secret 사용 권장
+  password: "your-redis-auth-token"
+  useSSL: true
+
+# Amazon S3 스토리지 사용
+externalS3:
+  enabled: true
+  endpoint: "https://s3.amazonaws.com"
+  # IAM 역할 사용 시 accessKey/secretKey는 불필요
+  accessKey: "your-access-key"
+  secretKey: "your-secret-key"
+  region: "us-east-1"
+  bucketName:
+    api: "dify-api-storage"
+    pluginDaemon: "dify-plugin-storage"
+  useIAM: false  # EKS IRSA (IAM Roles for Service Accounts) 사용 시 true
+  pathStyle: "false"
+
+# 내장 PostgreSQL 비활성화 (RDS 사용)
+postgresql:
+  enabled: false
+
+# 내장 Redis 비활성화 (ElastiCache 사용)
+redis:
+  enabled: false
+
+# 내장 Weaviate 사용 (또는 외부 벡터 DB 설정)
+weaviate:
+  enabled: true
+  storage:
+    size: 50Gi
+    storageClassName: "gp3"  # AWS EBS gp3
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+
+# =============================================================================
+# 인그레스 설정 (AWS Load Balancer Controller)
+# =============================================================================
+
+ingress:
+  enabled: true
+  className: "alb"
+  annotations:
+    # AWS Load Balancer Controller 설정
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:123456789012:certificate/your-cert-arn"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "30"
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "5"
+    alb.ingress.kubernetes.io/healthy-threshold-count: "2"
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: "5"
+  hosts:
+    - host: dify.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: dify-tls
+      hosts:
+        - dify.yourdomain.com
+
+# =============================================================================
+# 스토리지 클래스 설정 (AWS EBS)
+# =============================================================================
+
+# API 컴포넌트 설정
+api:
+  enabled: true
+  replicas: 2
+  
+  # 자동 스케일링 설정
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+  # PVC 비활성화 (S3 사용)
+  persistence:
+    enabled: false
+
+  # 환경 변수
+  extraEnv:
+    - name: CHECK_UPDATE_URL
+      value: "https://updates.dify.ai"  # AWS 환경에서는 활성화
+    - name: CODE_MAX_NUMBER
+      value: "9223372036854775807"
+    - name: CODE_MIN_NUMBER
+      value: "-9223372036854775808"
+    - name: CODE_MAX_STRING_LENGTH
+      value: "80000"
+
+# Worker 컴포넌트 설정
+worker:
+  enabled: true
+  replicas: 2
+  
+  # 자동 스케일링 설정
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 15
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  # 리소스 설정 (백그라운드 작업용으로 더 많은 리소스)
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+
+# Web 컴포넌트 설정
+web:
+  enabled: true
+  replicas: 2
+  
+  # 자동 스케일링 설정
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+# Sandbox 컴포넌트 설정
+sandbox:
+  enabled: true
+  replicas: 2
+  
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+# Plugin Daemon 설정
+pluginDaemon:
+  enabled: true
+  replicas: 1
+  
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+  # PVC 비활성화 (S3 사용)
+  persistence:
+    enabled: false
+
+  # 마켓플레이스 설정
+  marketplace:
+    enabled: true
+    apiProxyEnabled: true  # AWS에서는 프록시를 통한 API 호출 사용
+
+# Proxy 설정
+proxy:
+  enabled: true
+  replicas: 2
+  
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "250m"
+
+  # 로그 저장용 EBS 볼륨
+  log:
+    persistence:
+      enabled: true
+      storageClass: "gp3"
+      size: 10Gi
+
+# SSRF Proxy 설정 (AWS 환경에서는 활성화 권장)
+ssrfProxy:
+  enabled: true
+  replicas: 1
+  
+  # 리소스 설정
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "250m"
+
+  # 로그 저장용 EBS 볼륨
+  log:
+    persistence:
+      enabled: true
+      storageClass: "gp3"
+      size: 5Gi
+
+# =============================================================================
+# 글로벌 설정
+# =============================================================================
+
+# AWS EBS 스토리지 클래스 (기본)
+# Note: 실제 스토리지 클래스는 클러스터 설정에 따라 다를 수 있습니다
+nodeSelector:
+  # AWS 노드 그룹 라벨 예시
+  # node.kubernetes.io/instance-type: m5.large
+
+tolerations:
+  # AWS Spot 인스턴스 사용 시 설정 예시
+  # - key: "spot"
+  #   operator: "Equal"
+  #   value: "true"
+  #   effect: "NoSchedule"
+
+affinity:
+  # 멀티 AZ 배포를 위한 Anti-affinity 설정
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - dify
+        topologyKey: topology.kubernetes.io/zone
+
+# 서비스 설정
+service:
+  type: ClusterIP  # ALB를 통해 노출하므로 ClusterIP 사용
+  port: 80
+
+# 리소스 기본값 (개별 컴포넌트에서 오버라이드)
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "200m"
