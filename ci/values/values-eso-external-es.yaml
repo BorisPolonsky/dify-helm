@@ -1860,6 +1860,12 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
+      ELASTICSEARCH_USERNAME:
+        key: "dify/elasticsearch"
+        property: "elasticsearch_username"
+      ELASTICSEARCH_PASSWORD:
+        key: "dify/elasticsearch"
+        property: "elasticsearch_password"
     data:
       CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-external-es-redis-master:6379/1"
 
@@ -1931,6 +1937,12 @@ externalSecret:
       DIFY_INNER_API_KEY:
         key: "dify/plugin-daemon"
         property: "dify_api_key"
+      ELASTICSEARCH_USERNAME:
+        key: "dify/elasticsearch"
+        property: "elasticsearch_username"
+      ELASTICSEARCH_PASSWORD:
+        key: "dify/elasticsearch"
+        property: "elasticsearch_password"
 
   # Configuration for PostgreSQL secret (for built-in PostgreSQL with ExternalSecret)
   postgresql:
@@ -1954,20 +1966,3 @@ externalSecret:
       redis-password:
         key: "dify/redis"
         property: "redis_password"
-
-  # Configuration for Elasticsearch secret (for external Elasticsearch with ExternalSecret)
-  elasticsearch:
-    # Whether to create ExternalSecret for external Elasticsearch
-    enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
-    # Remote references for external secret store
-    # Only sensitive data (username/password) are fetched from external store
-    # Static values (host/port) are taken from values.yaml
-    remoteRefs:
-      ELASTICSEARCH_USERNAME:
-        key: "dify/elasticsearch"
-        property: "elasticsearch_username"
-      ELASTICSEARCH_PASSWORD:
-        key: "dify/elasticsearch"
-        property: "elasticsearch_password"

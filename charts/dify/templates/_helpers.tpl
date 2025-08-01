@@ -79,13 +79,6 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{ template "dify.fullname" . }}-plugin-daemon
 {{- end -}}
 
-{{/*
-Create a default elasticsearch secret name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
-{{- define "dify.elasticsearch.secretname" -}}
-{{ template "dify.fullname" . }}-elasticsearch
-{{- end -}}
 
 {{/*
 Create chart name and version as used by the chart label.

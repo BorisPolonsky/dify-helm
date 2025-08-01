@@ -73,10 +73,6 @@ spec:
             name: {{ template "dify.worker.fullname" . }}
         - secretRef:
             name: {{ template "dify.worker.fullname" . }}
-        {{- if and .Values.externalSecret.enabled .Values.externalSecret.elasticsearch.enabled .Values.externalElasticsearch.enabled }}
-        - secretRef:
-            name: {{ template "dify.elasticsearch.secretname" . }}
-        {{- end }}
         resources:
           requests:
             cpu: 50m
@@ -111,10 +107,6 @@ spec:
             name: {{ template "dify.worker.fullname" . }}
         - secretRef:
             name: {{ template "dify.worker.fullname" . }}
-        {{- if and .Values.externalSecret.enabled .Values.externalSecret.elasticsearch.enabled .Values.externalElasticsearch.enabled }}
-        - secretRef:
-            name: {{ template "dify.elasticsearch.secretname" . }}
-        {{- end }}
         resources:
           {{- toYaml .Values.worker.resources | nindent 12 }}
         volumeMounts:
