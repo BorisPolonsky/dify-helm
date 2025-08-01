@@ -74,12 +74,7 @@ spec:
         - secretRef:
             name: {{ template "dify.worker.fullname" . }}
         resources:
-          requests:
-            cpu: 50m
-            memory: 64Mi
-          limits:
-            cpu: 100m
-            memory: 128Mi
+          {{- toYaml .Values.worker.resources | nindent 12 }}
       {{- end }}
       containers:
       - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
