@@ -73,6 +73,8 @@ spec:
             name: {{ template "dify.worker.fullname" . }}
         - secretRef:
             name: {{ template "dify.worker.fullname" . }}
+        resources:
+          {{- toYaml .Values.worker.resources | nindent 12 }}
       {{- end }}
       containers:
       - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"

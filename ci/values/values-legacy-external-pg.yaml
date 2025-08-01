@@ -123,36 +123,36 @@ api:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary.
-  # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
-  # The direct approach
-  # - name: LANG
-  #   value: "C.UTF-8"
-  #   - name: SECRET_KEY
-  # Use existing k8s secrets
-  #  - name: DB_PASSWORD
-  #    valueFrom:
-  #      secretKeyRef:
-  #        name: my-secret
-  #        key: DB_PASSWORD
-  - name: CHECK_UPDATE_URL
-    # Won't check for updates if left empty
-    #   value: https://updates.dify.ai
-    value: ""
-  - name: CODE_MAX_NUMBER
-    value: "9223372036854775807"
-  - name: CODE_MIN_NUMBER
-    value: "-9223372036854775808"
-  - name: CODE_MAX_STRING_LENGTH
-    value: "80000"
-  - name: TEMPLATE_TRANSFORM_MAX_LENGTH
-    value: "80000"
-  - name: CODE_MAX_STRING_ARRAY_LENGTH
-    value: "30"
-  - name: CODE_MAX_OBJECT_ARRAY_LENGTH
-    value: "30"
-  - name: CODE_MAX_NUMBER_ARRAY_LENGTH
-    value: "1000"
+    # Apply your own Environment Variables if necessary.
+    # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
+    # The direct approach
+    # - name: LANG
+    #   value: "C.UTF-8"
+    #   - name: SECRET_KEY
+    # Use existing k8s secrets
+    #  - name: DB_PASSWORD
+    #    valueFrom:
+    #      secretKeyRef:
+    #        name: my-secret
+    #        key: DB_PASSWORD
+    - name: CHECK_UPDATE_URL
+      # Won't check for updates if left empty
+      #   value: https://updates.dify.ai
+      value: ""
+    - name: CODE_MAX_NUMBER
+      value: "9223372036854775807"
+    - name: CODE_MIN_NUMBER
+      value: "-9223372036854775808"
+    - name: CODE_MAX_STRING_LENGTH
+      value: "80000"
+    - name: TEMPLATE_TRANSFORM_MAX_LENGTH
+      value: "80000"
+    - name: CODE_MAX_STRING_ARRAY_LENGTH
+      value: "30"
+    - name: CODE_MAX_OBJECT_ARRAY_LENGTH
+      value: "30"
+    - name: CODE_MAX_NUMBER_ARRAY_LENGTH
+      value: "1000"
   service:
     port: 5001
     annotations: {}
@@ -428,9 +428,9 @@ web:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary
-  - name: EDITION
-    value: "SELF_HOSTED"
+    # Apply your own Environment Variables if necessary
+    - name: EDITION
+      value: "SELF_HOSTED"
   service:
     port: 3000
     annotations: {}
@@ -510,11 +510,11 @@ sandbox:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary
-  # - name: LANG
-  #   value: "C.UTF-8"
-  - name: WORKER_TIMEOUT
-    value: "15"
+    # Apply your own Environment Variables if necessary
+    # - name: LANG
+    #   value: "C.UTF-8"
+    - name: WORKER_TIMEOUT
+      value: "15"
   service:
     port: 8194
     annotations: {}
@@ -694,7 +694,7 @@ pluginDaemon:
     annotations: {}
 
 postgresql:
-  enabled: true
+  enabled: false
   name: postgres
   global:
     storageClass: ""
@@ -711,7 +711,7 @@ postgresql:
     pullPolicy: IfNotPresent
   ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
   ##
-  architecture: replication
+  architecture: standalone
   ## Replication configuration
   ## Ignored if `architecture` is `standalone`
   ##
@@ -926,11 +926,11 @@ weaviate:
     admin_list:
       enabled: true
       users:
-      # Examples
-      # - admin_user1
-      # - admin_user2
-      # - api-key-user-admin
-      - hello@dify.ai
+        # Examples
+        # - admin_user1
+        # - admin_user2
+        # - api-key-user-admin
+        - hello@dify.ai
       read_only_users:
       # Examples
       # - readonly_user1
@@ -3004,10 +3004,10 @@ redis:
 # - these configs are only used when `externalPostgres.enabled` is true
 ###################################
 externalPostgres:
-  enabled: false
+  enabled: true
   username: "postgres"
   password: "difyai123456"
-  address: localhost
+  address: "pg1.uat.internal.dify.ai"
   port: 5432
   database:
     api: "dify"
@@ -3214,188 +3214,3 @@ externalTableStore:
   instanceName: "instance-name"
   accessKeyId: "your-secret-id"
   accessKeySecret: "your-secret-key"
-
-###################################
-# External Elasticsearch
-# - these configs take effect only if all other vector databases are disabled and `externalElasticsearch.enabled` is `true`
-###################################
-externalElasticsearch:
-  enabled: false
-  host: "elasticsearch.example.com"
-  port: 9200
-  # Note: When using ExternalSecret, these values are managed externally
-  username: ""
-  password: ""
-
-###################################
-# External Secret (External Secrets Operator)
-# - these configs are used when `externalSecret.enabled` is true
-# - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
-###################################
-externalSecret:
-  enabled: false
-
-  # External secret store backend provider (e.g., vault, aws, azure, gcp, etc.)
-  secretStore:
-    name: "default-secret-store"
-    kind: "SecretStore"
-
-  # Global refresh interval for all ExternalSecrets
-  refreshInterval: "15m"
-
-  # Global ExternalSecret configuration options
-  # Default decoding strategy for secret data
-  # Options: Auto, Base64, Base64URL, None
-  decodingStrategy: "None"
-
-  # Configuration for api secret
-  api:
-    # Whether to create ExternalSecret for api
-    enabled: true
-    # Remote references for external secret store
-    # Only specify the fields you want to include - all possible fields are defined in the template
-    remoteRefs:
-      SECRET_KEY:
-        key: "dify/api"
-        property: "secret_key"
-      CODE_EXECUTION_API_KEY:
-        key: "dify/sandbox"
-        property: "api_key"
-      DB_USERNAME:
-        key: "dify/database"
-        property: "username"
-      DB_PASSWORD:
-        key: "dify/database"
-        property: "password"
-      REDIS_PASSWORD:
-        key: "dify/redis"
-        property: "password"
-      WEAVIATE_API_KEY:
-        key: "dify/weaviate"
-        property: "api_key"
-      RESEND_API_KEY:
-        key: "dify/mail"
-        property: "resend_api_key"
-      PLUGIN_DAEMON_KEY:
-        key: "dify/plugin-daemon"
-        property: "server_key"
-      INNER_API_KEY_FOR_PLUGIN:
-        key: "dify/plugin-daemon"
-        property: "dify_api_key"
-      S3_ACCESS_KEY:
-        key: "dify/s3"
-        property: "access_key"
-      S3_SECRET_KEY:
-        key: "dify/s3"
-        property: "secret_key"
-    data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
-
-  # Configuration for worker secret
-  worker:
-    # Whether to create ExternalSecret for worker
-    enabled: true
-    # Remote references for external secret store
-    remoteRefs:
-      SECRET_KEY:
-        key: "dify/api"
-        property: "secret_key"
-      DB_USERNAME:
-        key: "dify/database"
-        property: "username"
-      DB_PASSWORD:
-        key: "dify/database"
-        property: "password"
-      REDIS_PASSWORD:
-        key: "dify/redis"
-        property: "password"
-      WEAVIATE_API_KEY:
-        key: "dify/weaviate"
-        property: "api_key"
-      RESEND_API_KEY:
-        key: "dify/mail"
-        property: "resend_api_key"
-      PLUGIN_DAEMON_KEY:
-        key: "dify/plugin-daemon"
-        property: "server_key"
-      INNER_API_KEY_FOR_PLUGIN:
-        key: "dify/plugin-daemon"
-        property: "dify_api_key"
-      S3_ACCESS_KEY:
-        key: "dify/s3"
-        property: "access_key"
-      S3_SECRET_KEY:
-        key: "dify/s3"
-        property: "secret_key"
-    data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
-
-  # Configuration for sandbox secret
-  sandbox:
-    enabled: true
-    remoteRefs:
-      API_KEY:
-        key: "dify/sandbox"
-        property: "api_key"
-
-  # Configuration for plugin daemon secret
-  pluginDaemon:
-    # Whether to create ExternalSecret for plugin daemon
-    enabled: true
-    # Remote references for external secret store
-    remoteRefs:
-      DB_USERNAME:
-        key: "dify/database"
-        property: "username"
-      DB_PASSWORD:
-        key: "dify/database"
-        property: "password"
-      REDIS_PASSWORD:
-        key: "dify/redis"
-        property: "password"
-      SERVER_KEY:
-        key: "dify/plugin-daemon"
-        property: "server_key"
-      DIFY_INNER_API_KEY:
-        key: "dify/plugin-daemon"
-        property: "dify_api_key"
-
-  # Configuration for PostgreSQL secret (for built-in PostgreSQL with ExternalSecret)
-  postgresql:
-    # Whether to create ExternalSecret for built-in PostgreSQL
-    enabled: true
-    # Remote references for external secret store
-    remoteRefs:
-      postgres-password:
-        key: "dify/postgresql"
-        property: "postgres_password"
-      replication-password:
-        key: "dify/postgresql"
-        property: "replication_password"
-
-  # Configuration for Redis secret (for built-in Redis with ExternalSecret)
-  redis:
-    # Whether to create ExternalSecret for built-in Redis
-    enabled: true
-    # Remote references for external secret store
-    remoteRefs:
-      redis-password:
-        key: "dify/redis"
-        property: "redis_password"
-
-  # Configuration for Elasticsearch secret (for external Elasticsearch with ExternalSecret)
-  elasticsearch:
-    # Whether to create ExternalSecret for external Elasticsearch
-    enabled: false
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
-    # Remote references for external secret store
-    # Only sensitive data (username/password) are fetched from external store
-    # Static values (host/port) are taken from values.yaml
-    remoteRefs:
-      ELASTICSEARCH_USERNAME:
-        key: "dify/elasticsearch"
-        property: "username"
-      ELASTICSEARCH_PASSWORD:
-        key: "dify/elasticsearch"
-        property: "password"

@@ -123,36 +123,36 @@ api:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary.
-  # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
-  # The direct approach
-  # - name: LANG
-  #   value: "C.UTF-8"
-  #   - name: SECRET_KEY
-  # Use existing k8s secrets
-  #  - name: DB_PASSWORD
-  #    valueFrom:
-  #      secretKeyRef:
-  #        name: my-secret
-  #        key: DB_PASSWORD
-  - name: CHECK_UPDATE_URL
-    # Won't check for updates if left empty
-    #   value: https://updates.dify.ai
-    value: ""
-  - name: CODE_MAX_NUMBER
-    value: "9223372036854775807"
-  - name: CODE_MIN_NUMBER
-    value: "-9223372036854775808"
-  - name: CODE_MAX_STRING_LENGTH
-    value: "80000"
-  - name: TEMPLATE_TRANSFORM_MAX_LENGTH
-    value: "80000"
-  - name: CODE_MAX_STRING_ARRAY_LENGTH
-    value: "30"
-  - name: CODE_MAX_OBJECT_ARRAY_LENGTH
-    value: "30"
-  - name: CODE_MAX_NUMBER_ARRAY_LENGTH
-    value: "1000"
+    # Apply your own Environment Variables if necessary.
+    # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
+    # The direct approach
+    # - name: LANG
+    #   value: "C.UTF-8"
+    #   - name: SECRET_KEY
+    # Use existing k8s secrets
+    #  - name: DB_PASSWORD
+    #    valueFrom:
+    #      secretKeyRef:
+    #        name: my-secret
+    #        key: DB_PASSWORD
+    - name: CHECK_UPDATE_URL
+      # Won't check for updates if left empty
+      #   value: https://updates.dify.ai
+      value: ""
+    - name: CODE_MAX_NUMBER
+      value: "9223372036854775807"
+    - name: CODE_MIN_NUMBER
+      value: "-9223372036854775808"
+    - name: CODE_MAX_STRING_LENGTH
+      value: "80000"
+    - name: TEMPLATE_TRANSFORM_MAX_LENGTH
+      value: "80000"
+    - name: CODE_MAX_STRING_ARRAY_LENGTH
+      value: "30"
+    - name: CODE_MAX_OBJECT_ARRAY_LENGTH
+      value: "30"
+    - name: CODE_MAX_NUMBER_ARRAY_LENGTH
+      value: "1000"
   service:
     port: 5001
     annotations: {}
@@ -188,7 +188,7 @@ api:
     type: "resend"
     resend:
       # Resend API Key
-      apiKey: "xxxx"
+      apiKey: ""
       # Resend API URL
       apiUrl: https://api.resend.com
     # SMTP Configuration
@@ -196,14 +196,14 @@ api:
       server: "smtp.server.com"
       port: 465
       username: "YOUR EMAIL"
-      password: "YOUR EMAIL PASSWORD"
+      password: ""
       tls:
         enabled: true
         optimistic: false
   # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
   migration: true
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-  secretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
+  secretKey: ""
   ## Storage for `api` and `worker`
   ## Ignored if `.Values.externalS3.enabled` is true
   ##
@@ -428,9 +428,9 @@ web:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary
-  - name: EDITION
-    value: "SELF_HOSTED"
+    # Apply your own Environment Variables if necessary
+    - name: EDITION
+      value: "SELF_HOSTED"
   service:
     port: 3000
     annotations: {}
@@ -510,18 +510,18 @@ sandbox:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary
-  # - name: LANG
-  #   value: "C.UTF-8"
-  - name: WORKER_TIMEOUT
-    value: "15"
+    # Apply your own Environment Variables if necessary
+    # - name: LANG
+    #   value: "C.UTF-8"
+    - name: WORKER_TIMEOUT
+      value: "15"
   service:
     port: 8194
     annotations: {}
     labels: {}
     clusterIP: ""
   auth:
-    apiKey: "dify-sandbox"
+    apiKey: ""
   ## Sandbox ServiceAccount configuration
   ##
   serviceAccount:
@@ -700,7 +700,7 @@ postgresql:
     storageClass: ""
     postgresql:
       auth:
-        postgresPassword: "difyai123456"
+        existingSecret: "postgresql-secret"
         username: ""
         password: ""
         database: "dify"
@@ -711,7 +711,7 @@ postgresql:
     pullPolicy: IfNotPresent
   ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
   ##
-  architecture: replication
+  architecture: standalone
   ## Replication configuration
   ## Ignored if `architecture` is `standalone`
   ##
@@ -720,7 +720,7 @@ postgresql:
       limits: {}
       requests: {}
     persistence:
-      enabled: true
+      enabled: false
       storageClass: ""
       accessModes:
         - ReadWriteOnce
@@ -746,7 +746,7 @@ postgresql:
       limits: {}
       requests: {}
     persistence:
-      enabled: true
+      enabled: false
       storageClass: ""
       accessModes:
         - ReadWriteOnce
@@ -764,396 +764,7 @@ postgresql:
     tolerations: []
 
 weaviate:
-  enabled: true
-  image:
-    # registry where weaviate image is stored
-    registry: docker.io
-    # Tag of weaviate image to deploy
-    # Note: We strongly recommend you overwrite this value in your own values.yaml.
-    # Otherwise a mere upgrade of the chart could lead to an unexpected upgrade
-    # of weaviate. In accordance with Infra-as-code, you should pin this value
-    # down and only change it if you explicitly want to upgrade the Weaviate
-    # version.
-    tag: 1.19.1
-    repo: semitechnologies/weaviate
-    # Image pull policy: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
-    pullPolicy: IfNotPresent
-    pullSecrets: []
-
-  # overwrite command and args if you want to run specific startup scripts, for
-  # example setting the nofile limit
-  command: ["/bin/weaviate"]
-  args:
-    - "--host"
-    - "0.0.0.0"
-    - "--port"
-    - "8080"
-    - "--scheme"
-    - "http"
-    - "--config-file"
-    - "/weaviate-config/conf.yaml"
-    - --read-timeout=60s
-    - --write-timeout=60s
-
-  # below is an example that can be used to set an arbitrary nofile limit at
-  # startup:
-  #
-  # command:
-  #   - "/bin/sh"
-  # args:
-  #   - "-c"
-  #   - "ulimit -n 65535 && /bin/weaviate --host 0.0.0.0 --port 8080 --scheme http --config-file /weaviate-config/conf.yaml"
-
-  # it is possible to change the sysctl's 'vm.max_map_count' using initContainer for Weaviate,
-  # the init Container runs before Weaviate Container and sets the value for the WHOLE node
-  # to the one provided below.
-  # it is possible to run additional initContainer before Weaviate is up and running. You can specify the
-  # containers as a list in `extraInitContainers`, exactly how they are defined in a kubernetes manifest:
-  #   https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-  initContainers:
-    sysctlInitContainer:
-      enabled: true
-      sysctlVmMaxMapCount: 524288
-      image:
-        registry: docker.io
-        repo: alpine
-        tag: latest
-        pullPolicy: IfNotPresent
-
-    extraInitContainers: {}
-    # - image: some-image
-    #   name: some-name
-
-  # Scale replicas of Weaviate. Note that as of v1.8.0 dynamic scaling is limited
-  # to cases where no data is imported yet. Scaling down after importing data may
-  # break usability. Full dynamic scalability will be added in a future release.
-  replicas: 1
-  resources:
-    {}
-    # requests:
-    #   cpu: '500m'
-    #   memory: '300Mi'
-    # limits:
-    #   cpu: '1000m'
-    #   memory: '1Gi'
-
-  # Add a service account ot the Weaviate pods if you need Weaviate to have permissions to
-  # access kubernetes resources or cloud provider resources. For example for it to have
-  # access to a backup up bucket, or if you want to restrict Weaviate pod in any way.
-  # By default, use the default ServiceAccount
-  serviceAccountName:
-
-  # The Persistent Volume Claim settings for Weaviate. If there's a
-  # storage.fullnameOverride field set, then the default pvc will not be
-  # created, instead the one defined in fullnameOverride will be used
-  storage:
-    size: 32Gi
-    storageClassName: ""
-
-  # The service controls how weaviate is exposed to the outside world. If you
-  # don't want a public load balancer, you can also choose 'ClusterIP' to make
-  # weaviate only accessible within your cluster.
-  service:
-    name: weaviate
-    # type: LoadBalancer
-    type: ClusterIP
-    loadBalancerSourceRanges: []
-    # optionally set cluster IP if you want to set a static IP
-    clusterIP:
-    annotations: {}
-
-  # Adjust liveness, readiness and startup probes configuration
-  startupProbe:
-    # For kubernetes versions prior to 1.18 startupProbe is not supported thus can be disabled.
-    enabled: false
-
-    initialDelaySeconds: 300
-    periodSeconds: 60
-    failureThreshold: 50
-    successThreshold: 1
-    timeoutSeconds: 3
-
-  livenessProbe:
-    initialDelaySeconds: 900
-    periodSeconds: 10
-    failureThreshold: 30
-    successThreshold: 1
-    timeoutSeconds: 3
-
-  readinessProbe:
-    initialDelaySeconds: 3
-    periodSeconds: 10
-    failureThreshold: 3
-    successThreshold: 1
-    timeoutSeconds: 3
-
-  terminationGracePeriodSeconds: 600
-
-  # Weaviate Config
-  #
-  # The following settings allow you to customize Weaviate to your needs, for
-  # example set authentication and authorization options. See weaviate docs
-  # (https://www.weaviate.io/developers/weaviate/) for all
-  # configuration.
-  authentication:
-    anonymous_access:
-      enabled: false
-    # This configuration allows to add API keys to Weaviate. This configuration allows only
-    # plain text API Keys, if you want to store the API Keys in a Kubernetes secret you can
-    # configure the same configuration with ENV Vars. Read the `env` section below on what
-    # needs to be configured. If using ENV Vars over this make sure to comment out the whole
-    # `apikey` section (as it is by default). ENV Vars has priority over this config.
-    apikey:
-      enabled: true
-      # Any number of allowed API Keys as plain text
-      allowed_keys:
-        - "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
-      # You can either set a single user for all the listed Allowed API keys OR
-      # one user per API Key, i.e. length(apikey.allowed_keys) == length(apikey.users) OR
-      # length(apikey.users) == 1
-      # Only the first user-key pair will be used by `dify.api` and `dify-worker`
-      # NOTE: Make sure the lister Users are added to the Authorization as well.
-      users:
-        - hello@dify.ai
-    oidc:
-      enabled: false
-      # issuer: ''
-      # username_claim: ''
-      # groups_claim: ''
-      # client_id: ''
-
-  authorization:
-    admin_list:
-      enabled: true
-      users:
-      # Examples
-      # - admin_user1
-      # - admin_user2
-      # - api-key-user-admin
-      - hello@dify.ai
-      read_only_users:
-      # Examples
-      # - readonly_user1
-      # - readonly_user2
-      # - api-key-user-readOnly
-
-  query_defaults:
-    limit: 100
-  debug: false
-
-  # Insert any custom environment variables or envSecrets by putting the exact name
-  # and desired value into the settings below. Any env name passed will be automatically
-  # set for the statefulSet.
-  env:
-    CLUSTER_GOSSIP_BIND_PORT: 7000
-    CLUSTER_DATA_BIND_PORT: 7001
-    # The aggressiveness of the Go Garbage Collector. 100 is the default value.
-    GOGC: 100
-
-    # Expose metrics on port 2112 for Prometheus to scrape
-    PROMETHEUS_MONITORING_ENABLED: false
-
-    # Set a MEM limit for the Weaviate Pod so it can help you both increase GC-related
-    # performance as well as avoid GC-related out-of-memory (“OOM”) situations
-    # GOMEMLIMIT: 6GiB
-
-    # Maximum results Weaviate can query with/without pagination
-    # NOTE: Affects performance, do NOT set to a very high value.
-    # The default is 100K
-    QUERY_MAXIMUM_RESULTS: 100000
-
-    # whether to enable vector dimensions tracking metric
-    TRACK_VECTOR_DIMENSIONS: false
-
-    # whether to re-index/-compute the vector dimensions metric (needed if upgrading from weaviate < v1.16.0)
-    REINDEX_VECTOR_DIMENSIONS_AT_STARTUP: false
-
-    ##########################
-    # API Keys with ENV Vars #
-    ##########################
-    # If using ENV Vars to set up API Keys make sure to have `authentication.apikey` block commented out
-    # to avoid any future changes. ENV Vars has priority over the config above `authentication.apikey`.
-    # If using `authentication.apikey `the below ENV Vars will be used because they have priority,
-    # so comment them out to avoid any future changes.
-    # Enables API key authentication. If it is set to 'false' the AUTHENTICATION_APIKEY_ALLOWED_KEYS
-    # and AUTHENTICATION_APIKEY_USERS will not have any effect.
-    # AUTHENTICATION_APIKEY_ENABLED: 'true'
-
-    # List one or more keys, separated by commas. Each key corresponds to a specific user identity below.
-    # If you want to use a kubernetes secret for the API Keys comment out this Variable and use the one in `envSecrets` below
-    # AUTHENTICATION_APIKEY_ALLOWED_KEYS: 'jane-secret-key,ian-secret-key'  (plain text)
-
-    # List one or more user identities, separated by commas. You can have only one User for all the keys or one user per key.
-    # The User/s can be a simple name or an email, no matter if it exists or not.
-    # NOTE: Make sure to add the users to the authorization above overwise they will not be allowed to interact with Weaviate.
-    # AUTHENTICATION_APIKEY_USERS: 'jane@doe.com,ian-smith'
-    AUTHENTICATION_APIKEY_ENABLED: "true"
-    AUTHENTICATION_APIKEY_ALLOWED_KEYS: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
-    AUTHENTICATION_APIKEY_USERS: "hello@dify.ai"
-    AUTHORIZATION_ADMINLIST_ENABLED: "true"
-    AUTHORIZATION_ADMINLIST_USERS: "hello@dify.ai"
-  envSecrets:
-    # create a Kubernetes secret with AUTHENTICATION_APIKEY_ALLOWED_KEYS key and its respective value
-    # AUTHENTICATION_APIKEY_ALLOWED_KEYS: name-of-the-k8s-secret-containing-the-comma-separated-api-keys
-
-  # Configure backup providers
-  backups:
-    # The backup-filesystem module enables creation of the DB backups in
-    # the local filesystem
-    filesystem:
-      enabled: false
-      envconfig:
-        # Configure folder where backups should be saved
-        BACKUP_FILESYSTEM_PATH: /tmp/backups
-
-    s3:
-      enabled: false
-      # If one is using AWS EKS and has already configured K8s Service Account
-      # that holds the AWS credentials one can pass a name of that service account
-      # here using this setting.
-      # NOTE: the root `serviceAccountName` config has priority over this one, and
-      # if the root one is set this one will NOT overwrite it. This one is here for
-      # backwards compatibility.
-      serviceAccountName:
-
-      envconfig:
-        # Configure bucket where backups should be saved, this setting is mandatory
-        BACKUP_S3_BUCKET: weaviate-backups
-
-        # Optional setting. Defaults to empty string.
-        # Set this option if you want to save backups to a given location
-        # inside the bucket
-        # BACKUP_S3_PATH: path/inside/bucket
-
-        # Optional setting. Defaults to AWS S3 (s3.amazonaws.com).
-        # Set this option if you have a MinIO storage configured in your environment
-        # and want to use it instead of the AWS S3.
-        # BACKUP_S3_ENDPOINT: custom.minio.endpoint.address
-
-        # Optional setting. Defaults to true.
-        # Set this option if you don't want to use SSL.
-        # BACKUP_S3_USE_SSL: true
-
-        # You can pass environment AWS settings here:
-        # Define the region
-        # AWS_REGION: eu-west-1
-
-      # For Weaviate to be able to create bucket objects it needs a user credentials to authenticate to AWS.
-      # The User must have permissions to read/create/delete bucket objects.
-      # You can pass the User credentials (access-key id and access-secret-key) in 2 ways:
-      # 1. by setting the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY plain values in the `secrets` section below
-      #     this chart will create a kubernetes secret for you with these key-values pairs
-      # 2. create Kubernetes secret/s with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY  keys and their respective values
-      #     Set the Key and the secret where it is set in `envSecrets` section below
-      secrets: {}
-      #   AWS_ACCESS_KEY_ID: access-key-id (plain text)
-      #   AWS_SECRET_ACCESS_KEY: secret-access-key (plain text)
-
-      # If one has already defined secrets with AWS credentials one can pass them using
-      # this setting:
-      envSecrets: {}
-      #   AWS_ACCESS_KEY_ID: name-of-the-k8s-secret-containing-the-key-id
-      #   AWS_SECRET_ACCESS_KEY: name-of-the-k8s-secret-containing-the-key
-
-    gcs:
-      enabled: false
-      envconfig:
-        # Configure bucket where backups should be saved, this setting is mandatory
-        BACKUP_GCS_BUCKET: weaviate-backups
-
-        # Optional setting. Defaults to empty string.
-        # Set this option if you want to save backups to a given location
-        # inside the bucket
-        # BACKUP_GCS_PATH: path/inside/bucket
-
-        # You can pass environment Google settings here:
-        # Define the project
-        # GOOGLE_CLOUD_PROJECT: project-id
-
-      # For Weaviate to be able to create bucket objects it needs a ServiceAccount credentials to authenticate to GCP.
-      # The ServiceAccount must have permissions to read/create/delete bucket objects.
-      # You can pass the ServiceAccount credentials (as JSON) in 2 ways:
-      # 1. by setting the GOOGLE_APPLICATION_CREDENTIALS json as plain text in the `secrets` section below
-      #     this chart will create a kubernetes secret for you with this key-values pairs
-      # 2. create a Kubernetes secret with GOOGLE_APPLICATION_CREDENTIALS key and its respective value
-      #     Set the Key and the secret where it is set in `envSecrets` section below
-      secrets: {}
-      #   GOOGLE_APPLICATION_CREDENTIALS: credentials-json-string (plain text)
-
-      # If one has already defined a secret with GOOGLE_APPLICATION_CREDENTIALS one can pass them using
-      # this setting:
-      envSecrets: {}
-      #   GOOGLE_APPLICATION_CREDENTIALS: name-of-the-k8s-secret-containing-the-key
-
-    azure:
-      enabled: false
-      envconfig:
-        # Configure container where backups should be saved, this setting is mandatory
-        BACKUP_AZURE_CONTAINER: weaviate-backups
-
-        # Optional setting. Defaults to empty string.
-        # Set this option if you want to save backups to a given location
-        # inside the container
-        # BACKUP_AZURE_PATH: path/inside/container
-
-      # For Weaviate to be able to create container objects it needs a user credentials to authenticate to Azure Storage.
-      # The User must have permissions to read/create/delete container objects.
-      # You can pass the User credentials (account-name id and account-key or connection-string) in 2 ways:
-      # 1. by setting the AZURE_STORAGE_ACCOUNT and AZURE_STORAGE_KEY
-      #     or AZURE_STORAGE_CONNECTION_STRING plain values in the `secrets` section below
-      #     this chart will create a kubernetes secret for you with these key-values pairs
-      # 2. create Kubernetes secret/s with AZURE_STORAGE_ACCOUNT and AZURE_STORAGE_KEY
-      #     or AZURE_STORAGE_CONNECTION_STRING and their respective values
-      #     Set the Key and the secret where it is set in `envSecrets` section below
-      secrets: {}
-      #   AZURE_STORAGE_ACCOUNT: account-name (plain text)
-      #   AZURE_STORAGE_KEY: account-key (plain text)
-      #   AZURE_STORAGE_CONNECTION_STRING: connection-string (plain text)
-
-      # If one has already defined secrets with Azure Storage credentials one can pass them using
-      # this setting:
-      envSecrets: {}
-      #   AZURE_STORAGE_ACCOUNT: name-of-the-k8s-secret-containing-the-account-name
-      #   AZURE_STORAGE_KEY: name-of-the-k8s-secret-containing-account-key
-      #   AZURE_STORAGE_CONNECTION_STRING: name-of-the-k8s-secret-containing-connection-string
-
-  # modules are extensions to Weaviate, they can be used to support various
-  # ML-models, but also other features unrelated to model inference.
-  # An inference/vectorizer module is not required, you can also run without any
-  # modules and import your own vectors.
-  modules:
-    # by choosing the default vectorizer module, you can tell Weaviate to always
-    # use this module as the vectorizer if nothing else is specified. Can be
-    # overwritten on a per-class basis.
-    # set to text2vec-transformers if running with transformers instead
-    default_vectorizer_module: none
-
-  # It is also possible to configure authentication and authorization through a
-  # custom configmap The authorization and authentication values defined in
-  # values.yaml will be ignored when defining a custom config map.
-  custom_config_map:
-    enabled: false
-    name: "custom-config"
-
-  # Pass any annotations to Weaviate pods
-  annotations:
-
-  nodeSelector:
-
-  tolerations:
-
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            topologyKey: "kubernetes.io/hostname"
-            labelSelector:
-              matchExpressions:
-                - key: "app"
-                  operator: In
-                  values:
-                    - weaviate
+  enabled: false
 
 service:
   type: ClusterIP
@@ -1161,55 +772,6 @@ service:
 
 ingress:
   enabled: false
-  className: ""
-  annotations:
-    {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-    # nginx.ingress.kubernetes.io/backend-protocol: HTTP
-    # nginx.ingress.kubernetes.io/proxy-body-size: 15m
-    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
-  hosts:
-    - host: dify-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-    # - host: dify-example2.local
-    #   paths:
-    #     - path: /
-    #       pathType: Prefix
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - dify-example.local
-
-resources:
-  {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
-# Global node selector
-# If set, this will apply to all dify components
-# Individual components can be set to a different node selector
-nodeSelector: {}
-
-# Global tolerations
-# If set, this will apply to all dify components
-# Individual components can be set to a different tolerations
-tolerations: []
-
-# Global affinity
-# If set, this will apply to all dify components
-# Individual components can be set to a different affinity
-affinity: {}
 
 redis:
   enabled: true
@@ -1328,7 +890,7 @@ redis:
 
   ## @param architecture Redis&reg; architecture. Allowed values: `standalone` or `replication`
   ##
-  architecture: replication
+  architecture: standalone
   ## Redis&reg; Authentication parameters
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/redis#setting-the-server-password-on-first-run
   ##
@@ -1342,11 +904,11 @@ redis:
     ## @param auth.password Redis&reg; password
     ## Defaults to a random 10-character alphanumeric string if not set
     ##
-    password: "difyai123456"
+    password:
     ## @param auth.existingSecret The name of an existing secret with Redis&reg; credentials
     ## NOTE: When it's set, the previous `auth.password` parameter is ignored
     ##
-    existingSecret: ""
+    existingSecret: "redis-secret"
     ## @param auth.existingSecretPasswordKey Password key to be retrieved from existing secret
     ## NOTE: ignored unless `auth.existingSecret` parameter is set
     ##
@@ -1633,7 +1195,7 @@ redis:
     persistence:
       ## @param master.persistence.enabled Enable persistence on Redis&reg; master nodes using Persistent Volume Claims
       ##
-      enabled: true
+      enabled: false
       ## @param master.persistence.medium Provide a medium for `emptyDir` volumes.
       ##
       medium: ""
@@ -1768,727 +1330,6 @@ redis:
       ##
       annotations: {}
 
-  ## @section Redis&reg; replicas configuration parameters
-  ##
-
-  replica:
-    ## @param replica.replicaCount Number of Redis&reg; replicas to deploy
-    ##
-    replicaCount: 3
-    ## @param replica.configuration Configuration for Redis&reg; replicas nodes
-    ## ref: https://redis.io/topics/config
-    ##
-    configuration: ""
-    ## @param replica.disableCommands Array with Redis&reg; commands to disable on replicas nodes
-    ## Commands will be completely disabled by renaming each to an empty string.
-    ## ref: https://redis.io/topics/security#disabling-of-specific-commands
-    ##
-    disableCommands:
-      - FLUSHDB
-      - FLUSHALL
-    ## @param replica.command Override default container command (useful when using custom images)
-    ##
-    command: []
-    ## @param replica.args Override default container args (useful when using custom images)
-    ##
-    args: []
-    ## @param replica.preExecCmds Additional commands to run prior to starting Redis&reg; replicas
-    ##
-    preExecCmds: []
-    ## @param replica.extraFlags Array with additional command line flags for Redis&reg; replicas
-    ## e.g:
-    ## extraFlags:
-    ##  - "--maxmemory-policy volatile-ttl"
-    ##  - "--repl-backlog-size 1024mb"
-    ##
-    extraFlags: []
-    ## @param replica.extraEnvVars Array with extra environment variables to add to Redis&reg; replicas nodes
-    ## e.g:
-    ## extraEnvVars:
-    ##   - name: FOO
-    ##     value: "bar"
-    ##
-    extraEnvVars: []
-    ## @param replica.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for Redis&reg; replicas nodes
-    ##
-    extraEnvVarsCM: ""
-    ## @param replica.extraEnvVarsSecret Name of existing Secret containing extra env vars for Redis&reg; replicas nodes
-    ##
-    extraEnvVarsSecret: ""
-    ## @param replica.externalMaster.enabled Use external master for bootstrapping
-    ## @param replica.externalMaster.host External master host to bootstrap from
-    ## @param replica.externalMaster.port Port for Redis service external master host
-    ##
-    externalMaster:
-      enabled: false
-      host: ""
-      port: 6379
-    ## @param replica.containerPorts.redis Container port to open on Redis&reg; replicas nodes
-    ##
-    containerPorts:
-      redis: 6379
-    ## Configure extra options for Redis&reg; containers' liveness and readiness probes
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
-    ## @param replica.startupProbe.enabled Enable startupProbe on Redis&reg; replicas nodes
-    ## @param replica.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
-    ## @param replica.startupProbe.periodSeconds Period seconds for startupProbe
-    ## @param replica.startupProbe.timeoutSeconds Timeout seconds for startupProbe
-    ## @param replica.startupProbe.failureThreshold Failure threshold for startupProbe
-    ## @param replica.startupProbe.successThreshold Success threshold for startupProbe
-    ##
-    startupProbe:
-      enabled: true
-      initialDelaySeconds: 10
-      periodSeconds: 10
-      timeoutSeconds: 5
-      successThreshold: 1
-      failureThreshold: 22
-    ## @param replica.livenessProbe.enabled Enable livenessProbe on Redis&reg; replicas nodes
-    ## @param replica.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
-    ## @param replica.livenessProbe.periodSeconds Period seconds for livenessProbe
-    ## @param replica.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
-    ## @param replica.livenessProbe.failureThreshold Failure threshold for livenessProbe
-    ## @param replica.livenessProbe.successThreshold Success threshold for livenessProbe
-    ##
-    livenessProbe:
-      enabled: true
-      initialDelaySeconds: 20
-      periodSeconds: 5
-      timeoutSeconds: 5
-      successThreshold: 1
-      failureThreshold: 5
-    ## @param replica.readinessProbe.enabled Enable readinessProbe on Redis&reg; replicas nodes
-    ## @param replica.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
-    ## @param replica.readinessProbe.periodSeconds Period seconds for readinessProbe
-    ## @param replica.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
-    ## @param replica.readinessProbe.failureThreshold Failure threshold for readinessProbe
-    ## @param replica.readinessProbe.successThreshold Success threshold for readinessProbe
-    ##
-    readinessProbe:
-      enabled: true
-      initialDelaySeconds: 20
-      periodSeconds: 5
-      timeoutSeconds: 1
-      successThreshold: 1
-      failureThreshold: 5
-    ## @param replica.customStartupProbe Custom startupProbe that overrides the default one
-    ##
-    customStartupProbe: {}
-    ## @param replica.customLivenessProbe Custom livenessProbe that overrides the default one
-    ##
-    customLivenessProbe: {}
-    ## @param replica.customReadinessProbe Custom readinessProbe that overrides the default one
-    ##
-    customReadinessProbe: {}
-    ## Redis&reg; replicas resource requests and limits
-    ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
-    ## @param replica.resources.limits The resources limits for the Redis&reg; replicas containers
-    ## @param replica.resources.requests The requested resources for the Redis&reg; replicas containers
-    ##
-    resources:
-      # We usually recommend not to specify default resources and to leave this as a conscious
-      # choice for the user. This also increases chances charts run on environments with little
-      # resources, such as Minikube. If you do want to specify resources, uncomment the following
-      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-      limits: {}
-      #   cpu: 250m
-      #   memory: 256Mi
-      requests: {}
-      #   cpu: 250m
-      #   memory: 256Mi
-    ## Configure Pods Security Context
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
-    ## @param replica.podSecurityContext.enabled Enabled Redis&reg; replicas pods' Security Context
-    ## @param replica.podSecurityContext.fsGroup Set Redis&reg; replicas pod's Security Context fsGroup
-    ##
-    podSecurityContext:
-      enabled: true
-      fsGroup: 1001
-    ## Configure Container Security Context
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
-    ## @param replica.containerSecurityContext.enabled Enabled Redis&reg; replicas containers' Security Context
-    ## @param replica.containerSecurityContext.runAsUser Set Redis&reg; replicas containers' Security Context runAsUser
-    ##
-    containerSecurityContext:
-      enabled: true
-      runAsUser: 1001
-    ## @param replica.schedulerName Alternate scheduler for Redis&reg; replicas pods
-    ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
-    ##
-    schedulerName: ""
-    ## @param replica.updateStrategy.type Redis&reg; replicas statefulset strategy type
-    ## @skip replica.updateStrategy.rollingUpdate
-    ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
-    ##
-    updateStrategy:
-      ## StrategyType
-      ## Can be set to RollingUpdate, OnDelete (statefulset), Recreate (deployment)
-      ##
-      type: RollingUpdate
-    ## @param replica.minReadySeconds How many seconds a pod needs to be ready before killing the next, during update
-    ##
-    minReadySeconds: 0
-    ## @param replica.priorityClassName Redis&reg; replicas pods' priorityClassName
-    ##
-    priorityClassName: ""
-    ## @param replica.podManagementPolicy podManagementPolicy to manage scaling operation of %%MAIN_CONTAINER_NAME%% pods
-    ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-management-policies
-    ##
-    podManagementPolicy: ""
-    ## @param replica.hostAliases Redis&reg; replicas pods host aliases
-    ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
-    ##
-    hostAliases: []
-    ## @param replica.podLabels Extra labels for Redis&reg; replicas pods
-    ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-    ##
-    podLabels: {}
-    ## @param replica.podAnnotations Annotations for Redis&reg; replicas pods
-    ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-    ##
-    podAnnotations: {}
-    ## @param replica.shareProcessNamespace Share a single process namespace between all of the containers in Redis&reg; replicas pods
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
-    ##
-    shareProcessNamespace: false
-    ## @param replica.podAffinityPreset Pod affinity preset. Ignored if `replica.affinity` is set. Allowed values: `soft` or `hard`
-    ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
-    ##
-    podAffinityPreset: ""
-    ## @param replica.podAntiAffinityPreset Pod anti-affinity preset. Ignored if `replica.affinity` is set. Allowed values: `soft` or `hard`
-    ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
-    ##
-    podAntiAffinityPreset: soft
-    ## Node affinity preset
-    ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
-    ##
-    nodeAffinityPreset:
-      ## @param replica.nodeAffinityPreset.type Node affinity preset type. Ignored if `replica.affinity` is set. Allowed values: `soft` or `hard`
-      ##
-      type: ""
-      ## @param replica.nodeAffinityPreset.key Node label key to match. Ignored if `replica.affinity` is set
-      ##
-      key: ""
-      ## @param replica.nodeAffinityPreset.values Node label values to match. Ignored if `replica.affinity` is set
-      ## E.g.
-      ## values:
-      ##   - e2e-az1
-      ##   - e2e-az2
-      ##
-      values: []
-    ## @param replica.affinity Affinity for Redis&reg; replicas pods assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-    ## NOTE: `replica.podAffinityPreset`, `replica.podAntiAffinityPreset`, and `replica.nodeAffinityPreset` will be ignored when it's set
-    ##
-    affinity: {}
-    ## @param replica.nodeSelector Node labels for Redis&reg; replicas pods assignment
-    ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-    ##
-    nodeSelector: {}
-    ## @param replica.tolerations Tolerations for Redis&reg; replicas pods assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-    ##
-    tolerations: []
-    ## @param replica.topologySpreadConstraints Spread Constraints for Redis&reg; replicas pod assignment
-    ## ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
-    ## E.g.
-    ## topologySpreadConstraints:
-    ##   - maxSkew: 1
-    ##     topologyKey: node
-    ##     whenUnsatisfiable: DoNotSchedule
-    ##
-    topologySpreadConstraints: []
-    ## @param replica.dnsPolicy DNS Policy for Redis&reg; replica pods
-    ## ref: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/
-    ## E.g.
-    ## dnsPolicy: ClusterFirst
-    ##
-    dnsPolicy: ""
-    ## @param replica.dnsConfig DNS Configuration for Redis&reg; replica pods
-    ## ref: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/
-    ## E.g.
-    ## dnsConfig:
-    ##   options:
-    ##   - name: ndots
-    ##     value: "4"
-    ##   - name: single-request-reopen
-    ##
-    dnsConfig: {}
-    ## @param replica.lifecycleHooks for the Redis&reg; replica container(s) to automate configuration before or after startup
-    ##
-    lifecycleHooks: {}
-    ## @param replica.extraVolumes Optionally specify extra list of additional volumes for the Redis&reg; replicas pod(s)
-    ##
-    extraVolumes: []
-    ## @param replica.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis&reg; replicas container(s)
-    ##
-    extraVolumeMounts: []
-    ## @param replica.sidecars Add additional sidecar containers to the Redis&reg; replicas pod(s)
-    ## e.g:
-    ## sidecars:
-    ##   - name: your-image-name
-    ##     image: your-image
-    ##     imagePullPolicy: Always
-    ##     ports:
-    ##       - name: portname
-    ##         containerPort: 1234
-    ##
-    sidecars: []
-    ## @param replica.initContainers Add additional init containers to the Redis&reg; replicas pod(s)
-    ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
-    ## e.g:
-    ## initContainers:
-    ##  - name: your-image-name
-    ##    image: your-image
-    ##    imagePullPolicy: Always
-    ##    command: ['sh', '-c', 'echo "hello world"']
-    ##
-    initContainers: []
-    ## Persistence Parameters
-    ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
-    ##
-    persistence:
-      ## @param replica.persistence.enabled Enable persistence on Redis&reg; replicas nodes using Persistent Volume Claims
-      ##
-      enabled: true
-      ## @param replica.persistence.medium Provide a medium for `emptyDir` volumes.
-      ##
-      medium: ""
-      ## @param replica.persistence.sizeLimit Set this to enable a size limit for `emptyDir` volumes.
-      ##
-      sizeLimit: ""
-      ##  @param replica.persistence.path The path the volume will be mounted at on Redis&reg; replicas containers
-      ## NOTE: Useful when using different Redis&reg; images
-      ##
-      path: /data
-      ## @param replica.persistence.subPath The subdirectory of the volume to mount on Redis&reg; replicas containers
-      ## NOTE: Useful in dev environments
-      ##
-      subPath: ""
-      ## @param replica.persistence.subPathExpr Used to construct the subPath subdirectory of the volume to mount on Redis&reg; replicas containers
-      ##
-      subPathExpr: ""
-      ## @param replica.persistence.storageClass Persistent Volume storage class
-      ## If defined, storageClassName: <storageClass>
-      ## If set to "-", storageClassName: "", which disables dynamic provisioning
-      ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
-      ##
-      storageClass: ""
-      ## @param replica.persistence.accessModes Persistent Volume access modes
-      ##
-      accessModes:
-        - ReadWriteOnce
-      ## @param replica.persistence.size Persistent Volume size
-      ##
-      size: 8Gi
-      ## @param replica.persistence.annotations Additional custom annotations for the PVC
-      ##
-      annotations: {}
-      ## @param replica.persistence.labels Additional custom labels for the PVC
-      ##
-      labels: {}
-      ## @param replica.persistence.selector Additional labels to match for the PVC
-      ## e.g:
-      ## selector:
-      ##   matchLabels:
-      ##     app: my-app
-      ##
-      selector: {}
-      ## @param replica.persistence.dataSource Custom PVC data source
-      ##
-      dataSource: {}
-      ## @param replica.persistence.existingClaim Use a existing PVC which must be created manually before bound
-      ## NOTE: requires replica.persistence.enabled: true
-      ##
-      existingClaim: ""
-    ## Redis&reg; replicas service parameters
-    ##
-    service:
-      ## @param replica.service.type Redis&reg; replicas service type
-      ##
-      type: ClusterIP
-      ## @param replica.service.ports.redis Redis&reg; replicas service port
-      ##
-      ports:
-        redis: 6379
-      ## @param replica.service.nodePorts.redis Node port for Redis&reg; replicas
-      ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
-      ## NOTE: choose port between <30000-32767>
-      ##
-      nodePorts:
-        redis: ""
-      ## @param replica.service.externalTrafficPolicy Redis&reg; replicas service external traffic policy
-      ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
-      ##
-      externalTrafficPolicy: Cluster
-      ## @param replica.service.internalTrafficPolicy Redis&reg; replicas service internal traffic policy (requires Kubernetes v1.22 or greater to be usable)
-      ## ref: https://kubernetes.io/docs/concepts/services-networking/service-traffic-policy/
-      ##
-      internalTrafficPolicy: Cluster
-      ## @param replica.service.extraPorts Extra ports to expose (normally used with the `sidecar` value)
-      ##
-      extraPorts: []
-      ## @param replica.service.clusterIP Redis&reg; replicas service Cluster IP
-      ##
-      clusterIP: ""
-      ## @param replica.service.loadBalancerIP Redis&reg; replicas service Load Balancer IP
-      ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
-      ##
-      loadBalancerIP: ""
-      ## @param replica.service.loadBalancerSourceRanges Redis&reg; replicas service Load Balancer sources
-      ## https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
-      ## e.g.
-      ## loadBalancerSourceRanges:
-      ##   - 10.10.10.0/24
-      ##
-      loadBalancerSourceRanges: []
-      ## @param replica.service.annotations Additional custom annotations for Redis&reg; replicas service
-      ##
-      annotations: {}
-      ## @param replica.service.sessionAffinity Session Affinity for Kubernetes service, can be "None" or "ClientIP"
-      ## If "ClientIP", consecutive client requests will be directed to the same Pod
-      ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
-      ##
-      sessionAffinity: None
-      ## @param replica.service.sessionAffinityConfig Additional settings for the sessionAffinity
-      ## sessionAffinityConfig:
-      ##   clientIP:
-      ##     timeoutSeconds: 300
-      ##
-      sessionAffinityConfig: {}
-    ## @param replica.terminationGracePeriodSeconds Integer setting the termination grace period for the redis-replicas pods
-    ##
-    terminationGracePeriodSeconds: 30
-    ## Autoscaling configuration
-    ##
-    autoscaling:
-      ## @param replica.autoscaling.enabled Enable replica autoscaling settings
-      ##
-      enabled: false
-      ## @param replica.autoscaling.minReplicas Minimum replicas for the pod autoscaling
-      ##
-      minReplicas: 1
-      ## @param replica.autoscaling.maxReplicas Maximum replicas for the pod autoscaling
-      ##
-      maxReplicas: 11
-      ## @param replica.autoscaling.targetCPU Percentage of CPU to consider when autoscaling
-      ##
-      targetCPU: ""
-      ## @param replica.autoscaling.targetMemory Percentage of Memory to consider when autoscaling
-      ##
-      targetMemory: ""
-    ## ServiceAccount configuration
-    ##
-    serviceAccount:
-      ## @param replica.serviceAccount.create Specifies whether a ServiceAccount should be created
-      ##
-      create: false
-      ## @param replica.serviceAccount.name The name of the ServiceAccount to use.
-      ## If not set and create is true, a name is generated using the common.names.fullname template
-      ##
-      name: ""
-      ## @param replica.serviceAccount.automountServiceAccountToken Whether to auto mount the service account token
-      ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#use-the-default-service-account-to-access-the-api-server
-      ##
-      automountServiceAccountToken: true
-      ## @param replica.serviceAccount.annotations Additional custom annotations for the ServiceAccount
-      ##
-      annotations: {}
-  ## @section Redis&reg; Sentinel configuration parameters
-  ##
-
-  sentinel:
-    ## @param sentinel.enabled Use Redis&reg; Sentinel on Redis&reg; pods.
-    ## IMPORTANT: this will disable the master and replicas services and
-    ## create a single Redis&reg; service exposing both the Redis and Sentinel ports
-    ##
-    enabled: false
-    ## Bitnami Redis&reg; Sentinel image version
-    ## ref: https://hub.docker.com/r/bitnami/redis-sentinel/tags/
-    ## @param sentinel.image.registry Redis&reg; Sentinel image registry
-    ## @param sentinel.image.repository Redis&reg; Sentinel image repository
-    ## @param sentinel.image.tag Redis&reg; Sentinel image tag (immutable tags are recommended)
-    ## @param sentinel.image.digest Redis&reg; Sentinel image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag
-    ## @param sentinel.image.pullPolicy Redis&reg; Sentinel image pull policy
-    ## @param sentinel.image.pullSecrets Redis&reg; Sentinel image pull secrets
-    ## @param sentinel.image.debug Enable image debug mode
-    ##
-    image:
-      registry: docker.io
-      repository: bitnami/redis-sentinel
-      tag: 7.0.11-debian-11-r10
-      digest: ""
-      ## Specify a imagePullPolicy
-      ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
-      ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
-      ##
-      pullPolicy: IfNotPresent
-      ## Optionally specify an array of imagePullSecrets.
-      ## Secrets must be manually created in the namespace.
-      ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-      ## e.g:
-      ## pullSecrets:
-      ##   - myRegistryKeySecretName
-      ##
-      pullSecrets: []
-      ## Enable debug mode
-      ##
-      debug: false
-    ## @param sentinel.annotations Additional custom annotations for Redis&reg; Sentinel resource
-    ##
-    annotations: {}
-    ## @param sentinel.masterSet Master set name
-    ##
-    masterSet: mymaster
-    ## @param sentinel.quorum Sentinel Quorum
-    ##
-    quorum: 2
-    ## @param sentinel.getMasterTimeout Amount of time to allow before get_sentinel_master_info() times out.
-    ## NOTE: This is directly related to the startupProbes which are configured to run every 10 seconds for a total of 22 failures. If adjusting this value, also adjust the startupProbes.
-    ##
-    getMasterTimeout: 220
-    ## @param sentinel.automateClusterRecovery Automate cluster recovery in cases where the last replica is not considered a good replica and Sentinel won't automatically failover to it.
-    ## This also prevents any new replica from starting until the last remaining replica is elected as master to guarantee that it is the one to be elected by Sentinel, and not a newly started replica with no data.
-    ## NOTE: This feature requires a "downAfterMilliseconds" value less or equal to 2000.
-    ##
-    automateClusterRecovery: false
-    ## @param sentinel.redisShutdownWaitFailover Whether the Redis&reg; master container waits for the failover at shutdown (in addition to the Redis&reg; Sentinel container).
-    ##
-    redisShutdownWaitFailover: true
-    ## Sentinel timing restrictions
-    ## @param sentinel.downAfterMilliseconds Timeout for detecting a Redis&reg; node is down
-    ## @param sentinel.failoverTimeout Timeout for performing a election failover
-    ##
-    downAfterMilliseconds: 60000
-    failoverTimeout: 180000
-    ## @param sentinel.parallelSyncs Number of replicas that can be reconfigured in parallel to use the new master after a failover
-    ##
-    parallelSyncs: 1
-    ## @param sentinel.configuration Configuration for Redis&reg; Sentinel nodes
-    ## ref: https://redis.io/topics/sentinel
-    ##
-    configuration: ""
-    ## @param sentinel.command Override default container command (useful when using custom images)
-    ##
-    command: []
-    ## @param sentinel.args Override default container args (useful when using custom images)
-    ##
-    args: []
-    ## @param sentinel.preExecCmds Additional commands to run prior to starting Redis&reg; Sentinel
-    ##
-    preExecCmds: []
-    ## @param sentinel.extraEnvVars Array with extra environment variables to add to Redis&reg; Sentinel nodes
-    ## e.g:
-    ## extraEnvVars:
-    ##   - name: FOO
-    ##     value: "bar"
-    ##
-    extraEnvVars: []
-    ## @param sentinel.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for Redis&reg; Sentinel nodes
-    ##
-    extraEnvVarsCM: ""
-    ## @param sentinel.extraEnvVarsSecret Name of existing Secret containing extra env vars for Redis&reg; Sentinel nodes
-    ##
-    extraEnvVarsSecret: ""
-    ## @param sentinel.externalMaster.enabled Use external master for bootstrapping
-    ## @param sentinel.externalMaster.host External master host to bootstrap from
-    ## @param sentinel.externalMaster.port Port for Redis service external master host
-    ##
-    externalMaster:
-      enabled: false
-      host: ""
-      port: 6379
-    ## @param sentinel.containerPorts.sentinel Container port to open on Redis&reg; Sentinel nodes
-    ##
-    containerPorts:
-      sentinel: 26379
-    ## Configure extra options for Redis&reg; containers' liveness and readiness probes
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
-    ## @param sentinel.startupProbe.enabled Enable startupProbe on Redis&reg; Sentinel nodes
-    ## @param sentinel.startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
-    ## @param sentinel.startupProbe.periodSeconds Period seconds for startupProbe
-    ## @param sentinel.startupProbe.timeoutSeconds Timeout seconds for startupProbe
-    ## @param sentinel.startupProbe.failureThreshold Failure threshold for startupProbe
-    ## @param sentinel.startupProbe.successThreshold Success threshold for startupProbe
-    ##
-    startupProbe:
-      enabled: true
-      initialDelaySeconds: 10
-      periodSeconds: 10
-      timeoutSeconds: 5
-      successThreshold: 1
-      failureThreshold: 22
-    ## @param sentinel.livenessProbe.enabled Enable livenessProbe on Redis&reg; Sentinel nodes
-    ## @param sentinel.livenessProbe.initialDelaySeconds Initial delay seconds for livenessProbe
-    ## @param sentinel.livenessProbe.periodSeconds Period seconds for livenessProbe
-    ## @param sentinel.livenessProbe.timeoutSeconds Timeout seconds for livenessProbe
-    ## @param sentinel.livenessProbe.failureThreshold Failure threshold for livenessProbe
-    ## @param sentinel.livenessProbe.successThreshold Success threshold for livenessProbe
-    ##
-    livenessProbe:
-      enabled: true
-      initialDelaySeconds: 20
-      periodSeconds: 10
-      timeoutSeconds: 5
-      successThreshold: 1
-      failureThreshold: 6
-    ## @param sentinel.readinessProbe.enabled Enable readinessProbe on Redis&reg; Sentinel nodes
-    ## @param sentinel.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
-    ## @param sentinel.readinessProbe.periodSeconds Period seconds for readinessProbe
-    ## @param sentinel.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
-    ## @param sentinel.readinessProbe.failureThreshold Failure threshold for readinessProbe
-    ## @param sentinel.readinessProbe.successThreshold Success threshold for readinessProbe
-    ##
-    readinessProbe:
-      enabled: true
-      initialDelaySeconds: 20
-      periodSeconds: 5
-      timeoutSeconds: 1
-      successThreshold: 1
-      failureThreshold: 6
-    ## @param sentinel.customStartupProbe Custom startupProbe that overrides the default one
-    ##
-    customStartupProbe: {}
-    ## @param sentinel.customLivenessProbe Custom livenessProbe that overrides the default one
-    ##
-    customLivenessProbe: {}
-    ## @param sentinel.customReadinessProbe Custom readinessProbe that overrides the default one
-    ##
-    customReadinessProbe: {}
-    ## Persistence parameters
-    ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
-    ##
-    persistence:
-      ## @param sentinel.persistence.enabled Enable persistence on Redis&reg; sentinel nodes using Persistent Volume Claims (Experimental)
-      ##
-      enabled: false
-      ## @param sentinel.persistence.storageClass Persistent Volume storage class
-      ## If defined, storageClassName: <storageClass>
-      ## If set to "-", storageClassName: "", which disables dynamic provisioning
-      ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
-      ##
-      storageClass: ""
-      ## @param sentinel.persistence.accessModes Persistent Volume access modes
-      ##
-      accessModes:
-        - ReadWriteOnce
-      ## @param sentinel.persistence.size Persistent Volume size
-      ##
-      size: 100Mi
-      ## @param sentinel.persistence.annotations Additional custom annotations for the PVC
-      ##
-      annotations: {}
-      ## @param sentinel.persistence.labels Additional custom labels for the PVC
-      ##
-      labels: {}
-      ## @param sentinel.persistence.selector Additional labels to match for the PVC
-      ## e.g:
-      ## selector:
-      ##   matchLabels:
-      ##     app: my-app
-      ##
-      selector: {}
-      ## @param sentinel.persistence.dataSource Custom PVC data source
-      ##
-      dataSource: {}
-      ## @param sentinel.persistence.medium Provide a medium for `emptyDir` volumes.
-      ##
-      medium: ""
-      ## @param sentinel.persistence.sizeLimit Set this to enable a size limit for `emptyDir` volumes.
-      ##
-      sizeLimit: ""
-    ## Redis&reg; Sentinel resource requests and limits
-    ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
-    ## @param sentinel.resources.limits The resources limits for the Redis&reg; Sentinel containers
-    ## @param sentinel.resources.requests The requested resources for the Redis&reg; Sentinel containers
-    ##
-    resources:
-      limits: {}
-      requests: {}
-    ## Configure Container Security Context
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
-    ## @param sentinel.containerSecurityContext.enabled Enabled Redis&reg; Sentinel containers' Security Context
-    ## @param sentinel.containerSecurityContext.runAsUser Set Redis&reg; Sentinel containers' Security Context runAsUser
-    ##
-    containerSecurityContext:
-      enabled: true
-      runAsUser: 1001
-    ## @param sentinel.lifecycleHooks for the Redis&reg; sentinel container(s) to automate configuration before or after startup
-    ##
-    lifecycleHooks: {}
-    ## @param sentinel.extraVolumes Optionally specify extra list of additional volumes for the Redis&reg; Sentinel
-    ##
-    extraVolumes: []
-    ## @param sentinel.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis&reg; Sentinel container(s)
-    ##
-    extraVolumeMounts: []
-    ## Redis&reg; Sentinel service parameters
-    ##
-    service:
-      ## @param sentinel.service.type Redis&reg; Sentinel service type
-      ##
-      type: ClusterIP
-      ## @param sentinel.service.ports.redis Redis&reg; service port for Redis&reg;
-      ## @param sentinel.service.ports.sentinel Redis&reg; service port for Redis&reg; Sentinel
-      ##
-      ports:
-        redis: 6379
-        sentinel: 26379
-      ## @param sentinel.service.nodePorts.redis Node port for Redis&reg;
-      ## @param sentinel.service.nodePorts.sentinel Node port for Sentinel
-      ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
-      ## NOTE: choose port between <30000-32767>
-      ## NOTE: By leaving these values blank, they will be generated by ports-configmap
-      ##       If setting manually, please leave at least replica.replicaCount + 1 in between sentinel.service.nodePorts.redis and sentinel.service.nodePorts.sentinel to take into account the ports that will be created while incrementing that base port
-      ##
-      nodePorts:
-        redis: ""
-        sentinel: ""
-      ## @param sentinel.service.externalTrafficPolicy Redis&reg; Sentinel service external traffic policy
-      ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
-      ##
-      externalTrafficPolicy: Cluster
-      ## @param sentinel.service.extraPorts Extra ports to expose (normally used with the `sidecar` value)
-      ##
-      extraPorts: []
-      ## @param sentinel.service.clusterIP Redis&reg; Sentinel service Cluster IP
-      ##
-      clusterIP: ""
-      ## @param sentinel.service.loadBalancerIP Redis&reg; Sentinel service Load Balancer IP
-      ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
-      ##
-      loadBalancerIP: ""
-      ## @param sentinel.service.loadBalancerSourceRanges Redis&reg; Sentinel service Load Balancer sources
-      ## https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
-      ## e.g.
-      ## loadBalancerSourceRanges:
-      ##   - 10.10.10.0/24
-      ##
-      loadBalancerSourceRanges: []
-      ## @param sentinel.service.annotations Additional custom annotations for Redis&reg; Sentinel service
-      ##
-      annotations: {}
-      ## @param sentinel.service.sessionAffinity Session Affinity for Kubernetes service, can be "None" or "ClientIP"
-      ## If "ClientIP", consecutive client requests will be directed to the same Pod
-      ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
-      ##
-      sessionAffinity: None
-      ## @param sentinel.service.sessionAffinityConfig Additional settings for the sessionAffinity
-      ## sessionAffinityConfig:
-      ##   clientIP:
-      ##     timeoutSeconds: 300
-      ##
-      sessionAffinityConfig: {}
-      ## Headless service properties
-      ##
-      headless:
-        ## @param sentinel.service.headless.annotations Annotations for the headless service.
-        ##
-        annotations: {}
-    ## @param sentinel.terminationGracePeriodSeconds Integer setting the termination grace period for the redis-node pods
-    ##
-    terminationGracePeriodSeconds: 30
-
   ## @section Other Parameters
   ##
 
@@ -2498,61 +1339,6 @@ redis:
   serviceBindings:
     enabled: false
 
-  ## Network Policy configuration
-  ## ref: https://kubernetes.io/docs/concepts/services-networking/network-policies/
-  ##
-  networkPolicy:
-    ## @param networkPolicy.enabled Enable creation of NetworkPolicy resources
-    ##
-    enabled: false
-    ## @param networkPolicy.allowExternal Don't require client label for connections
-    ## When set to false, only pods with the correct client label will have network access to the ports
-    ## Redis&reg; is listening on. When true, Redis&reg; will accept connections from any source
-    ## (with the correct destination port).
-    ##
-    allowExternal: true
-    ## @param networkPolicy.extraIngress Add extra ingress rules to the NetworkPolicy
-    ## e.g:
-    ## extraIngress:
-    ##   - ports:
-    ##       - port: 1234
-    ##     from:
-    ##       - podSelector:
-    ##           - matchLabels:
-    ##               - role: frontend
-    ##       - podSelector:
-    ##           - matchExpressions:
-    ##               - key: role
-    ##                 operator: In
-    ##                 values:
-    ##                   - frontend
-    ##
-    extraIngress: []
-    ## @param networkPolicy.extraEgress Add extra egress rules to the NetworkPolicy
-    ## e.g:
-    ## extraEgress:
-    ##   - ports:
-    ##       - port: 1234
-    ##     to:
-    ##       - podSelector:
-    ##           - matchLabels:
-    ##               - role: frontend
-    ##       - podSelector:
-    ##           - matchExpressions:
-    ##               - key: role
-    ##                 operator: In
-    ##                 values:
-    ##                   - frontend
-    ##
-    extraEgress: []
-    ## @param networkPolicy.ingressNSMatchLabels Labels to match to allow traffic from other namespaces
-    ## @param networkPolicy.ingressNSPodMatchLabels Pod labels to match to allow traffic from other namespaces
-    ##
-    ingressNSMatchLabels: {}
-    ingressNSPodMatchLabels: {}
-  ## PodSecurityPolicy configuration
-  ## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
-  ##
   podSecurityPolicy:
     ## @param podSecurityPolicy.create Whether to create a PodSecurityPolicy. WARNING: PodSecurityPolicy is deprecated in Kubernetes v1.21 or later, unavailable in v1.25 or later
     ##
@@ -3000,228 +1786,12 @@ redis:
     additionalAnnotations: {}
 
 ###################################
-# External postgres
-# - these configs are only used when `externalPostgres.enabled` is true
-###################################
-externalPostgres:
-  enabled: false
-  username: "postgres"
-  password: "difyai123456"
-  address: localhost
-  port: 5432
-  database:
-    api: "dify"
-    pluginDaemon: "dify_plugin"
-  maxOpenConns: 20
-  maxIdleConns: 5
-
-###################################
-# External S3
-# - these configs are only used when `externalS3.enabled` is true
-###################################
-externalS3:
-  enabled: false
-  endpoint: "https://xxx.r2.cloudflarestorage.com"
-  pathStyle: false
-  accessKey: "ak-difyai"
-  secretKey: "sk-difyai"
-  useSSL: false
-  bucketName:
-    # Shared storage for `api` and `worker`
-    api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalS3.enabled` is set to `true`).
-    pluginDaemon:
-  useIAM: false
-  region: "us-east-1"
-
-###################################
-# External Azure Blob Storage
-# - these configs are only used when `externalS3.enabled` is false and `externalAzureBlobStorage.enabled` is true
-###################################
-externalAzureBlobStorage:
-  enabled: false
-  url: "https://<your_account_name>.blob.core.windows.net"
-  account: "https://xxx.r2.cloudflarestorage.com"
-  key: "difyai"
-  container: "difyai-container"
-
-###################################
-# External OSS
-# - these configs are only used when both `externalS3.enabled` and `externalAzureBlobStorage.enabled` are false and `externalOSS.enabled` is true
-###################################
-externalOSS:
-  enabled: false
-  endpoint: "https://oss-ap-southeast-1-internal.aliyuncs.com"
-  accessKey: "ak-difyai"
-  secretKey: "sk-difyai"
-  region: "ap-southeast-1"
-  bucketName:
-    api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOSS.enabled` is set to `true`).
-    pluginDaemon:
-  authVersion: v4
-  path: "your-path"
-
-###################################
-# External Google Cloud Storage
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` are false and `externalGCS.enabled` is true
-###################################
-externalGCS:
-  enabled: false
-  bucketName:
-    api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalGCS.enabled` is set to `true`).
-    pluginDaemon:
-  serviceAccountJsonBase64: ""
-
-###################################
-# External TENCENT COS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` are false and `externalCOS.enabled` is true
-###################################
-externalCOS:
-  enabled: false
-  secretKey: "your-secret-key"
-  secretId: "your-secret-id"
-  region: "your-region"
-  bucketName:
-    api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalCOS.enabled` is set to `true`).
-    pluginDaemon:
-  scheme: "your-scheme"
-
-###################################
-# External HUAWEI OBS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` are false and `externalOBS.enabled` is true
-###################################
-externalOBS:
-  enabled: false
-  endpoint: "https://your-endpoint"
-  accessKey: "your-secret-id"
-  secretKey: "your-secret-key"
-  bucketName:
-    api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOBS.enabled` is set to `true`).
-    pluginDaemon:
-
-###################################
-# External Tinder Object Storage (TOS) from volcengine
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` and `externalOBS.enabled` are false and `externalTOS.enabled` is true
-###################################
-externalTOS:
-  enabled: false
-  endpoint: "https://tos-cn-beijing.volces.com"
-  accessKey: "your-access-key"
-  secretKey: "your-secret-key"
-  bucketName:
-    # Shared storage for `api` and `worker`
-    api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalTOS.enabled` is set to `true`).
-    pluginDaemon:
-  region: "cn-beijing"
-
-###################################
-# External Redis
-# - these configs are only used when `externalRedis.enabled` is true
-###################################
-externalRedis:
-  enabled: false
-  host: "redis.example"
-  port: 6379
-  username: ""
-  password: "difyai123456"
-  useSSL: false
-
-###################################
-# External Weaviate
-# - these configs take effect when `externalWeaviate.enabled` is true
-###################################
-externalWeaviate:
-  enabled: false
-  endpoint: "http://weaviate:8080"
-  apiKey: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
-
-###################################
-# External Qdrant
-# - these configs take effect only if `externalWeaviate.enabled` is `false` and `externalQdrant.enabled` is `true`
-###################################
-externalQdrant:
-  enabled: false
-  endpoint: "https://your-qdrant-cluster-url.qdrant.tech/"
-  apiKey: "ak-difyai"
-  timeout: 20
-  grpc:
-    enabled: false
-    port: 6334
-
-###################################
-# External Milvus
-# - these configs take effect only if both `externalWeaviate.enabled` and `externalQdrant.enabled` are set as `false` and `externalMilvus.enabled` is `true`
-###################################
-externalMilvus:
-  enabled: false
-  uri: "http://your-milvus.domain:19530"
-  database: "default"
-  token: ""
-  user: ""
-  password: ""
-
-###################################
-# External Pgvector
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` are set as `false` and `externalPgvector.enabled` is `true`
-###################################
-externalPgvector:
-  enabled: false
-  username: "postgres"
-  password: "difyai123456"
-  address: "pgvector"
-  port: 5432
-  dbName: dify
-
-###################################
-# External Tencent Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` are set as `false` and `externalTencentVectorDB.enabled` is `true`
-###################################
-externalTencentVectorDB:
-  enabled: false
-  url: "your-tencent-vector-db-url"
-  apiKey: "your-tencent-vector-db-api-key"
-  timeout: 30
-  username: "root"
-  database: "dify"
-  shard: 1
-  replicas: 2
-
-###################################
-# External MyScaleDB Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` are set as `false` and `externalMyScaleDB.enabled` is `true`
-###################################
-externalMyScaleDB:
-  enabled: false
-  host: "myscale"
-  port: 8123
-  user: "default"
-  password: ""
-  database: "dify"
-  ftsParams: ""
-
-###################################
-# External TableStore Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` and `externalMyScaleDB.enabled` are set as `false` and `externalTableStore.enabled` is `true`
-###################################
-externalTableStore:
-  enabled: false
-  endpoint: "endpoint"
-  instanceName: "instance-name"
-  accessKeyId: "your-secret-id"
-  accessKeySecret: "your-secret-key"
-
-###################################
 # External Elasticsearch
 # - these configs take effect only if all other vector databases are disabled and `externalElasticsearch.enabled` is `true`
 ###################################
 externalElasticsearch:
-  enabled: false
-  host: "elasticsearch.example.com"
+  enabled: true
+  host: "external-elasticsearch"
   port: 9200
   # Note: When using ExternalSecret, these values are managed externally
   username: ""
@@ -3233,12 +1803,14 @@ externalElasticsearch:
 # - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
 ###################################
 externalSecret:
-  enabled: false
+  enabled: true
 
   # External secret store backend provider (e.g., vault, aws, azure, gcp, etc.)
   secretStore:
+    # SecretStore or ClusterSecretStore name to reference
     name: "default-secret-store"
-    kind: "SecretStore"
+    # kind: SecretStore or ClusterSecretStore
+    kind: "ClusterSecretStore"
 
   # Global refresh interval for all ExternalSecrets
   refreshInterval: "15m"
@@ -3288,8 +1860,14 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
+      ELASTICSEARCH_USERNAME:
+        key: "dify/elasticsearch"
+        property: "elasticsearch_username"
+      ELASTICSEARCH_PASSWORD:
+        key: "dify/elasticsearch"
+        property: "elasticsearch_password"
     data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-external-es-redis-master:6379/1"
 
   # Configuration for worker secret
   worker:
@@ -3328,7 +1906,7 @@ externalSecret:
         key: "dify/s3"
         property: "secret_key"
     data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-external-es-redis-master:6379/1"
 
   # Configuration for sandbox secret
   sandbox:
@@ -3359,6 +1937,12 @@ externalSecret:
       DIFY_INNER_API_KEY:
         key: "dify/plugin-daemon"
         property: "dify_api_key"
+      ELASTICSEARCH_USERNAME:
+        key: "dify/elasticsearch"
+        property: "elasticsearch_username"
+      ELASTICSEARCH_PASSWORD:
+        key: "dify/elasticsearch"
+        property: "elasticsearch_password"
 
   # Configuration for PostgreSQL secret (for built-in PostgreSQL with ExternalSecret)
   postgresql:
@@ -3382,20 +1966,3 @@ externalSecret:
       redis-password:
         key: "dify/redis"
         property: "redis_password"
-
-  # Configuration for Elasticsearch secret (for external Elasticsearch with ExternalSecret)
-  elasticsearch:
-    # Whether to create ExternalSecret for external Elasticsearch
-    enabled: false
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
-    # Remote references for external secret store
-    # Only sensitive data (username/password) are fetched from external store
-    # Static values (host/port) are taken from values.yaml
-    remoteRefs:
-      ELASTICSEARCH_USERNAME:
-        key: "dify/elasticsearch"
-        property: "username"
-      ELASTICSEARCH_PASSWORD:
-        key: "dify/elasticsearch"
-        property: "password"

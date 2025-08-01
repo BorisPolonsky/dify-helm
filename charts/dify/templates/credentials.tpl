@@ -61,7 +61,7 @@ DB_PASSWORD: {{ .password | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.storage.credentials" -}}
-{{- if .Values.externalS3.enabled }}
+{{- if and .Values.externalS3.enabled (not .Values.externalSecret.enabled)}}
 S3_ACCESS_KEY: {{ .Values.externalS3.accessKey | b64enc | quote }}
 S3_SECRET_KEY: {{ .Values.externalS3.secretKey | b64enc | quote }}
 {{- else if .Values.externalAzureBlobStorage.enabled }}

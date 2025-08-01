@@ -2,6 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# update values.yaml to use ExternalSecret for PostgreSQL and Redis (both are built-in)
+# Expected behavior: no existing secrets are created, only ExternalSecret resources are created
+
 image:
   api:
     repository: langgenius/dify-api
@@ -76,7 +79,6 @@ api:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -123,36 +125,36 @@ api:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary.
-  # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
-  # The direct approach
-  # - name: LANG
-  #   value: "C.UTF-8"
-  #   - name: SECRET_KEY
-  # Use existing k8s secrets
-  #  - name: DB_PASSWORD
-  #    valueFrom:
-  #      secretKeyRef:
-  #        name: my-secret
-  #        key: DB_PASSWORD
-  - name: CHECK_UPDATE_URL
-    # Won't check for updates if left empty
-    #   value: https://updates.dify.ai
-    value: ""
-  - name: CODE_MAX_NUMBER
-    value: "9223372036854775807"
-  - name: CODE_MIN_NUMBER
-    value: "-9223372036854775808"
-  - name: CODE_MAX_STRING_LENGTH
-    value: "80000"
-  - name: TEMPLATE_TRANSFORM_MAX_LENGTH
-    value: "80000"
-  - name: CODE_MAX_STRING_ARRAY_LENGTH
-    value: "30"
-  - name: CODE_MAX_OBJECT_ARRAY_LENGTH
-    value: "30"
-  - name: CODE_MAX_NUMBER_ARRAY_LENGTH
-    value: "1000"
+    # Apply your own Environment Variables if necessary.
+    # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
+    # The direct approach
+    # - name: LANG
+    #   value: "C.UTF-8"
+    #   - name: SECRET_KEY
+    # Use existing k8s secrets
+    #  - name: DB_PASSWORD
+    #    valueFrom:
+    #      secretKeyRef:
+    #        name: my-secret
+    #        key: DB_PASSWORD
+    - name: CHECK_UPDATE_URL
+      # Won't check for updates if left empty
+      #   value: https://updates.dify.ai
+      value: ""
+    - name: CODE_MAX_NUMBER
+      value: "9223372036854775807"
+    - name: CODE_MIN_NUMBER
+      value: "-9223372036854775808"
+    - name: CODE_MAX_STRING_LENGTH
+      value: "80000"
+    - name: TEMPLATE_TRANSFORM_MAX_LENGTH
+      value: "80000"
+    - name: CODE_MAX_STRING_ARRAY_LENGTH
+      value: "30"
+    - name: CODE_MAX_OBJECT_ARRAY_LENGTH
+      value: "30"
+    - name: CODE_MAX_NUMBER_ARRAY_LENGTH
+      value: "1000"
   service:
     port: 5001
     annotations: {}
@@ -188,7 +190,8 @@ api:
     type: "resend"
     resend:
       # Resend API Key
-      apiKey: "xxxx"
+      # Note: When using ExternalSecret, this value is managed externally
+      apiKey: ""
       # Resend API URL
       apiUrl: https://api.resend.com
     # SMTP Configuration
@@ -196,14 +199,16 @@ api:
       server: "smtp.server.com"
       port: 465
       username: "YOUR EMAIL"
-      password: "YOUR EMAIL PASSWORD"
+      # Note: When using ExternalSecret, this value is managed externally
+      password: ""
       tls:
         enabled: true
         optimistic: false
   # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
   migration: true
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-  secretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
+  # Note: When using ExternalSecret, this value is managed externally
+  secretKey: ""
   ## Storage for `api` and `worker`
   ## Ignored if `.Values.externalS3.enabled` is true
   ##
@@ -248,7 +253,6 @@ worker:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -308,7 +312,6 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   ## Configure extra options for proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param proxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -381,7 +384,6 @@ web:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -428,9 +430,9 @@ web:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary
-  - name: EDITION
-    value: "SELF_HOSTED"
+    # Apply your own Environment Variables if necessary
+    - name: EDITION
+      value: "SELF_HOSTED"
   service:
     port: 3000
     annotations: {}
@@ -463,7 +465,6 @@ sandbox:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -510,18 +511,19 @@ sandbox:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary
-  # - name: LANG
-  #   value: "C.UTF-8"
-  - name: WORKER_TIMEOUT
-    value: "15"
+    # Apply your own Environment Variables if necessary
+    # - name: LANG
+    #   value: "C.UTF-8"
+    - name: WORKER_TIMEOUT
+      value: "15"
   service:
     port: 8194
     annotations: {}
     labels: {}
     clusterIP: ""
   auth:
-    apiKey: "dify-sandbox"
+    # Note: When using ExternalSecret, this value is managed externally
+    apiKey: ""
   ## Sandbox ServiceAccount configuration
   ##
   serviceAccount:
@@ -546,7 +548,6 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   ## Configure extra options for ssrf proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param ssrfProxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -617,7 +618,6 @@ pluginDaemon:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   ## Configure extra options for plugin daemon containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param pluginDaemon.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -700,7 +700,7 @@ postgresql:
     storageClass: ""
     postgresql:
       auth:
-        postgresPassword: "difyai123456"
+        existingSecret: "postgresql-secret"
         username: ""
         password: ""
         database: "dify"
@@ -711,7 +711,7 @@ postgresql:
     pullPolicy: IfNotPresent
   ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
   ##
-  architecture: replication
+  architecture: standalone
   ## Replication configuration
   ## Ignored if `architecture` is `standalone`
   ##
@@ -720,7 +720,7 @@ postgresql:
       limits: {}
       requests: {}
     persistence:
-      enabled: true
+      enabled: false
       storageClass: ""
       accessModes:
         - ReadWriteOnce
@@ -746,7 +746,7 @@ postgresql:
       limits: {}
       requests: {}
     persistence:
-      enabled: true
+      enabled: false
       storageClass: ""
       accessModes:
         - ReadWriteOnce
@@ -907,7 +907,7 @@ weaviate:
       enabled: true
       # Any number of allowed API Keys as plain text
       allowed_keys:
-        - "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
+        - ""
       # You can either set a single user for all the listed Allowed API keys OR
       # one user per API Key, i.e. length(apikey.allowed_keys) == length(apikey.users) OR
       # length(apikey.users) == 1
@@ -926,11 +926,11 @@ weaviate:
     admin_list:
       enabled: true
       users:
-      # Examples
-      # - admin_user1
-      # - admin_user2
-      # - api-key-user-admin
-      - hello@dify.ai
+        # Examples
+        # - admin_user1
+        # - admin_user2
+        # - api-key-user-admin
+        - hello@dify.ai
       read_only_users:
       # Examples
       # - readonly_user1
@@ -988,7 +988,8 @@ weaviate:
     # NOTE: Make sure to add the users to the authorization above overwise they will not be allowed to interact with Weaviate.
     # AUTHENTICATION_APIKEY_USERS: 'jane@doe.com,ian-smith'
     AUTHENTICATION_APIKEY_ENABLED: "true"
-    AUTHENTICATION_APIKEY_ALLOWED_KEYS: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
+    # Note: When using ExternalSecret, this value is managed externally
+    # AUTHENTICATION_APIKEY_ALLOWED_KEYS: ""
     AUTHENTICATION_APIKEY_USERS: "hello@dify.ai"
     AUTHORIZATION_ADMINLIST_ENABLED: "true"
     AUTHORIZATION_ADMINLIST_USERS: "hello@dify.ai"
@@ -1328,7 +1329,7 @@ redis:
 
   ## @param architecture Redis&reg; architecture. Allowed values: `standalone` or `replication`
   ##
-  architecture: replication
+  architecture: standalone
   ## Redis&reg; Authentication parameters
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/redis#setting-the-server-password-on-first-run
   ##
@@ -1342,11 +1343,11 @@ redis:
     ## @param auth.password Redis&reg; password
     ## Defaults to a random 10-character alphanumeric string if not set
     ##
-    password: "difyai123456"
+    password:
     ## @param auth.existingSecret The name of an existing secret with Redis&reg; credentials
     ## NOTE: When it's set, the previous `auth.password` parameter is ignored
     ##
-    existingSecret: ""
+    existingSecret: "redis-secret"
     ## @param auth.existingSecretPasswordKey Password key to be retrieved from existing secret
     ## NOTE: ignored unless `auth.existingSecret` parameter is set
     ##
@@ -1633,7 +1634,7 @@ redis:
     persistence:
       ## @param master.persistence.enabled Enable persistence on Redis&reg; master nodes using Persistent Volume Claims
       ##
-      enabled: true
+      enabled: false
       ## @param master.persistence.medium Provide a medium for `emptyDir` volumes.
       ##
       medium: ""
@@ -3005,8 +3006,9 @@ redis:
 ###################################
 externalPostgres:
   enabled: false
-  username: "postgres"
-  password: "difyai123456"
+  # Note: When using ExternalSecret, these values are managed externally
+  username: ""
+  password: ""
   address: localhost
   port: 5432
   database:
@@ -3021,10 +3023,11 @@ externalPostgres:
 ###################################
 externalS3:
   enabled: false
-  endpoint: "https://xxx.r2.cloudflarestorage.com"
-  pathStyle: false
-  accessKey: "ak-difyai"
-  secretKey: "sk-difyai"
+  endpoint: "http://minio:9000"
+  pathStyle: true
+  # Note: When using ExternalSecret, these values are managed externally
+  accessKey: ""
+  secretKey: ""
   useSSL: false
   bucketName:
     # Shared storage for `api` and `worker`
@@ -3052,8 +3055,9 @@ externalAzureBlobStorage:
 externalOSS:
   enabled: false
   endpoint: "https://oss-ap-southeast-1-internal.aliyuncs.com"
-  accessKey: "ak-difyai"
-  secretKey: "sk-difyai"
+  # Note: When using ExternalSecret, these values are managed externally
+  accessKey: ""
+  secretKey: ""
   region: "ap-southeast-1"
   bucketName:
     api: "difyai"
@@ -3068,10 +3072,7 @@ externalOSS:
 ###################################
 externalGCS:
   enabled: false
-  bucketName:
-    api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalGCS.enabled` is set to `true`).
-    pluginDaemon:
+  bucketName: "difyai"
   serviceAccountJsonBase64: ""
 
 ###################################
@@ -3080,7 +3081,7 @@ externalGCS:
 ###################################
 externalCOS:
   enabled: false
-  secretKey: "your-secret-key"
+  secretKey: ""
   secretId: "your-secret-id"
   region: "your-region"
   bucketName:
@@ -3096,28 +3097,9 @@ externalCOS:
 externalOBS:
   enabled: false
   endpoint: "https://your-endpoint"
-  accessKey: "your-secret-id"
-  secretKey: "your-secret-key"
-  bucketName:
-    api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOBS.enabled` is set to `true`).
-    pluginDaemon:
-
-###################################
-# External Tinder Object Storage (TOS) from volcengine
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` and `externalOBS.enabled` are false and `externalTOS.enabled` is true
-###################################
-externalTOS:
-  enabled: false
-  endpoint: "https://tos-cn-beijing.volces.com"
-  accessKey: "your-access-key"
-  secretKey: "your-secret-key"
-  bucketName:
-    # Shared storage for `api` and `worker`
-    api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalTOS.enabled` is set to `true`).
-    pluginDaemon:
-  region: "cn-beijing"
+  asscessKey: "your-secret-id"
+  secretKey: ""
+  bucketName: "your-bucket-name"
 
 ###################################
 # External Redis
@@ -3128,7 +3110,7 @@ externalRedis:
   host: "redis.example"
   port: 6379
   username: ""
-  password: "difyai123456"
+  password: ""
   useSSL: false
 
 ###################################
@@ -3138,7 +3120,8 @@ externalRedis:
 externalWeaviate:
   enabled: false
   endpoint: "http://weaviate:8080"
-  apiKey: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
+  # Note: When using ExternalSecret, this value is managed externally
+  apiKey: ""
 
 ###################################
 # External Qdrant
@@ -3147,7 +3130,8 @@ externalWeaviate:
 externalQdrant:
   enabled: false
   endpoint: "https://your-qdrant-cluster-url.qdrant.tech/"
-  apiKey: "ak-difyai"
+  # Note: When using ExternalSecret, this value is managed externally
+  apiKey: ""
   timeout: 20
   grpc:
     enabled: false
@@ -3171,8 +3155,9 @@ externalMilvus:
 ###################################
 externalPgvector:
   enabled: false
-  username: "postgres"
-  password: "difyai123456"
+  # Note: When using ExternalSecret, these values are managed externally
+  username: ""
+  password: ""
   address: "pgvector"
   port: 5432
   dbName: dify
@@ -3184,7 +3169,8 @@ externalPgvector:
 externalTencentVectorDB:
   enabled: false
   url: "your-tencent-vector-db-url"
-  apiKey: "your-tencent-vector-db-api-key"
+  # Note: When using ExternalSecret, this value is managed externally
+  apiKey: ""
   timeout: 30
   username: "root"
   database: "dify"
@@ -3212,20 +3198,9 @@ externalTableStore:
   enabled: false
   endpoint: "endpoint"
   instanceName: "instance-name"
-  accessKeyId: "your-secret-id"
-  accessKeySecret: "your-secret-key"
-
-###################################
-# External Elasticsearch
-# - these configs take effect only if all other vector databases are disabled and `externalElasticsearch.enabled` is `true`
-###################################
-externalElasticsearch:
-  enabled: false
-  host: "elasticsearch.example.com"
-  port: 9200
   # Note: When using ExternalSecret, these values are managed externally
-  username: ""
-  password: ""
+  accessKeyId: ""
+  accessKeySecret: ""
 
 ###################################
 # External Secret (External Secrets Operator)
@@ -3233,25 +3208,21 @@ externalElasticsearch:
 # - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
 ###################################
 externalSecret:
-  enabled: false
+  enabled: true
 
   # External secret store backend provider (e.g., vault, aws, azure, gcp, etc.)
   secretStore:
+    # SecretStore or ClusterSecretStore name to reference
     name: "default-secret-store"
-    kind: "SecretStore"
-
-  # Global refresh interval for all ExternalSecrets
-  refreshInterval: "15m"
-
-  # Global ExternalSecret configuration options
-  # Default decoding strategy for secret data
-  # Options: Auto, Base64, Base64URL, None
-  decodingStrategy: "None"
+    # kind: SecretStore or ClusterSecretStore
+    kind: "ClusterSecretStore"
 
   # Configuration for api secret
   api:
     # Whether to create ExternalSecret for api
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
     # Remote references for external secret store
     # Only specify the fields you want to include - all possible fields are defined in the template
     remoteRefs:
@@ -3289,12 +3260,14 @@ externalSecret:
         key: "dify/s3"
         property: "secret_key"
     data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-redis-master:6379/1"
 
   # Configuration for worker secret
   worker:
     # Whether to create ExternalSecret for worker
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       SECRET_KEY:
@@ -3328,11 +3301,15 @@ externalSecret:
         key: "dify/s3"
         property: "secret_key"
     data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-redis-master:6379/1"
 
   # Configuration for sandbox secret
   sandbox:
+    # Whether to create ExternalSecret for sandbox
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
     remoteRefs:
       API_KEY:
         key: "dify/sandbox"
@@ -3342,6 +3319,8 @@ externalSecret:
   pluginDaemon:
     # Whether to create ExternalSecret for plugin daemon
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       DB_USERNAME:
@@ -3364,6 +3343,8 @@ externalSecret:
   postgresql:
     # Whether to create ExternalSecret for built-in PostgreSQL
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       postgres-password:
@@ -3377,25 +3358,10 @@ externalSecret:
   redis:
     # Whether to create ExternalSecret for built-in Redis
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       redis-password:
         key: "dify/redis"
         property: "redis_password"
-
-  # Configuration for Elasticsearch secret (for external Elasticsearch with ExternalSecret)
-  elasticsearch:
-    # Whether to create ExternalSecret for external Elasticsearch
-    enabled: false
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
-    # Remote references for external secret store
-    # Only sensitive data (username/password) are fetched from external store
-    # Static values (host/port) are taken from values.yaml
-    remoteRefs:
-      ELASTICSEARCH_USERNAME:
-        key: "dify/elasticsearch"
-        property: "username"
-      ELASTICSEARCH_PASSWORD:
-        key: "dify/elasticsearch"
-        property: "password"
