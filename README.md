@@ -45,6 +45,9 @@ graph TB
     %% Worker Pod (Background Processing)
     WorkerPod[📦 Worker Pod<br/>langgenius/dify-api:1.7.1<br/>Background Tasks]
 
+    %% Celery Beat Pod (Scheduled Tasks)
+    BeatPod[📦 Beat Pod<br/>langgenius/dify-api:1.7.1<br/>Scheduled Tasks]
+
     %% Sandbox Service
     SandboxService[🏖️ Sandbox Service<br/>Port: 8194] --> SandboxPod[📦 Sandbox Pod<br/>langgenius/dify-sandbox:0.2.12<br/>Port: 8194]
 
@@ -61,19 +64,21 @@ graph TB
     subgraph DataLayer [🗄️ Data Layer]
         PostgresService[🐘 PostgreSQL Service<br/>Port: 5432]
         RedisService[🔴 Redis Service<br/>Port: 6379]
-        VectorDBService[🧮 Vector DB Service]
+        WeaviateService[🌊 Weaviate Service<br/>Port: 8080]
     end
 
     %% Database Connections
     APIPod -.->|Database Operations| PostgresService
     WorkerPod -.->|Database Operations| PostgresService
     PluginPod -.->|Database Operations| PostgresService
+    BeatPod -.->|Database Operations| PostgresService
 
     APIPod -.->|Cache & Sessions| RedisService
     WorkerPod -.->|Queue Processing| RedisService
+    BeatPod -.->|Task Scheduling| RedisService
 
-    APIPod -.->|Vector Storage| VectorDBService
-    WorkerPod -.->|Vector Operations| VectorDBService
+    APIPod -.->|Vector Storage| WeaviateService
+    WorkerPod -.->|Vector Operations| WeaviateService
 
     %% Storage Layer
     subgraph StorageLayer [💾 Storage Layer]
@@ -94,19 +99,6 @@ graph TB
     StorageType --> AzureStorage
     StorageType --> GCSStorage
 
-    %% Vector Database Options
-    subgraph VectorOptions [🧮 Vector Database Options]
-        WeaviateDB[🌊 Weaviate<br/>Port: 8080]
-        QdrantDB[⚡ Qdrant<br/>Port: 6333]
-        MilvusDB[🔍 Milvus<br/>Port: 19530]
-        PGVectorDB[🐘 PGVector<br/>Port: 5432]
-    end
-
-    VectorDBService -.-> WeaviateDB
-    VectorDBService -.-> QdrantDB
-    VectorDBService -.-> MilvusDB
-    VectorDBService -.-> PGVectorDB
-
     %% External Dependencies
     subgraph ExternalServices [🌐 External Services]
         ExternalDB[(🔧 External PostgreSQL)]
@@ -120,6 +112,10 @@ graph TB
     APIPod -.->|Alternative| ExternalRedis
     APIPod -.->|Alternative| ExternalVector
     APIPod -.->|Alternative| ExternalStorage
+    
+    ExternalVector -.-> Qdrant
+    ExternalVector -.-> Milvus
+    ExternalVector -.-> PGVector
 
     %% Styling
     classDef podClass fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
@@ -127,10 +123,10 @@ graph TB
     classDef storageClass fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     classDef externalClass fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
 
-    class APIPod,WebPod,WorkerPod,SandboxPod,SSRFPod,PluginPod podClass
-    class APIService,WebService,SandboxService,SSRFService,PluginService,ProxyService serviceClass
-    class PostgresService,RedisService,VectorDBService,WeaviateDB,QdrantDB,MilvusDB,PGVectorDB storageClass
-    class ExternalDB,ExternalRedis,ExternalVector,ExternalStorage,S3Storage,AzureStorage,GCSStorage externalClass
+    class APIPod,WebPod,WorkerPod,BeatPod,SandboxPod,SSRFPod,PluginPod podClass
+    class APIService,WebService,SandboxService,SSRFService,PluginService,ProxyService,WeaviateService serviceClass
+    class PostgresService,RedisService,WeaviateService storageClass
+    class ExternalDB,ExternalRedis,ExternalVector,ExternalStorage,S3Storage,AzureStorage,GCSStorage,Qdrant,Milvus,PGVector externalClass
 ```
 
 ### Traffic Routing Rules
