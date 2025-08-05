@@ -43,7 +43,10 @@ graph TB
     PluginService --> PluginPod[📦 Plugin Daemon Pod<br/>langgenius/dify-plugin-daemon:0.1.3<br/>Port: 5002, 5003]
 
     %% Worker Pod (Background Processing)
-    WorkerPod[📦 Worker Pod<br/>langgenius/dify-api:1.7.1<br/>Background Tasks]
+    WorkerPod[📦 Worker Pod<br/>langgenius/dify-api:1.7.1]
+
+    %% Beat Pod (Periodic task scheduler)
+    BeatPod[📦 Beat Pod<br/>langgenius/dify-api:1.7.1]
 
     %% Sandbox Service
     SandboxService[🏖️ Sandbox Service<br/>Port: 8194] --> SandboxPod[📦 Sandbox Pod<br/>langgenius/dify-sandbox:0.2.12<br/>Port: 8194]
@@ -70,7 +73,8 @@ graph TB
     PluginPod -.->|Database Operations| PostgresService
 
     APIPod -.->|Cache & Sessions| RedisService
-    WorkerPod -.->|Queue Processing| RedisService
+    WorkerPod -.->|Task Processing| RedisService
+    BeatPod -.->|Task Scheduling| RedisService
 
     APIPod -.->|Vector Storage| VectorDBService
     WorkerPod -.->|Vector Operations| VectorDBService
@@ -127,7 +131,7 @@ graph TB
     classDef storageClass fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     classDef externalClass fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
 
-    class APIPod,WebPod,WorkerPod,SandboxPod,SSRFPod,PluginPod podClass
+    class APIPod,WebPod,WorkerPod,BeatPod,SandboxPod,SSRFPod,PluginPod podClass
     class APIService,WebService,SandboxService,SSRFService,PluginService,ProxyService serviceClass
     class PostgresService,RedisService,VectorDBService,WeaviateDB,QdrantDB,MilvusDB,PGVectorDB storageClass
     class ExternalDB,ExternalRedis,ExternalVector,ExternalStorage,S3Storage,AzureStorage,GCSStorage externalClass
@@ -156,6 +160,7 @@ The Nginx proxy handles traffic routing with the following rules:
 | **API** | `langgenius/dify-api:1.7.1` | 5001 | RESTful API server, business logic processing |
 | **Web** | `langgenius/dify-web:1.7.1` | 3000 | Web UI frontend |
 | **Worker** | `langgenius/dify-api:1.7.1` | - | Background task processing (Celery) |
+| **Beat** | `langgenius/dify-api:1.7.1` | - | Periodic task scheduler (Celery Beat) |
 | **Sandbox** | `langgenius/dify-sandbox:0.2.12` | 8194 | Secure code execution environment |
 | **Plugin Daemon** | `langgenius/dify-plugin-daemon:0.1.3` | 5002, 5003 | Plugin management and execution |
 | **SSRF Proxy** | `ubuntu/squid:latest` | 3128 | External request security proxy |
@@ -165,7 +170,7 @@ The Nginx proxy handles traffic routing with the following rules:
 
 ### Components that could be deployed on kubernetes in current version
 
-- [x] core (`api`, `worker`, `sandbox`)
+- [x] core (`api`, `worker`, `beat`, `sandbox`)
 - [x] ssrf_proxy
 - [x] proxy (via built-in `nginx` or `ingress`)
 - [x] redis
