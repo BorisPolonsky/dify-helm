@@ -308,7 +308,7 @@ beat:
   affinity: {}
   tolerations: []
   priorityClassName: ""
-  ## Configure extra options for worker containers' liveness, readiness, and startup probes
+  ## Configure extra options for celery beat containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param beat.customLivenessProbe Custom livenessProbe that overrides the default one (None)
   customLivenessProbe: {}
