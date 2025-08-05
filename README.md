@@ -71,10 +71,9 @@ graph TB
     APIPod -.->|Database Operations| PostgresService
     WorkerPod -.->|Database Operations| PostgresService
     PluginPod -.->|Database Operations| PostgresService
-    BeatPod -.->|Database Operations| PostgresService
 
     APIPod -.->|Cache & Sessions| RedisService
-    WorkerPod -.->|Queue Processing| RedisService
+    WorkerPod -.->|Task Processing| RedisService
     BeatPod -.->|Task Scheduling| RedisService
 
     APIPod -.->|Vector Storage| WeaviateService
