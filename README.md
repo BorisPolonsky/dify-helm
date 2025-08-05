@@ -112,9 +112,10 @@ graph TB
     APIPod -.->|Alternative| ExternalVector
     APIPod -.->|Alternative| ExternalStorage
     
-    ExternalVector -.-> Qdrant
-    ExternalVector -.-> Milvus
-    ExternalVector -.-> PGVector
+    ExternalVector -.-> Weaviate[🌊 Weaviate<br/>Port: 8080]
+    ExternalVector -.-> Qdrant[⚡ Qdrant<br/>Port: 6333]
+    ExternalVector -.-> Milvus[🔍 Milvus<br/>Port: 19530]
+    ExternalVector -.-> PGVector[🐘 PGVector<br/>Port: 5432]
 
     %% Styling
     classDef podClass fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
@@ -125,7 +126,7 @@ graph TB
     class APIPod,WebPod,WorkerPod,BeatPod,SandboxPod,SSRFPod,PluginPod podClass
     class APIService,WebService,SandboxService,SSRFService,PluginService,ProxyService,WeaviateService serviceClass
     class PostgresService,RedisService,WeaviateService storageClass
-    class ExternalDB,ExternalRedis,ExternalVector,ExternalStorage,S3Storage,AzureStorage,GCSStorage,Qdrant,Milvus,PGVector externalClass
+    class ExternalDB,ExternalRedis,ExternalVector,ExternalStorage,S3Storage,AzureStorage,GCSStorage,Weaviate,Qdrant,Milvus,PGVector externalClass
 ```
 
 ### Traffic Routing Rules
