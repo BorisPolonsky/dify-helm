@@ -1,10 +1,31 @@
 name: CI - External Secrets Operator Tests
 
 on:
-  push:
-    branches: [main, develop, feat/support-externa-secret]
-  pull_request:
-    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to test'
+        required: true
+      run_all_tests:
+        description: 'Run all test configurations'
+        type: boolean
+        default: true
+      specific_test:
+        description: 'Specific test to run (if not running all)'
+        required: false
+        type: choice
+        options:
+        - "legacy: using built-in PostgreSQL and built-in Redis"
+        - "legacy: using external redis and built-in(PostgreSQL)"
+        - "legacy: using external PostgreSQL and built-in Redis"
+        - "legacy: using external S3 and built-in PostgreSQL and Redis"
+        - "external-secrets: using built-in (pg, redis)"
+        - "external-secrets: using external (pg)"
+        - "external-secrets: using external (s3)"
+        - "external-secrets: using external (redis)"
+        - "external-secrets: using external (es)"
+        - "external-secrets: using external (s3, pg, es, redis)"
+
 
 jobs:
   # Stage 1: Pre-pull all images and prepare infrastructure
