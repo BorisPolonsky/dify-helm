@@ -21,8 +21,11 @@ spec:
       {{/*
       # Required labels for istio
       # app: {{ template "dify.worker.fullname" . }}
-      # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+      # version: {{ .Values.istioServiceMesh.version | quote }}
       */}}
+  {{- if .Values.worker.updateStrategy }}
+  strategy: {{- toYaml .Values.worker.updateStrategy | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       annotations:
@@ -35,11 +38,14 @@ spec:
         {{/*
         # Required labels for istio
         # app: {{ template "dify.worker.fullname" . }}
-        # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+        # version: {{ .Values.istioServiceMesh.version | quote }}
         */}}
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
       serviceAccountName: {{ include "dify.worker.serviceAccountName" . }}
+      {{- if .Values.worker.priorityClassName }}
+      priorityClassName: {{ .Values.worker.priorityClassName | quote }}
+      {{- end }}
       {{- if .Values.image.api.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.api.pullSecrets }}
@@ -49,6 +55,26 @@ spec:
       {{- if .Values.worker.podSecurityContext }}
       securityContext:
 {{ toYaml .Values.worker.podSecurityContext | indent 8 }}
+      {{- end }}
+      {{- if .Values.api.migration }}
+      initContainers:
+      - name: check-api
+        image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
+        command:
+          - sh
+          - -c
+          - |
+            until curl http://{{ template "dify.api.fullname" . }}:{{ .Values.api.service.port }}/health; do
+              echo "Waiting for API service to be available..."
+              sleep 1
+            done
+        envFrom:
+        - configMapRef:
+            name: {{ template "dify.worker.fullname" . }}
+        - secretRef:
+            name: {{ template "dify.worker.fullname" . }}
+        resources:
+          {{- toYaml .Values.worker.resources | nindent 12 }}
       {{- end }}
       containers:
       - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"

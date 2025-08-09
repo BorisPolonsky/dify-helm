@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "dify.fullname" . }}-test-redis-connection"
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    component: "redis"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: check-redis
+          image: "{{ .Values.redis.image.registry }}/{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+          command:
+            - sh
+            - -c
+            - |
+              until redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping | grep -q PONG; do
+                echo "Waiting for Redis service to be available..."
+                sleep 1
+              done
+              echo "Redis is ready."
+          envFrom:
+          - configMapRef:
+              name: {{ template "dify.api.fullname" . }}
+          - secretRef:
+              name: {{ template "dify.api.fullname" . }}
+

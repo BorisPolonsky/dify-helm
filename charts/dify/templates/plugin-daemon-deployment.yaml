@@ -1,4 +1,13 @@
 {{- if and .Values.pluginDaemon.enabled}}
+{{- $usePvc := not (or
+  (and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon)
+  (and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon)
+  (and .Values.externalGCS.enabled .Values.externalGCS.bucketName.pluginDaemon)
+  (and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon)
+  (and .Values.externalOBS.enabled .Values.externalOBS.bucketName.pluginDaemon)
+  (and .Values.externalTOS.enabled .Values.externalTOS.bucketName.pluginDaemon)
+)
+}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,8 +29,11 @@ spec:
       {{/*
       # Required labels for istio
       # app: {{ template "dify.pluginDaemon.fullname" . }}
-      # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+      # version: {{ .Values.istioServiceMesh.version | quote }}
       */}}
+  {{- if .Values.pluginDaemon.updateStrategy }}
+  strategy: {{- toYaml .Values.pluginDaemon.updateStrategy | nindent 4 }}
+  {{- end }}
   template:
     metadata:
       annotations:
@@ -34,11 +46,14 @@ spec:
         {{/*
         # Required labels for istio
         # app: {{ template "dify.pluginDaemon.fullname" . }}
-        # version: {{ (print "v" .Values.serviceMesh.version) | quote }}
+        # version: {{ .Values.istioServiceMesh.version | quote }}
         */}}
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
       serviceAccountName: {{ include "dify.pluginDaemon.serviceAccountName" . }}
+      {{- if .Values.pluginDaemon.priorityClassName }}
+      priorityClassName: {{ .Values.pluginDaemon.priorityClassName | quote }}
+      {{- end }}
       {{- if .Values.image.pluginDaemon.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.pluginDaemon.pullSecrets }}
@@ -85,9 +100,11 @@ spec:
         resources:
           {{- toYaml .Values.pluginDaemon.resources | nindent 12 }}
         volumeMounts:
+        {{- if $usePvc }}
         - name: app-data
           mountPath: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
           subPath: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.subPath | default "" }}
+        {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.pluginDaemon.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
@@ -113,7 +130,9 @@ spec:
 {{ toYaml .Values.pluginDaemon.tolerations | indent 8 }}
     {{- end }}
       volumes:
+      {{- if $usePvc }}
       - name: app-data
         persistentVolumeClaim:
           claimName: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.pluginDaemon.fullname" . | trunc 58)) }}
+      {{- end }}
 {{- end }}

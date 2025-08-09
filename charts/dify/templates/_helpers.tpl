@@ -40,6 +40,15 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a default fully qualified celery beat name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "dify.beat.fullname" -}}
+{{ template "dify.fullname" . }}-beat
+{{- end -}}
+
+
+{{/*
 Create a default fully qualified web name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
@@ -185,6 +194,18 @@ Create the name of the service account to use for the Dify Worker
     {{ default "default" .Values.worker.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create the name of the service account to use for the celery beat
+*/}}
+{{- define "dify.beat.serviceAccountName" -}}
+{{- if .Values.beat.serviceAccount.create -}}
+    {{ default (include "dify.beat.fullname" .) .Values.beat.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.beat.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
 
 {{/*
 Create the name of the service account to use for the Dify Plugin Daemon
