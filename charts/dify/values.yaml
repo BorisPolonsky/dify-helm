@@ -5,11 +5,7 @@
 image:
   api:
     repository: langgenius/dify-api
-<<<<<<< HEAD
-    tag: "1.2.0"
-=======
     tag: "1.7.1"
->>>>>>> master
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -20,11 +16,7 @@ image:
 
   web:
     repository: langgenius/dify-web
-<<<<<<< HEAD
-    tag: "1.2.0"
-=======
     tag: "1.7.1"
->>>>>>> master
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -35,11 +27,7 @@ image:
 
   sandbox:
     repository: langgenius/dify-sandbox
-<<<<<<< HEAD
-    tag: "0.2.11"
-=======
     tag: "0.2.12"
->>>>>>> master
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -72,11 +60,7 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-<<<<<<< HEAD
-    tag: 0.0.7-local
-=======
     tag: 0.2.0-local
->>>>>>> master
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
