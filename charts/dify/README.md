@@ -23,27 +23,27 @@ You can specify custom images for different components:
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.7.1"
+    tag: "your-tag"
     pullPolicy: IfNotPresent
   web:
     repository: langgenius/dify-web
-    tag: "1.7.1"
+    tag: "your-tag"
     pullPolicy: IfNotPresent
   sandbox:
     repository: langgenius/dify-sandbox
-    tag: "0.2.12"
+    tag: "your-tag"
     pullPolicy: IfNotPresent
   proxy:
     repository: nginx
-    tag: latest
+    tag: "your-tag"
     pullPolicy: IfNotPresent
   ssrfProxy:
     repository: ubuntu/squid
-    tag: latest
+    tag: "your-tag"
     pullPolicy: IfNotPresent
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.2.0-local
+    tag: "your-tag"
     pullPolicy: IfNotPresent
 ```
 
