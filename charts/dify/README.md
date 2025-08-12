@@ -22,27 +22,27 @@ You can specify custom images for different components:
 # values.yaml
 image:
   api:
-    repository: langgenius/dify-api
+    repository: your-registry/dify-api
     tag: "your-tag"
     pullPolicy: IfNotPresent
   web:
-    repository: langgenius/dify-web
+    repository: your-registry/dify-web
     tag: "your-tag"
     pullPolicy: IfNotPresent
   sandbox:
-    repository: langgenius/dify-sandbox
+    repository: your-registry/dify-sandbox
     tag: "your-tag"
     pullPolicy: IfNotPresent
   proxy:
-    repository: nginx
+    repository: your-registry/nginx
     tag: "your-tag"
     pullPolicy: IfNotPresent
   ssrfProxy:
-    repository: ubuntu/squid
+    repository: your-registry/squid
     tag: "your-tag"
     pullPolicy: IfNotPresent
   pluginDaemon:
-    repository: langgenius/dify-plugin-daemon
+    repository: your-registry/dify-plugin-daemon
     tag: "your-tag"
     pullPolicy: IfNotPresent
 ```
