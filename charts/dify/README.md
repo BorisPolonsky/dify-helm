@@ -20,17 +20,31 @@ Fear not its extensive content as they are arranged in sections below:
 You can specify custom images for different components:
 ```yaml
 # values.yaml
-images:
+image:
   api:
     repository: your-registry/dify-api
-    tag: your-tag
+    tag: "your-tag"
     pullPolicy: IfNotPresent
-  worker:
-    repository: your-registry/dify-worker
-    tag: your-tag
+  web:
+    repository: your-registry/dify-web
+    tag: "your-tag"
     pullPolicy: IfNotPresent
   sandbox:
     repository: your-registry/dify-sandbox
+    tag: "your-tag"
+    pullPolicy: IfNotPresent
+  proxy:
+    repository: your-registry/nginx
+    tag: "your-tag"
+    pullPolicy: IfNotPresent
+  ssrfProxy:
+    repository: your-registry/squid
+    tag: "your-tag"
+    pullPolicy: IfNotPresent
+  pluginDaemon:
+    repository: your-registry/dify-plugin-daemon
+    tag: "your-tag"
+    pullPolicy: IfNotPresent
 ```
 
 ### 2. Customize Dify Components
