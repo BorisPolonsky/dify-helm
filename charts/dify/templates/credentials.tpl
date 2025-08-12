@@ -141,6 +141,10 @@ MYSCALE_PASSWORD: {{ .Values.externalMyScaleDB.password | b64enc | quote }}
 {{- else if .Values.externalTableStore.enabled}}
 TABLESTORE_ACCESS_KEY_ID: {{ .Values.externalTableStore.accessKeyId | b64enc | quote }}
 TABLESTORE_ACCESS_KEY_SECRET: {{ .Values.externalTableStore.accessKeySecret | b64enc | quote }}
+{{- else if .Values.externalElasticsearch.enabled}}
+# The Elasticsearch credentials
+ELASTICSEARCH_USERNAME: {{ .Values.externalElasticsearch.username | b64enc | quote }}
+ELASTICSEARCH_PASSWORD: {{ .Values.externalElasticsearch.password | b64enc | quote }}
 {{- else if .Values.weaviate.enabled }}
 # The Weaviate API key.
   {{- if .Values.weaviate.authentication.apikey }}

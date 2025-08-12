@@ -341,8 +341,6 @@ TABLESTORE_INSTANCE_NAME: {{ .Values.externalTableStore.instanceName | quote }}
 VECTOR_STORE: elasticsearch
 ELASTICSEARCH_HOST: {{ .Values.externalElasticsearch.host | quote }}
 ELASTICSEARCH_PORT: {{ .Values.externalElasticsearch.port | toString | quote }}
-# ELASTICSEARCH_USERNAME: {{ .Values.externalElasticsearch.username | quote }}
-# ELASTICSEARCH_PASSWORD: {{ .Values.externalElasticsearch.password | quote }}
 {{- else if .Values.weaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
