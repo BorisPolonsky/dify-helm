@@ -4,28 +4,32 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to test'
+        description: "Branch to test"
         required: true
       run_all_tests:
-        description: 'Run all test configurations'
+        description: "Run all test configurations"
         type: boolean
         default: true
       specific_test:
-        description: 'Specific test to run (if not running all)'
+        description: "Specific test to run (if not running all)"
         required: false
         type: choice
         options:
-        - "legacy: using built-in PostgreSQL and built-in Redis"
-        - "legacy: using external redis and built-in(PostgreSQL)"
-        - "legacy: using external PostgreSQL and built-in Redis"
-        - "legacy: using external S3 and built-in PostgreSQL and Redis"
-        - "external-secrets: using built-in (pg, redis)"
-        - "external-secrets: using external (pg)"
-        - "external-secrets: using external (s3)"
-        - "external-secrets: using external (redis)"
-        - "external-secrets: using external (es)"
-        - "external-secrets: using external (s3, pg, es, redis)"
+          - "legacy: using built-in PostgreSQL and built-in Redis"
+          - "legacy: using external redis and built-in(PostgreSQL)"
+          - "legacy: using external PostgreSQL and built-in Redis"
+          - "legacy: using external S3 and built-in PostgreSQL and Redis"
+          - "legacy: using external Elasticsearch"
+          - "external-secrets: using built-in (pg, redis)"
+          - "external-secrets: using external (pg)"
+          - "external-secrets: using external (s3)"
+          - "external-secrets: using external (redis)"
+          - "external-secrets: using external (es)"
+          - "external-secrets: using external (s3, pg, es, redis)"
 
+  pull_request:
+    branches:
+      - "regression/*"
 
 jobs:
   # Stage 1: Pre-pull all images and prepare infrastructure
@@ -161,6 +165,14 @@ jobs:
             use_external_pg: false
             use_external_s3: true
             use_external_es: false
+
+          - config_name: "legacy: using external Elasticsearch"
+            values_file: "values-legacy-external-es.yaml"
+            use_eso: false
+            use_external_redis: false
+            use_external_pg: false
+            use_external_s3: false
+            use_external_es: true
 
           - config_name: "external-secrets: using built-in (pg, redis)"
             values_file: "values-eso.yaml"
