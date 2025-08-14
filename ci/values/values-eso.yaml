@@ -3303,17 +3303,11 @@ externalElasticsearch:
 externalSecret:
   enabled: true
 
-  # External secret store backend provider (e.g., vault, aws, azure, gcp, etc.)
   secretStore:
     name: "default-secret-store"
-    kind: "SecretStore"
+    kind: "ClusterSecretStore"
 
-  # Global refresh interval for all ExternalSecrets
   refreshInterval: "15m"
-
-  # Global ExternalSecret configuration options
-  # Default decoding strategy for secret data
-  # Options: Auto, Base64, Base64URL, None
   decodingStrategy: "None"
 
   # Configuration for api secret
