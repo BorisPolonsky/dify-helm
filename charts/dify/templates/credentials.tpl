@@ -17,6 +17,9 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | b64enc | quote }}
 INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
 {{- end }}
+{{- if and .Values.api.otel.enabled (not .Values.externalSecret.enabled) }}
+OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.worker.credentials" -}}
@@ -37,6 +40,9 @@ SECRET_KEY: {{ .Values.api.secretKey | b64enc | quote }}
 {{- if .Values.pluginDaemon.enabled }}
 PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | b64enc | quote }}
 INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
+{{- end }}
+{{- if and .Values.api.otel.enabled (not .Values.externalSecret.enabled) }}
+OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
 {{- end }}
 {{- end }}
 

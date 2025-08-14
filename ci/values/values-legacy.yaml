@@ -7,67 +7,31 @@ image:
     repository: langgenius/dify-api
     tag: "1.7.1"
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
   web:
     repository: langgenius/dify-web
     tag: "1.7.1"
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
   sandbox:
     repository: langgenius/dify-sandbox
     tag: "0.2.12"
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
   proxy:
     repository: nginx
     tag: latest
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
   ssrfProxy:
     repository: ubuntu/squid
     tag: latest
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
     tag: 0.2.0-local
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
 api:
   enabled: true
@@ -153,6 +117,37 @@ api:
       value: "30"
     - name: CODE_MAX_NUMBER_ARRAY_LENGTH
       value: "1000"
+
+  ## OpenTelemetry (OTEL) configuration
+  otel:
+    enabled: false
+    # OpenTelemetry trace endpoint
+    traceEndpoint: ""
+    # OpenTelemetry metric endpoint
+    metricEndpoint: ""
+    # OpenTelemetry base endpoint
+    baseEndpoint: "http://localhost:4318"
+    # OpenTelemetry API Key (sensitive - stored in secret)
+    apiKey: ""
+    # OpenTelemetry exporter protocol
+    exporterProtocol: ""
+    # OpenTelemetry exporter type
+    exporterType: "otlp"
+    # OpenTelemetry sampling rate
+    samplingRate: "0.1"
+    # OpenTelemetry batch export schedule delay in milliseconds
+    batchExportScheduleDelay: "5000"
+    # OpenTelemetry max queue size
+    maxQueueSize: "2048"
+    # OpenTelemetry max export batch size
+    maxExportBatchSize: "512"
+    # OpenTelemetry metric export interval in milliseconds
+    metricExportInterval: "60000"
+    # OpenTelemetry batch export timeout in milliseconds
+    batchExportTimeout: "10000"
+    # OpenTelemetry metric export timeout in milliseconds
+    metricExportTimeout: "30000"
+
   service:
     port: 5001
     annotations: {}
@@ -283,6 +278,37 @@ worker:
   #      secretKeyRef:
   #        name: my-secret
   #        key: DB_PASSWORD
+
+  ## OpenTelemetry (OTEL) configuration
+  otel:
+    enabled: false
+    # OpenTelemetry trace endpoint
+    traceEndpoint: ""
+    # OpenTelemetry metric endpoint
+    metricEndpoint: ""
+    # OpenTelemetry base endpoint
+    baseEndpoint: "http://localhost:4318"
+    # OpenTelemetry API Key (sensitive - stored in secret)
+    apiKey: ""
+    # OpenTelemetry exporter protocol
+    exporterProtocol: ""
+    # OpenTelemetry exporter type
+    exporterType: "otlp"
+    # OpenTelemetry sampling rate
+    samplingRate: "0.1"
+    # OpenTelemetry batch export schedule delay in milliseconds
+    batchExportScheduleDelay: "5000"
+    # OpenTelemetry max queue size
+    maxQueueSize: "2048"
+    # OpenTelemetry max export batch size
+    maxExportBatchSize: "512"
+    # OpenTelemetry metric export interval in milliseconds
+    metricExportInterval: "60000"
+    # OpenTelemetry batch export timeout in milliseconds
+    batchExportTimeout: "10000"
+    # OpenTelemetry metric export timeout in milliseconds
+    metricExportTimeout: "30000"
+
   logLevel: INFO
   ## Dify Worker ServiceAccount configuration
   ##
@@ -298,6 +324,52 @@ worker:
     ##
     automountServiceAccountToken: false
     ## @param worker.serviceAccount.annotations Additional custom annotations for the ServiceAccount
+    ##
+    annotations: {}
+
+beat:
+  enabled: false
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  priorityClassName: ""
+  ## Configure extra options for celery beat containers' liveness, readiness, and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param beat.customLivenessProbe Custom livenessProbe that overrides the default one (None)
+  customLivenessProbe: {}
+  ## @param beat.customReadinessProbe Custom readinessProbe that overrides the default one (None)
+  customReadinessProbe: {}
+  ## @param beat.customStartupProbe Custom startupProbe that overrides the default one (None)
+  customStartupProbe: {}
+  ## @param beat.updateStrategy Update strategy type and configuration parameters
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  updateStrategy:
+    type: Recreate
+  # Configure Pods Security Context
+  podSecurityContext: {}
+  # Configure Container Security Context
+  containerSecurityContext: {}
+  extraEnv:
+  # Apply your own Environment Variables if necessary.
+  # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
+  # - name: ENABLE_CLEAN_EMBEDDING_CACHE_TASK
+  #   value: "false"
+  logLevel: INFO
+  ## celery beat ServiceAccount configuration
+  ##
+  serviceAccount:
+    ## @param beat.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: false
+    ## @param beat.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param beat.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+    ##
+    automountServiceAccountToken: false
+    ## @param beat.serviceAccount.annotations Additional custom annotations for the ServiceAccount
     ##
     annotations: {}
 
@@ -711,7 +783,7 @@ postgresql:
     pullPolicy: IfNotPresent
   ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
   ##
-  architecture: replication
+  architecture: standalone
   ## Replication configuration
   ## Ignored if `architecture` is `standalone`
   ##
@@ -1328,7 +1400,7 @@ redis:
 
   ## @param architecture Redis&reg; architecture. Allowed values: `standalone` or `replication`
   ##
-  architecture: replication
+  architecture: standalone
   ## Redis&reg; Authentication parameters
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/redis#setting-the-server-password-on-first-run
   ##
@@ -3223,8 +3295,9 @@ externalElasticsearch:
   enabled: false
   host: "elasticsearch.example.com"
   port: 9200
-  username: "abc"
-  password: "abc"
+  # Note: When using ExternalSecret, these values are managed externally
+  username: ""
+  password: ""
 
 ###################################
 # External Secret (External Secrets Operator)

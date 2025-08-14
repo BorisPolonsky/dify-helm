@@ -1,76 +1,33 @@
-# Default values for dify.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-# update values.yaml to use ExternalSecret for PostgreSQL and Redis (both are built-in)
-# Expected behavior: no existing secrets are created, only ExternalSecret resources are created
-
 image:
   api:
     repository: langgenius/dify-api
     tag: "1.7.1"
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
   web:
     repository: langgenius/dify-web
     tag: "1.7.1"
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
   sandbox:
     repository: langgenius/dify-sandbox
     tag: "0.2.12"
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
   proxy:
     repository: nginx
     tag: latest
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
   ssrfProxy:
     repository: ubuntu/squid
     tag: latest
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
     tag: 0.2.0-local
     pullPolicy: IfNotPresent
-    ## Optionally specify an array of imagePullSecrets.
-    ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-    ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
 
 api:
   enabled: true
@@ -79,6 +36,7 @@ api:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -155,6 +113,37 @@ api:
       value: "30"
     - name: CODE_MAX_NUMBER_ARRAY_LENGTH
       value: "1000"
+
+  ## OpenTelemetry (OTEL) configuration
+  otel:
+    enabled: false
+    # OpenTelemetry trace endpoint
+    traceEndpoint: ""
+    # OpenTelemetry metric endpoint
+    metricEndpoint: ""
+    # OpenTelemetry base endpoint
+    baseEndpoint: "http://localhost:4318"
+    # OpenTelemetry API Key (sensitive - stored in secret)
+    apiKey: ""
+    # OpenTelemetry exporter protocol
+    exporterProtocol: ""
+    # OpenTelemetry exporter type
+    exporterType: "otlp"
+    # OpenTelemetry sampling rate
+    samplingRate: "0.1"
+    # OpenTelemetry batch export schedule delay in milliseconds
+    batchExportScheduleDelay: "5000"
+    # OpenTelemetry max queue size
+    maxQueueSize: "2048"
+    # OpenTelemetry max export batch size
+    maxExportBatchSize: "512"
+    # OpenTelemetry metric export interval in milliseconds
+    metricExportInterval: "60000"
+    # OpenTelemetry batch export timeout in milliseconds
+    batchExportTimeout: "10000"
+    # OpenTelemetry metric export timeout in milliseconds
+    metricExportTimeout: "30000"
+
   service:
     port: 5001
     annotations: {}
@@ -190,7 +179,6 @@ api:
     type: "resend"
     resend:
       # Resend API Key
-      # Note: When using ExternalSecret, this value is managed externally
       apiKey: ""
       # Resend API URL
       apiUrl: https://api.resend.com
@@ -199,7 +187,6 @@ api:
       server: "smtp.server.com"
       port: 465
       username: "YOUR EMAIL"
-      # Note: When using ExternalSecret, this value is managed externally
       password: ""
       tls:
         enabled: true
@@ -207,7 +194,6 @@ api:
   # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
   migration: true
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-  # Note: When using ExternalSecret, this value is managed externally
   secretKey: ""
   ## Storage for `api` and `worker`
   ## Ignored if `.Values.externalS3.enabled` is true
@@ -253,6 +239,7 @@ worker:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -287,6 +274,37 @@ worker:
   #      secretKeyRef:
   #        name: my-secret
   #        key: DB_PASSWORD
+
+  ## OpenTelemetry (OTEL) configuration
+  otel:
+    enabled: false
+    # OpenTelemetry trace endpoint
+    traceEndpoint: ""
+    # OpenTelemetry metric endpoint
+    metricEndpoint: ""
+    # OpenTelemetry base endpoint
+    baseEndpoint: "http://localhost:4318"
+    # OpenTelemetry API Key (sensitive - stored in secret)
+    apiKey: ""
+    # OpenTelemetry exporter protocol
+    exporterProtocol: ""
+    # OpenTelemetry exporter type
+    exporterType: "otlp"
+    # OpenTelemetry sampling rate
+    samplingRate: "0.1"
+    # OpenTelemetry batch export schedule delay in milliseconds
+    batchExportScheduleDelay: "5000"
+    # OpenTelemetry max queue size
+    maxQueueSize: "2048"
+    # OpenTelemetry max export batch size
+    maxExportBatchSize: "512"
+    # OpenTelemetry metric export interval in milliseconds
+    metricExportInterval: "60000"
+    # OpenTelemetry batch export timeout in milliseconds
+    batchExportTimeout: "10000"
+    # OpenTelemetry metric export timeout in milliseconds
+    metricExportTimeout: "30000"
+
   logLevel: INFO
   ## Dify Worker ServiceAccount configuration
   ##
@@ -305,6 +323,52 @@ worker:
     ##
     annotations: {}
 
+beat:
+  enabled: false
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  priorityClassName: ""
+  ## Configure extra options for celery beat containers' liveness, readiness, and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param beat.customLivenessProbe Custom livenessProbe that overrides the default one (None)
+  customLivenessProbe: {}
+  ## @param beat.customReadinessProbe Custom readinessProbe that overrides the default one (None)
+  customReadinessProbe: {}
+  ## @param beat.customStartupProbe Custom startupProbe that overrides the default one (None)
+  customStartupProbe: {}
+  ## @param beat.updateStrategy Update strategy type and configuration parameters
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  updateStrategy:
+    type: Recreate
+  # Configure Pods Security Context
+  podSecurityContext: {}
+  # Configure Container Security Context
+  containerSecurityContext: {}
+  extraEnv:
+  # Apply your own Environment Variables if necessary.
+  # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
+  # - name: ENABLE_CLEAN_EMBEDDING_CACHE_TASK
+  #   value: "false"
+  logLevel: INFO
+  ## celery beat ServiceAccount configuration
+  ##
+  serviceAccount:
+    ## @param beat.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: false
+    ## @param beat.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param beat.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+    ##
+    automountServiceAccountToken: false
+    ## @param beat.serviceAccount.annotations Additional custom annotations for the ServiceAccount
+    ##
+    annotations: {}
+
 proxy:
   enabled: true
   replicas: 1
@@ -312,6 +376,7 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   ## Configure extra options for proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param proxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -384,6 +449,7 @@ web:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -465,6 +531,7 @@ sandbox:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -522,7 +589,6 @@ sandbox:
     labels: {}
     clusterIP: ""
   auth:
-    # Note: When using ExternalSecret, this value is managed externally
     apiKey: ""
   ## Sandbox ServiceAccount configuration
   ##
@@ -548,6 +614,7 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   ## Configure extra options for ssrf proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param ssrfProxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -618,6 +685,7 @@ pluginDaemon:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   ## Configure extra options for plugin daemon containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param pluginDaemon.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -988,7 +1056,6 @@ weaviate:
     # NOTE: Make sure to add the users to the authorization above overwise they will not be allowed to interact with Weaviate.
     # AUTHENTICATION_APIKEY_USERS: 'jane@doe.com,ian-smith'
     AUTHENTICATION_APIKEY_ENABLED: "true"
-    # Note: When using ExternalSecret, this value is managed externally
     # AUTHENTICATION_APIKEY_ALLOWED_KEYS: ""
     AUTHENTICATION_APIKEY_USERS: "hello@dify.ai"
     AUTHORIZATION_ADMINLIST_ENABLED: "true"
@@ -3006,7 +3073,6 @@ redis:
 ###################################
 externalPostgres:
   enabled: false
-  # Note: When using ExternalSecret, these values are managed externally
   username: ""
   password: ""
   address: localhost
@@ -3023,9 +3089,8 @@ externalPostgres:
 ###################################
 externalS3:
   enabled: false
-  endpoint: "http://minio:9000"
-  pathStyle: true
-  # Note: When using ExternalSecret, these values are managed externally
+  endpoint: "https://xxx.r2.cloudflarestorage.com"
+  pathStyle: false
   accessKey: ""
   secretKey: ""
   useSSL: false
@@ -3055,7 +3120,6 @@ externalAzureBlobStorage:
 externalOSS:
   enabled: false
   endpoint: "https://oss-ap-southeast-1-internal.aliyuncs.com"
-  # Note: When using ExternalSecret, these values are managed externally
   accessKey: ""
   secretKey: ""
   region: "ap-southeast-1"
@@ -3072,7 +3136,10 @@ externalOSS:
 ###################################
 externalGCS:
   enabled: false
-  bucketName: "difyai"
+  bucketName:
+    api: "difyai"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalGCS.enabled` is set to `true`).
+    pluginDaemon:
   serviceAccountJsonBase64: ""
 
 ###################################
@@ -3082,7 +3149,7 @@ externalGCS:
 externalCOS:
   enabled: false
   secretKey: ""
-  secretId: "your-secret-id"
+  secretId: ""
   region: "your-region"
   bucketName:
     api: "your-bucket-name"
@@ -3097,9 +3164,28 @@ externalCOS:
 externalOBS:
   enabled: false
   endpoint: "https://your-endpoint"
-  asscessKey: "your-secret-id"
+  accessKey: ""
   secretKey: ""
-  bucketName: "your-bucket-name"
+  bucketName:
+    api: "your-bucket-name"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOBS.enabled` is set to `true`).
+    pluginDaemon:
+
+###################################
+# External Tinder Object Storage (TOS) from volcengine
+# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` and `externalOBS.enabled` are false and `externalTOS.enabled` is true
+###################################
+externalTOS:
+  enabled: false
+  endpoint: "https://tos-cn-beijing.volces.com"
+  accessKey: "your-access-key"
+  secretKey: "your-secret-key"
+  bucketName:
+    # Shared storage for `api` and `worker`
+    api: "your-bucket-name"
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalTOS.enabled` is set to `true`).
+    pluginDaemon:
+  region: "cn-beijing"
 
 ###################################
 # External Redis
@@ -3110,7 +3196,7 @@ externalRedis:
   host: "redis.example"
   port: 6379
   username: ""
-  password: ""
+  password: "difyai123456"
   useSSL: false
 
 ###################################
@@ -3120,7 +3206,6 @@ externalRedis:
 externalWeaviate:
   enabled: false
   endpoint: "http://weaviate:8080"
-  # Note: When using ExternalSecret, this value is managed externally
   apiKey: ""
 
 ###################################
@@ -3130,7 +3215,6 @@ externalWeaviate:
 externalQdrant:
   enabled: false
   endpoint: "https://your-qdrant-cluster-url.qdrant.tech/"
-  # Note: When using ExternalSecret, this value is managed externally
   apiKey: ""
   timeout: 20
   grpc:
@@ -3155,7 +3239,6 @@ externalMilvus:
 ###################################
 externalPgvector:
   enabled: false
-  # Note: When using ExternalSecret, these values are managed externally
   username: ""
   password: ""
   address: "pgvector"
@@ -3169,7 +3252,6 @@ externalPgvector:
 externalTencentVectorDB:
   enabled: false
   url: "your-tencent-vector-db-url"
-  # Note: When using ExternalSecret, this value is managed externally
   apiKey: ""
   timeout: 30
   username: "root"
@@ -3198,9 +3280,20 @@ externalTableStore:
   enabled: false
   endpoint: "endpoint"
   instanceName: "instance-name"
-  # Note: When using ExternalSecret, these values are managed externally
   accessKeyId: ""
   accessKeySecret: ""
+
+###################################
+# External Elasticsearch
+# - these configs take effect only if all other vector databases are disabled and `externalElasticsearch.enabled` is `true`
+###################################
+externalElasticsearch:
+  enabled: false
+  host: "elasticsearch.example.com"
+  port: 9200
+  # Note: When using ExternalSecret, these values are managed externally
+  username: ""
+  password: ""
 
 ###################################
 # External Secret (External Secrets Operator)
@@ -3210,19 +3303,17 @@ externalTableStore:
 externalSecret:
   enabled: true
 
-  # External secret store backend provider (e.g., vault, aws, azure, gcp, etc.)
   secretStore:
-    # SecretStore or ClusterSecretStore name to reference
     name: "default-secret-store"
-    # kind: SecretStore or ClusterSecretStore
     kind: "ClusterSecretStore"
+
+  refreshInterval: "15m"
+  decodingStrategy: "None"
 
   # Configuration for api secret
   api:
     # Whether to create ExternalSecret for api
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
     # Remote references for external secret store
     # Only specify the fields you want to include - all possible fields are defined in the template
     remoteRefs:
@@ -3259,15 +3350,16 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
+      OTLP_API_KEY:
+        key: "dify/otel"
+        property: "api_key"
     data:
-      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-redis-master:6379/1"
+      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
   # Configuration for worker secret
   worker:
     # Whether to create ExternalSecret for worker
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       SECRET_KEY:
@@ -3300,16 +3392,15 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
+      OTLP_API_KEY:
+        key: "dify/otel"
+        property: "api_key"
     data:
-      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-redis-master:6379/1"
+      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
   # Configuration for sandbox secret
   sandbox:
-    # Whether to create ExternalSecret for sandbox
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
-    # Remote references for external secret store
     remoteRefs:
       API_KEY:
         key: "dify/sandbox"
@@ -3319,8 +3410,6 @@ externalSecret:
   pluginDaemon:
     # Whether to create ExternalSecret for plugin daemon
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       DB_USERNAME:
@@ -3343,8 +3432,6 @@ externalSecret:
   postgresql:
     # Whether to create ExternalSecret for built-in PostgreSQL
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       postgres-password:
@@ -3358,10 +3445,25 @@ externalSecret:
   redis:
     # Whether to create ExternalSecret for built-in Redis
     enabled: true
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       redis-password:
         key: "dify/redis"
         property: "redis_password"
+
+  # Configuration for Elasticsearch secret (for external Elasticsearch with ExternalSecret)
+  elasticsearch:
+    # Whether to create ExternalSecret for external Elasticsearch
+    enabled: false
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
+    # Only sensitive data (username/password) are fetched from external store
+    # Static values (host/port) are taken from values.yaml
+    remoteRefs:
+      ELASTICSEARCH_USERNAME:
+        key: "dify/elasticsearch"
+        property: "username"
+      ELASTICSEARCH_PASSWORD:
+        key: "dify/elasticsearch"
+        property: "password"

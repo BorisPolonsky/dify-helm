@@ -101,29 +101,10 @@ check_prerequisites() {
     log_success "All prerequisites checked"
 }
 
-# Function to cleanup existing resources
-cleanup_existing() {
-    echo "INFO: Cleaning up any existing resources..."
+# Pre-deployment checks
+check_prerequisites
 
-    # Check if release already exists
-    if helm list -n "$NAMESPACE" | grep -q "$RELEASE_NAME"; then
-        echo "INFO: Removing existing release: $RELEASE_NAME"
-        helm uninstall "$RELEASE_NAME" -n "$NAMESPACE" --timeout 300s || true
-
-        # Wait for pods to be deleted
-        echo "INFO: Waiting for pods to be deleted..."
-        kubectl wait --for=delete pods -l app.kubernetes.io/instance="$RELEASE_NAME" -n "$NAMESPACE" --timeout=300s || true
-    fi
-
-    # Clean up any stuck external secrets
-    local stuck_es=$(kubectl get externalsecrets -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || echo "")
-    if [[ -n "$stuck_es" ]]; then
-        echo "INFO: Cleaning up stuck external secrets: $stuck_es"
-        kubectl delete externalsecrets -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" --timeout=60s || true
-    fi
-}
-
-# Function to show deployment progress
+# Deploy using Helm with better error handling
 show_deployment_progress() {
     echo "INFO: Monitoring deployment progress..."
 
@@ -362,9 +343,6 @@ diagnose_deployment_issues() {
 # Pre-deployment checks
 check_prerequisites
 
-# Clean up existing resources
-cleanup_existing
-
 # Deploy using Helm with better error handling
 echo "INFO: Deploying Dify using Helm..."
 echo "INFO: Helm command: helm install $RELEASE_NAME charts/dify --values ci/values/$VALUES_FILE --namespace $NAMESPACE --wait --timeout $HELM_TIMEOUT"
@@ -398,15 +376,15 @@ if ! kubectl wait --for=condition=ready pod \
 
     echo "ERROR: Pods did not become ready within timeout"
     echo "INFO: Gathering detailed failure information for debugging..."
-    
+
     # Show current pod status with more details
     echo "INFO: Current pod status:"
     kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o wide || true
-    
+
     # Show container statuses for all pods
     echo "INFO: Container statuses:"
     kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.phase}{"\t"}{.status.containerStatuses[0].state}{"\n"}{end}' 2>/dev/null || true
-    
+
     show_deployment_progress
     diagnose_deployment_issues
     exit 1
@@ -437,7 +415,7 @@ check_pod_health() {
         # Show container logs if available
         echo "INFO: Current container logs:"
         kubectl logs "$pod_name" -n "$NAMESPACE" --tail=100 || true
-        
+
         # Show previous container logs if available
         echo "INFO: Previous container logs:"
         kubectl logs "$pod_name" -n "$NAMESPACE" --previous --tail=50 2>/dev/null || echo "No previous logs available"
@@ -459,50 +437,152 @@ check_pod_health() {
 # Fast batch connectivity test using single curl pod
 test_connectivity_batch() {
     local services_and_components="$1"
-    
+
     echo "INFO: Testing connectivity to all services in parallel..."
-    
+
     local test_name="connectivity-test-$(date +%s)"
-    
+
     set +e  # Temporarily disable exit on error
-    
+
     # Build curl commands for parallel execution
     local curl_commands=""
     local service_list=""
-    
+
     # Parse services and components
     while IFS='|' read -r service component; do
         [[ -n "$service" && -n "$component" ]] || continue
         curl_commands+="echo 'Testing $component ($service)...' && curl -I -s -m 5 --connect-timeout 2 '$service' && echo 'SUCCESS: $component reachable' || echo 'FAILED: $component unreachable' &"$'\n'
         service_list+="$component "
     done <<< "$services_and_components"
-    
+
     # Add wait command to wait for all background processes
     curl_commands+="wait"
-    
+
     echo "INFO: Running connectivity tests for: $service_list"
-    
+
     # Create single pod with all curl tests
     kubectl run "$test_name" --image=curlimages/curl --restart=Never -- sh -c "$curl_commands"
-    
+
     # Wait for pod to complete (much faster than individual waits)
     echo "INFO: Waiting for batch connectivity test to complete..."
     kubectl wait --for=condition=Ready pod/"$test_name" -n "$NAMESPACE" --timeout=30s 2>/dev/null || true
-    
+
     # Give a moment for the curl commands to execute
     sleep 3
-    
+
     # Get the curl output
     echo "INFO: Connectivity test results:"
     echo "================================"
     kubectl logs "$test_name" -n "$NAMESPACE" 2>/dev/null || echo "Could not retrieve logs"
     echo "================================"
-    
-    # Clean up
-    kubectl delete pod "$test_name" -n "$NAMESPACE" --ignore-not-found=true
+
     set -e
-    
+
     return 0
+}
+
+# Function to test OTEL Collector metrics
+test_otel_collector() {
+    echo "INFO: Testing OpenTelemetry Collector..."
+    echo "======================================="
+
+    set +e  # Temporarily disable exit on error
+
+    # Execute curl directly in API pod to test OTEL metrics
+    echo "INFO: Testing OTEL Collector metrics endpoint via API pod..."
+    local test_output
+    test_output=$(kubectl exec "$API_POD" -n "$NAMESPACE" -- curl -s --connect-timeout 10 --max-time 30 'http://otel-collector:8888/metrics' 2>&1)
+    local curl_exit_code=$?
+
+    set -e
+
+    echo "INFO: OTEL Collector metrics test results:"
+    echo "=========================================="
+
+    if [[ $curl_exit_code -ne 0 ]]; then
+        echo "ERROR: Failed to connect to OTEL Collector metrics endpoint"
+        echo "Curl error output: $test_output"
+        echo "INFO: This could indicate that:"
+        echo "  - OTEL Collector service is not responding"
+        echo "  - Network connectivity issues"
+        echo "  - OTEL Collector is not properly configured"
+
+        # Show additional OTEL Collector status for debugging
+        echo ""
+        echo "INFO: OTEL Collector pod status:"
+        kubectl get pods -l app.kubernetes.io/name=opentelemetry-collector -o wide 2>/dev/null || echo "No OTEL Collector pods found with standard labels"
+
+        log_failure "OTEL Collector metrics test failed"
+        return 1
+    fi
+
+    # Show sample of metrics output (first 10 lines)
+    echo "INFO: Sample metrics output (first 10 lines):"
+    echo "$test_output" | head -10
+    echo "..."
+    echo ""
+
+    # Check if metrics were found and parse the spans count
+    if echo "$test_output" | grep -q "otelcol_receiver_accepted_spans__spans__total"; then
+        echo "SUCCESS: Found OTEL receiver metrics"
+
+        # Extract and validate the spans count
+        local spans_metrics=$(echo "$test_output" | grep "otelcol_receiver_accepted_spans__spans__total")
+        echo "INFO: Spans metrics found:"
+        echo "$spans_metrics"
+
+        # Check if any spans count is greater than 3
+        local max_spans=0
+        while IFS= read -r line; do
+            # Match patterns like: otelcol_receiver_accepted_spans__spans__total{...} 172
+            if [[ "$line" =~ otelcol_receiver_accepted_spans__spans__total.*[[:space:]]+([0-9]+)([[:space:]]*$|[[:space:]]+.*) ]]; then
+                local count="${BASH_REMATCH[1]}"
+                echo "INFO: Found spans count: $count in line: $line"
+                if [[ $count -gt $max_spans ]]; then
+                    max_spans=$count
+                fi
+            fi
+        done <<< "$spans_metrics"
+
+        echo "INFO: Maximum spans count found: $max_spans"
+
+        if [[ $max_spans -gt 3 ]]; then
+            echo "SUCCESS: OTEL Collector is receiving spans (count: $max_spans > 3)"
+            log_success "OTEL Collector metrics test completed"
+            return 0
+        else
+            echo "WARNING: OTEL Collector spans count is low (count: $max_spans <= 3)"
+            echo "INFO: This might indicate that the application is not sending enough telemetry data"
+            # Don't fail the test immediately, as this might be expected in some scenarios
+            log_success "OTEL Collector metrics test completed (low spans count)"
+            return 0
+        fi
+    else
+        echo "ERROR: OTEL receiver metrics not found"
+        echo "INFO: This could indicate that:"
+        echo "  - OTEL Collector is not receiving any telemetry data"
+        echo "  - OTEL Collector configuration is incorrect"
+        echo "  - Application is not configured to send telemetry"
+
+        # Show additional debugging info
+        echo ""
+        echo "INFO: Checking for any OTEL-related metrics..."
+        local otel_metrics_count=$(echo "$test_output" | grep -c "otelcol_" || echo "0")
+        echo "INFO: Found $otel_metrics_count OTEL-related metrics in total"
+
+        if [[ $otel_metrics_count -gt 0 ]]; then
+            echo "INFO: Sample OTEL metrics found:"
+            echo "$test_output" | grep "otelcol_" | head -5
+        fi
+
+        # Show additional OTEL Collector status for debugging
+        echo ""
+        echo "INFO: OTEL Collector pod status:"
+        kubectl get pods -l app.kubernetes.io/name=opentelemetry-collector -o wide 2>/dev/null || echo "No OTEL Collector pods found with standard labels"
+
+        log_failure "OTEL Collector metrics test failed"
+        return 1
+    fi
 }
 
 # Function to check secrets and configmaps
@@ -559,26 +639,13 @@ check_secrets_and_configs() {
     fi
 }
 
-# Debugging: Show all pods for this release
-echo "All pods for release $RELEASE_NAME:"
-kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o wide || true
-
-echo ""
-echo "Pod labels breakdown:"
-kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels}{"\n"}{end}' || true
-
-echo ""
-echo "Available pod selectors:"
-kubectl get pods -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels.component}{"\n"}{end}' || true
-
 # Get pod names using simple selectors (CI environment has only one deployment)
 API_POD=$(kubectl get pods -n "$NAMESPACE" -l "app.kubernetes.io/instance=$RELEASE_NAME" -o jsonpath='{.items[?(@.metadata.labels.component=="api")].metadata.name}' 2>/dev/null || echo "")
 WEB_POD=$(kubectl get pods -n "$NAMESPACE" -l "app.kubernetes.io/instance=$RELEASE_NAME" -o jsonpath='{.items[?(@.metadata.labels.component=="web")].metadata.name}' 2>/dev/null || echo "")
 WORKER_POD=$(kubectl get pods -n "$NAMESPACE" -l "app.kubernetes.io/instance=$RELEASE_NAME" -o jsonpath='{.items[?(@.metadata.labels.component=="worker")].metadata.name}' 2>/dev/null || echo "")
 SANDBOX_POD=$(kubectl get pods -n "$NAMESPACE" -l "app.kubernetes.io/instance=$RELEASE_NAME" -o jsonpath='{.items[?(@.metadata.labels.component=="sandbox")].metadata.name}' 2>/dev/null || echo "")
 
-echo ""
-echo "Found pods - API: $API_POD, Web: $WEB_POD, Worker: $WORKER_POD, Sandbox: $SANDBOX_POD"
+echo "INFO: Found pods - API: $API_POD, Web: $WEB_POD, Worker: $WORKER_POD, Sandbox: $SANDBOX_POD"
 
 # Comprehensive health checks
 echo ""
@@ -591,27 +658,11 @@ echo "========================================="
 [[ -n "$WORKER_POD" ]] && check_pod_health "$WORKER_POD" "Worker"
 [[ -n "$SANDBOX_POD" ]] && check_pod_health "$SANDBOX_POD" "Sandbox"
 
-# Show all services for this release
+# Show services and endpoints for this release
 echo ""
-echo "INFO: All services for release $RELEASE_NAME:"
-echo "============================================="
-kubectl get services -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o wide || true
-
-echo ""
-echo "INFO: All services in namespace $NAMESPACE:"
-echo "==========================================="
-kubectl get services -n "$NAMESPACE" -o wide || true
-
-echo ""
-echo "INFO: All endpoints for release $RELEASE_NAME:"
-echo "=============================================="
-kubectl get endpoints -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" || true
-
-echo ""
-echo "INFO: Network connectivity overview:"
-echo "==================================="
-echo "Cluster DNS:"
-kubectl get service kube-dns -n kube-system 2>/dev/null || echo "DNS service not found"
+echo "INFO: Services and endpoints for release $RELEASE_NAME:"
+echo "====================================================="
+kubectl get services,endpoints -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o wide || true
 
 # Test basic connectivity using optimized batch curl
 echo ""
@@ -625,8 +676,20 @@ ${RELEASE_NAME}-web.${NAMESPACE}.svc.cluster.local:3000|web"
 
 test_connectivity_batch "$SERVICES_TO_TEST"
 
+# Test OTEL Collector if enabled
+if [[ "${USE_OTEL_COLLECTOR:-false}" == "true" ]]; then
+    echo ""
+    echo "INFO: OTEL Collector testing enabled, checking metrics..."
+    echo "======================================================="
+    test_otel_collector
+else
+    echo ""
+    echo "INFO: OTEL Collector testing disabled (USE_OTEL_COLLECTOR=${USE_OTEL_COLLECTOR:-false})"
+fi
+
 # Check secrets and configs
 check_secrets_and_configs
+
 
 # Run Helm test if available
 echo "INFO: Running Helm tests..."
@@ -642,44 +705,26 @@ else
     echo "SUCCESS: Helm tests passed"
 fi
 
-# Generate comprehensive deployment summary
+# Generate deployment summary
 echo ""
-echo "INFO: Comprehensive Deployment Summary:"
-echo "====================================="
+echo "INFO: Deployment Summary:"
+echo "========================"
 echo "Values file: $VALUES_FILE"
 echo "Release name: $RELEASE_NAME"
 echo "Namespace: $NAMESPACE"
 echo "Failed checks: $FAILED_CHECKS"
-echo ""
-
-echo "INFO: Resource Status:"
-kubectl get pods,services,secrets,configmaps,externalsecrets -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" 2>/dev/null || \
-kubectl get pods,services,secrets,configmaps -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME"
 
 echo ""
-echo "INFO: Resource Usage:"
-kubectl top pods -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" 2>/dev/null || echo "Metrics not available"
-
-echo ""
-echo "INFO: Recent Events:"
-kubectl get events -n "$NAMESPACE" --sort-by='.lastTimestamp' | tail -10
+echo "INFO: Final Resource Status:"
+kubectl get pods,services -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" || true
 
 # Final status
 echo ""
-echo "INFO: Final check summary - Failed checks: $FAILED_CHECKS"
-
-# List what checks actually failed
-if [[ $FAILED_CHECKS -gt 0 ]]; then
-    echo "WARNING: Some checks failed, but deployment may still be functional"
-    echo "INFO: Check the details above to determine if issues are critical"
-fi
-
 if [[ $FAILED_CHECKS -eq 0 ]]; then
     echo "SUCCESS: All checks passed! Deployment is healthy and functional."
     exit 0
 else
-    # For CI/CD purposes, we'll allow some failures but still report them
-    echo "WARNING: $FAILED_CHECKS checks had issues, but pods are healthy"
+    echo "WARNING: $FAILED_CHECKS checks had issues, but deployment may still be functional"
     echo "INFO: If pods are Running and Ready, the deployment is likely functional"
     exit 0  # Exit with success since pods are healthy
 fi

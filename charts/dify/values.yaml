@@ -153,6 +153,36 @@ api:
     value: "30"
   - name: CODE_MAX_NUMBER_ARRAY_LENGTH
     value: "1000"
+  ## OpenTelemetry (OTEL) configuration
+  otel:
+    enabled: false
+    # OpenTelemetry trace endpoint
+    traceEndpoint: ""
+    # OpenTelemetry metric endpoint
+    metricEndpoint: ""
+    # OpenTelemetry base endpoint
+    baseEndpoint: "http://localhost:4318"
+    # OpenTelemetry API Key (sensitive - stored in secret)
+    apiKey: ""
+    # OpenTelemetry exporter protocol
+    exporterProtocol: ""
+    # OpenTelemetry exporter type
+    exporterType: "otlp"
+    # OpenTelemetry sampling rate
+    samplingRate: 0.1
+    # OpenTelemetry batch export schedule delay in milliseconds
+    batchExportScheduleDelay: 5000
+    # OpenTelemetry max queue size
+    maxQueueSize: 2048
+    # OpenTelemetry max export batch size
+    maxExportBatchSize: 512
+    # OpenTelemetry metric export interval in milliseconds
+    metricExportInterval: 60000
+    # OpenTelemetry batch export timeout in milliseconds
+    batchExportTimeout: 10000
+    # OpenTelemetry metric export timeout in milliseconds
+    metricExportTimeout: 30000
+
   service:
     port: 5001
     annotations: {}
@@ -283,6 +313,7 @@ worker:
   #      secretKeyRef:
   #        name: my-secret
   #        key: DB_PASSWORD
+
   logLevel: INFO
   ## Dify Worker ServiceAccount configuration
   ##
@@ -3334,6 +3365,9 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
+      OTLP_API_KEY:
+        key: "dify/otel"
+        property: "api_key"
     data:
       CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
@@ -3373,6 +3407,9 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
+      OTLP_API_KEY:
+        key: "dify/otel"
+        property: "api_key"
     data:
       CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
