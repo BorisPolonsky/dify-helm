@@ -92,13 +92,13 @@ OTLP_BASE_ENDPOINT: {{ .Values.api.otel.baseEndpoint | quote }}
 OTEL_EXPORTER_OTLP_PROTOCOL: {{ .Values.api.otel.exporterProtocol | quote }}
 {{- end }}
 OTEL_EXPORTER_TYPE: {{ .Values.api.otel.exporterType | quote }}
-OTEL_SAMPLING_RATE: {{ .Values.api.otel.samplingRate | quote }}
-OTEL_BATCH_EXPORT_SCHEDULE_DELAY: {{ .Values.api.otel.batchExportScheduleDelay | quote }}
-OTEL_MAX_QUEUE_SIZE: {{ .Values.api.otel.maxQueueSize | quote }}
-OTEL_MAX_EXPORT_BATCH_SIZE: {{ .Values.api.otel.maxExportBatchSize | quote }}
-OTEL_METRIC_EXPORT_INTERVAL: {{ .Values.api.otel.metricExportInterval | quote }}
-OTEL_BATCH_EXPORT_TIMEOUT: {{ .Values.api.otel.batchExportTimeout | quote }}
-OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.api.otel.metricExportTimeout | quote }}
+OTEL_SAMPLING_RATE: {{ .Values.api.otel.samplingRate | toString | quote }}
+OTEL_BATCH_EXPORT_SCHEDULE_DELAY: {{ .Values.api.otel.batchExportScheduleDelay | toString | quote }}
+OTEL_MAX_QUEUE_SIZE: {{ .Values.api.otel.maxQueueSize | toString | quote }}
+OTEL_MAX_EXPORT_BATCH_SIZE: {{ .Values.api.otel.maxExportBatchSize | toString | quote }}
+OTEL_METRIC_EXPORT_INTERVAL: {{ .Values.api.otel.metricExportInterval | toString | quote }}
+OTEL_BATCH_EXPORT_TIMEOUT: {{ .Values.api.otel.batchExportTimeout | toString | quote }}
+OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.api.otel.metricExportTimeout | toString | quote }}
 {{- end }}
 {{- end }}
 
@@ -138,27 +138,27 @@ PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Value
 {{- end }}
 {{- include "dify.marketplace.config" . }}
 
-{{- if .Values.worker.otel.enabled }}
+{{- if .Values.api.otel.enabled }}
 # OpenTelemetry configuration
-ENABLE_OTEL: {{ .Values.worker.otel.enabled | toString | quote }}
-{{- if .Values.worker.otel.traceEndpoint }}
-OTLP_TRACE_ENDPOINT: {{ .Values.worker.otel.traceEndpoint | quote }}
+ENABLE_OTEL: {{ .Values.api.otel.enabled | toString | quote }}
+{{- if .Values.api.otel.traceEndpoint }}
+OTLP_TRACE_ENDPOINT: {{ .Values.api.otel.traceEndpoint | quote }}
 {{- end }}
-{{- if .Values.worker.otel.metricEndpoint }}
-OTLP_METRIC_ENDPOINT: {{ .Values.worker.otel.metricEndpoint | quote }}
+{{- if .Values.api.otel.metricEndpoint }}
+OTLP_METRIC_ENDPOINT: {{ .Values.api.otel.metricEndpoint | quote }}
 {{- end }}
-OTLP_BASE_ENDPOINT: {{ .Values.worker.otel.baseEndpoint | quote }}
-{{- if .Values.worker.otel.exporterProtocol }}
-OTEL_EXPORTER_OTLP_PROTOCOL: {{ .Values.worker.otel.exporterProtocol | quote }}
+OTLP_BASE_ENDPOINT: {{ .Values.api.otel.baseEndpoint | quote }}
+{{- if .Values.api.otel.exporterProtocol }}
+OTEL_EXPORTER_OTLP_PROTOCOL: {{ .Values.api.otel.exporterProtocol | quote }}
 {{- end }}
-OTEL_EXPORTER_TYPE: {{ .Values.worker.otel.exporterType | quote }}
-OTEL_SAMPLING_RATE: {{ .Values.worker.otel.samplingRate | quote }}
-OTEL_BATCH_EXPORT_SCHEDULE_DELAY: {{ .Values.worker.otel.batchExportScheduleDelay | quote }}
-OTEL_MAX_QUEUE_SIZE: {{ .Values.worker.otel.maxQueueSize | quote }}
-OTEL_MAX_EXPORT_BATCH_SIZE: {{ .Values.worker.otel.maxExportBatchSize | quote }}
-OTEL_METRIC_EXPORT_INTERVAL: {{ .Values.worker.otel.metricExportInterval | quote }}
-OTEL_BATCH_EXPORT_TIMEOUT: {{ .Values.worker.otel.batchExportTimeout | quote }}
-OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.worker.otel.metricExportTimeout | quote }}
+OTEL_EXPORTER_TYPE: {{ .Values.api.otel.exporterType | quote }}
+OTEL_SAMPLING_RATE: {{ .Values.api.otel.samplingRate | toString | quote }}
+OTEL_BATCH_EXPORT_SCHEDULE_DELAY: {{ .Values.api.otel.batchExportScheduleDelay | toString | quote }}
+OTEL_MAX_QUEUE_SIZE: {{ .Values.api.otel.maxQueueSize | toString | quote }}
+OTEL_MAX_EXPORT_BATCH_SIZE: {{ .Values.api.otel.maxExportBatchSize | toString | quote }}
+OTEL_METRIC_EXPORT_INTERVAL: {{ .Values.api.otel.metricExportInterval | toString | quote }}
+OTEL_BATCH_EXPORT_TIMEOUT: {{ .Values.api.otel.batchExportTimeout | toString | quote }}
+OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.api.otel.metricExportTimeout | toString | quote }}
 {{- end }}
 {{- end }}
 
