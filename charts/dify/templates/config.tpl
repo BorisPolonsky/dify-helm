@@ -600,6 +600,7 @@ S3_USE_PATH_STYLE: {{ .Values.externalS3.pathStyle | toString | quote }}
 S3_ENDPOINT: {{ .Values.externalS3.endpoint | quote }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalS3.bucketName.pluginDaemon | quote }}
 AWS_REGION: {{ .Values.externalS3.region | quote }}
+S3_USE_AWS_MANAGED_IAM: {{ .Values.externalS3.useIAM | toString | quote }}
 {{- else if and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: "aliyun_oss"
 ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}
