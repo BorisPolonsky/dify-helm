@@ -41,6 +41,15 @@ spec:
         */}}
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
+      {{- if .Values.sandbox.dependencies }}
+      volumes:
+        - name: {{ template "dify.sandbox.fullname" . }}-dependencies-volume
+          configMap:
+            name: {{ template "dify.sandbox.fullname" . }}
+            items:
+              - key: SANDBOX_DEPENDENCIES
+                path: python-requirements.txt
+      {{- end }}
       serviceAccountName: {{ include "dify.sandbox.serviceAccountName" . }}
       {{- if .Values.sandbox.priorityClassName }}
       priorityClassName: {{ .Values.sandbox.priorityClassName | quote }}
@@ -101,6 +110,12 @@ spec:
             protocol: TCP
         resources:
           {{- toYaml .Values.sandbox.resources | nindent 12 }}
+        {{- if .Values.sandbox.dependencies }}
+        volumeMounts:
+          - name: {{ template "dify.sandbox.fullname" . }}-dependencies-volume
+            mountPath: /dependencies/python-requirements.txt
+            subPath: python-requirements.txt
+        {{- end -}}
     {{- if and (.Values.nodeSelector) (not .Values.sandbox.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}

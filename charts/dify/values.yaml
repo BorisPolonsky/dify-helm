@@ -586,6 +586,8 @@ sandbox:
   podSecurityContext: {}
   # Configure Container Security Context
   containerSecurityContext: {}
+  # Configure additional Python dependencies, ref: https://docs.dify.ai/en/development/backend/sandbox/README#installation-dependencies
+  dependencies: []
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
