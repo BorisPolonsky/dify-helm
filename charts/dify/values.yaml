@@ -508,6 +508,8 @@ web:
   # Apply your own Environment Variables if necessary
   - name: EDITION
     value: "SELF_HOSTED"
+  - name: HOSTNAME
+    value: "0.0.0.0"
   service:
     port: 3000
     annotations: {}
