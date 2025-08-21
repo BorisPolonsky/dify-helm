@@ -322,6 +322,9 @@ REDIS_DB: "0"
 {{- end }}
 
 {{- define "dify.vectordb.config" -}}
+{{- if .Values.vectorIndexNamePrefix }}
+VECTOR_INDEX_NAME_PREFIX: {{ .Values.vectorIndexNamePrefix | quote }}
+{{- end }}
 {{- if .Values.externalWeaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`, `pgvector`, `tencent`, `myscale`.
 VECTOR_STORE: weaviate

@@ -3209,6 +3209,12 @@ externalRedis:
   useSSL: false
 
 ###################################
+# Vector Database Global Configuration
+###################################
+# Prefix used to create collection name in vector database
+vectorIndexNamePrefix: ""
+
+###################################
 # External Weaviate
 # - these configs take effect when `externalWeaviate.enabled` is true
 ###################################
