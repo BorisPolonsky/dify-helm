@@ -25,22 +25,29 @@ version: 0.28.1
 appVersion: "1.7.1"
 
 dependencies:
-- name: postgresql
-  version: 12.5.6
-  repository: https://charts.bitnami.com/bitnami
-  condition: postgresql.enabled
-  tags:
-    - postgres
-- name: redis
-  version: 16.13.2
-  repository: https://charts.bitnami.com/bitnami
-  condition: redis.enabled
-  tags:
-    - redis
-- name: weaviate
-  version: 16.1.0
-  repository: https://weaviate.github.io/weaviate-helm
-  condition: weaviate.enabled
-  tags:
-    - vector
-    - search
+  - name: postgresql
+    version: 12.5.6
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled
+    tags:
+      - postgres
+  - name: redis
+    version: 16.13.2
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled
+    tags:
+      - redis
+  - name: weaviate
+    version: 16.1.0
+    repository: https://weaviate.github.io/weaviate-helm
+    condition: weaviate.enabled
+    tags:
+      - vector
+      - search
+  - name: qdrant
+    version: 0.7.4
+    repository: https://qdrant.github.io/qdrant-helm
+    condition: qdrant.enabled
+    tags:
+      - vector
+      - search

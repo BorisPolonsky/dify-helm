@@ -405,6 +405,9 @@ WEAVIATE_ENDPOINT: {{ printf "http://%s" .name | quote }}
   {{- if .Values.weaviate.authentication.apikey }}
 # WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys }}
   {{- end }}
+{{- else if .Values.qdrant.enabled }}
+VECTOR_STORE: qdrant
+QDRANT_URL: 'http://{{ .Values.qdrant.fullnameOverride | default (printf "%s-%s" .Release.Name "qdrant") }}'
 {{- end }}
 {{- end }}
 
