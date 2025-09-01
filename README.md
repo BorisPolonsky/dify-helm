@@ -201,6 +201,7 @@ The Nginx proxy handles traffic routing with the following rules:
   - [x] Tencent Vector DB
   - [x] MyScaleDB
   - [x] TableStore
+  - [x] elasticsearch
 
 ## ExternalSecret Support
 

@@ -77,6 +77,29 @@ SSRF_PROXY_HTTPS_URL: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Value
 {{- if .Values.pluginDaemon.enabled }}
 PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.ports.daemon }}
 {{- end }}
+
+{{- if .Values.api.otel.enabled }}
+# OpenTelemetry configuration
+ENABLE_OTEL: {{ .Values.api.otel.enabled | toString | quote }}
+{{- if .Values.api.otel.traceEndpoint }}
+OTLP_TRACE_ENDPOINT: {{ .Values.api.otel.traceEndpoint | quote }}
+{{- end }}
+{{- if .Values.api.otel.metricEndpoint }}
+OTLP_METRIC_ENDPOINT: {{ .Values.api.otel.metricEndpoint | quote }}
+{{- end }}
+OTLP_BASE_ENDPOINT: {{ .Values.api.otel.baseEndpoint | quote }}
+{{- if .Values.api.otel.exporterProtocol }}
+OTEL_EXPORTER_OTLP_PROTOCOL: {{ .Values.api.otel.exporterProtocol | quote }}
+{{- end }}
+OTEL_EXPORTER_TYPE: {{ .Values.api.otel.exporterType | quote }}
+OTEL_SAMPLING_RATE: {{ .Values.api.otel.samplingRate | toString | quote }}
+OTEL_BATCH_EXPORT_SCHEDULE_DELAY: {{ .Values.api.otel.batchExportScheduleDelay | toString | quote }}
+OTEL_MAX_QUEUE_SIZE: {{ .Values.api.otel.maxQueueSize | toString | quote }}
+OTEL_MAX_EXPORT_BATCH_SIZE: {{ .Values.api.otel.maxExportBatchSize | toString | quote }}
+OTEL_METRIC_EXPORT_INTERVAL: {{ .Values.api.otel.metricExportInterval | toString | quote }}
+OTEL_BATCH_EXPORT_TIMEOUT: {{ .Values.api.otel.batchExportTimeout | toString | quote }}
+OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.api.otel.metricExportTimeout | toString | quote }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.worker.config" -}}
@@ -114,6 +137,29 @@ CELERY_BACKEND: redis
 PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.ports.daemon }}
 {{- end }}
 {{- include "dify.marketplace.config" . }}
+
+{{- if .Values.api.otel.enabled }}
+# OpenTelemetry configuration
+ENABLE_OTEL: {{ .Values.api.otel.enabled | toString | quote }}
+{{- if .Values.api.otel.traceEndpoint }}
+OTLP_TRACE_ENDPOINT: {{ .Values.api.otel.traceEndpoint | quote }}
+{{- end }}
+{{- if .Values.api.otel.metricEndpoint }}
+OTLP_METRIC_ENDPOINT: {{ .Values.api.otel.metricEndpoint | quote }}
+{{- end }}
+OTLP_BASE_ENDPOINT: {{ .Values.api.otel.baseEndpoint | quote }}
+{{- if .Values.api.otel.exporterProtocol }}
+OTEL_EXPORTER_OTLP_PROTOCOL: {{ .Values.api.otel.exporterProtocol | quote }}
+{{- end }}
+OTEL_EXPORTER_TYPE: {{ .Values.api.otel.exporterType | quote }}
+OTEL_SAMPLING_RATE: {{ .Values.api.otel.samplingRate | toString | quote }}
+OTEL_BATCH_EXPORT_SCHEDULE_DELAY: {{ .Values.api.otel.batchExportScheduleDelay | toString | quote }}
+OTEL_MAX_QUEUE_SIZE: {{ .Values.api.otel.maxQueueSize | toString | quote }}
+OTEL_MAX_EXPORT_BATCH_SIZE: {{ .Values.api.otel.maxExportBatchSize | toString | quote }}
+OTEL_METRIC_EXPORT_INTERVAL: {{ .Values.api.otel.metricExportInterval | toString | quote }}
+OTEL_BATCH_EXPORT_TIMEOUT: {{ .Values.api.otel.batchExportTimeout | toString | quote }}
+OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.api.otel.metricExportTimeout | toString | quote }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.web.config" -}}
@@ -172,6 +218,7 @@ S3_BUCKET_NAME: {{ .Values.externalS3.bucketName.api | quote }}
 # S3_ACCESS_KEY: {{ .Values.externalS3.accessKey | quote }}
 # S3_SECRET_KEY: {{ .Values.externalS3.secretKey | quote }}
 S3_REGION: {{ .Values.externalS3.region | quote }}
+S3_USE_AWS_MANAGED_IAM: {{ .Values.externalS3.useIAM | toString | quote }}
 {{- else if .Values.externalAzureBlobStorage.enabled }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss` and `google-storage`, Default: `local`
 STORAGE_TYPE: azure-blob
@@ -341,8 +388,6 @@ TABLESTORE_INSTANCE_NAME: {{ .Values.externalTableStore.instanceName | quote }}
 VECTOR_STORE: elasticsearch
 ELASTICSEARCH_HOST: {{ .Values.externalElasticsearch.host | quote }}
 ELASTICSEARCH_PORT: {{ .Values.externalElasticsearch.port | toString | quote }}
-# ELASTICSEARCH_USERNAME: {{ .Values.externalElasticsearch.username | quote }}
-# ELASTICSEARCH_PASSWORD: {{ .Values.externalElasticsearch.password | quote }}
 {{- else if .Values.weaviate.enabled }}
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`.
 VECTOR_STORE: weaviate
@@ -604,6 +649,7 @@ S3_USE_PATH_STYLE: {{ .Values.externalS3.pathStyle | toString | quote }}
 S3_ENDPOINT: {{ .Values.externalS3.endpoint | quote }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalS3.bucketName.pluginDaemon | quote }}
 AWS_REGION: {{ .Values.externalS3.region | quote }}
+S3_USE_AWS_MANAGED_IAM: {{ .Values.externalS3.useIAM | toString | quote }}
 {{- else if and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: "aliyun_oss"
 ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}

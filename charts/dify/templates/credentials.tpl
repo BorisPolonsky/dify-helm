@@ -17,6 +17,9 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | b64enc | quote }}
 INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
 {{- end }}
+{{- if and .Values.api.otel.enabled (not .Values.externalSecret.enabled) }}
+OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.worker.credentials" -}}
@@ -37,6 +40,9 @@ SECRET_KEY: {{ .Values.api.secretKey | b64enc | quote }}
 {{- if .Values.pluginDaemon.enabled }}
 PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | b64enc | quote }}
 INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
+{{- end }}
+{{- if and .Values.api.otel.enabled (not .Values.externalSecret.enabled) }}
+OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
 {{- end }}
 {{- end }}
 
@@ -141,6 +147,10 @@ MYSCALE_PASSWORD: {{ .Values.externalMyScaleDB.password | b64enc | quote }}
 {{- else if .Values.externalTableStore.enabled}}
 TABLESTORE_ACCESS_KEY_ID: {{ .Values.externalTableStore.accessKeyId | b64enc | quote }}
 TABLESTORE_ACCESS_KEY_SECRET: {{ .Values.externalTableStore.accessKeySecret | b64enc | quote }}
+{{- else if .Values.externalElasticsearch.enabled}}
+# The Elasticsearch credentials
+ELASTICSEARCH_USERNAME: {{ .Values.externalElasticsearch.username | b64enc | quote }}
+ELASTICSEARCH_PASSWORD: {{ .Values.externalElasticsearch.password | b64enc | quote }}
 {{- else if .Values.weaviate.enabled }}
 # The Weaviate API key.
   {{- if .Values.weaviate.authentication.apikey }}
