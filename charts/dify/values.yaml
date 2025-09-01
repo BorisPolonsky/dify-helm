@@ -251,7 +251,7 @@ api:
       ## ReadWriteMany access mode required for `api` and `worker`
       ##
       storageClass:
-      accessModes: ReadWriteOnce
+      accessModes: ReadWriteMany
       size: 5Gi
       subPath: ""
   ## Dify API ServiceAccount configuration
@@ -426,7 +426,7 @@ proxy:
         ## ReadWriteMany access mode required for nginx
         ##
         storageClass:
-        accessModes: ReadWriteOnce
+        accessModes: ReadWriteMany
         size: 1Gi
         subPath: ""
   service:
@@ -662,7 +662,7 @@ ssrfProxy:
         ## ReadWriteMany access mode required for squid
         ##
         storageClass:
-        accessModes: ReadWriteOnce
+        accessModes: ReadWriteMany
         size: 1Gi
         subPath: ""
   service:
@@ -744,7 +744,7 @@ pluginDaemon:
       ## ReadWriteMany access mode required for `pluginDaemon`
       ##
       storageClass:
-      accessModes: ReadWriteOnce
+      accessModes: ReadWriteMany
       size: 5Gi
       subPath: ""
   marketplace:
@@ -788,7 +788,7 @@ postgresql:
     pullPolicy: IfNotPresent
   ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
   ##
-  architecture: standalone
+  architecture: replication
   ## Replication configuration
   ## Ignored if `architecture` is `standalone`
   ##
@@ -1414,7 +1414,7 @@ redis:
 
   ## @param architecture Redis&reg; architecture. Allowed values: `standalone` or `replication`
   ##
-  architecture: standalone
+  architecture: replication
   ## Redis&reg; Authentication parameters
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/redis#setting-the-server-password-on-first-run
   ##
