@@ -188,6 +188,8 @@ MARKETPLACE_URL: {{ .Values.api.url.marketplace | quote }}
 DB_HOST: {{ .Values.externalPostgres.address }}
 DB_PORT: {{ .Values.externalPostgres.port | toString | quote }}
 DB_DATABASE: {{ .Values.externalPostgres.database.api | quote }}
+SQLALCHEMY_POOL_SIZE: {{ .Values.externalPostgres.maxOpenConns | default 30 | toString | quote }}
+SQLALCHEMY_POOL_RECYCLE: {{ .Values.externalPostgres.maxIdleConns | default 3600 | toString | quote }}
 {{- else if .Values.postgresql.enabled }}
   {{ with .Values.postgresql.global.postgresql.auth }}
   {{- if empty .username }}
