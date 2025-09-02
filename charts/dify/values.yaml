@@ -3089,8 +3089,6 @@ externalPostgres:
   database:
     api: "dify"
     pluginDaemon: "dify_plugin"
-  maxOpenConns: 20
-  maxIdleConns: 5
 
 ###################################
 # External S3
