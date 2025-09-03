@@ -3126,7 +3126,7 @@ externalSecret:
         key: "dify/otel"
         property: "api_key"
     data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
   # Configuration for worker secret
   worker:
@@ -3168,7 +3168,7 @@ externalSecret:
         key: "dify/otel"
         property: "api_key"
     data:
-      CELERY_BROKER_URL: "reids://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
   # Configuration for sandbox secret
   sandbox:
