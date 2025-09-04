@@ -366,7 +366,7 @@ jobs:
         run: |
           echo "Installing external PostgreSQL..."
           helm install external-postgres bitnami/postgresql \
-            --set image.repository="bitnamilegacy/postgresql"
+            --set image.repository="bitnamilegacy/postgresql" \
             --set auth.postgresPassword="difyai123456" \
             --set auth.database="dify" \
             --set primary.service.type="ClusterIP" \
@@ -412,7 +412,7 @@ jobs:
         run: |
           echo "Installing Elasticsearch for vector database testing..."
           helm install external-elasticsearch bitnami/elasticsearch \
-            --set image.repostory="bitnamilegacy/elasticsearch"
+            --set image.repostory="bitnamilegacy/elasticsearch" \
             --set auth.elasticPassword="elasticsearch123456" \
             --set master.replicaCount=1 \
             --set data.replicaCount=0 \
