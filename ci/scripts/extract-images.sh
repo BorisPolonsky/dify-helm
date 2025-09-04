@@ -47,11 +47,11 @@ DIFY_IMAGES=(
 
 # Common dependency images
 DEPENDENCY_IMAGES=(
-    "bitnami/postgresql:15.3.0-debian-11-r7"
-    "bitnami/redis:7.0.11-debian-11-r12"
-    "bitnami/redis-sentinel:7.0.11-debian-11-r10"
-    "bitnami/redis-exporter:1.50.0-debian-11-r13"
-    "bitnami/bitnami-shell:11-debian-11-r118"
+    "bitnamilegacy/postgresql:15.3.0-debian-11-r7"
+    "bitnamilegacy/redis:7.0.11-debian-11-r12"
+    "bitnamilegacy/redis-sentinel:7.0.11-debian-11-r10"
+    "bitnamilegacy/redis-exporter:1.50.0-debian-11-r13"
+    "bitnamilegacy/bitnami-shell:11-debian-11-r118"
 )
 
 # Common utility images
