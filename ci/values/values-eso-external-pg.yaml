@@ -1181,7 +1181,7 @@ redis:
   ##
   image:
     registry: docker.io
-    repository: bitnami/redis
+    repository: bitnamilegacy/redis
     tag: 7.0.11-debian-11-r12
     digest: ""
     ## Specify a imagePullPolicy
@@ -2094,7 +2094,7 @@ redis:
     ##
     image:
       registry: docker.io
-      repository: bitnami/redis-sentinel
+      repository: bitnamilegacy/redis-sentinel
       tag: 7.0.11-debian-11-r10
       digest: ""
       ## Specify a imagePullPolicy
@@ -2536,7 +2536,7 @@ redis:
     ##
     image:
       registry: docker.io
-      repository: bitnami/redis-exporter
+      repository: bitnamilegacy/redis-exporter
       tag: 1.50.0-debian-11-r13
       digest: ""
       pullPolicy: IfNotPresent
@@ -2790,7 +2790,7 @@ redis:
     ##
     image:
       registry: docker.io
-      repository: bitnami/bitnami-shell
+      repository: bitnamilegacy/bitnami-shell
       tag: 11-debian-11-r118
       digest: ""
       pullPolicy: IfNotPresent
@@ -2838,7 +2838,7 @@ redis:
     ##
     image:
       registry: docker.io
-      repository: bitnami/bitnami-shell
+      repository: bitnamilegacy/bitnami-shell
       tag: 11-debian-11-r118
       digest: ""
       pullPolicy: IfNotPresent
