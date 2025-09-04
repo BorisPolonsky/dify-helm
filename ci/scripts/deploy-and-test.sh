@@ -523,11 +523,11 @@ test_otel_collector() {
     echo ""
 
     # Check if metrics were found and parse the spans count
-    if echo "$test_output" | grep -q "otelcol_receiver_accepted_spans__spans__total"; then
+    if echo "$test_output" | grep -q "otelcol_receiver_accepted_spans_total"; then
         echo "SUCCESS: Found OTEL receiver metrics"
 
         # Extract and validate the spans count
-        local spans_metrics=$(echo "$test_output" | grep "otelcol_receiver_accepted_spans__spans__total")
+        local spans_metrics=$(echo "$test_output" | grep "otelcol_receiver_accepted_spans_total")
         echo "INFO: Spans metrics found:"
         echo "$spans_metrics"
 
@@ -535,7 +535,7 @@ test_otel_collector() {
         local max_spans=0
         while IFS= read -r line; do
             # Match patterns like: otelcol_receiver_accepted_spans__spans__total{...} 172
-            if [[ "$line" =~ otelcol_receiver_accepted_spans__spans__total.*[[:space:]]+([0-9]+)([[:space:]]*$|[[:space:]]+.*) ]]; then
+            if [[ "$line" =~ otelcol_receiver_accepted_spans_total.*[[:space:]]+([0-9]+)([[:space:]]*$|[[:space:]]+.*) ]]; then
                 local count="${BASH_REMATCH[1]}"
                 echo "INFO: Found spans count: $count in line: $line"
                 if [[ $count -gt $max_spans ]]; then
