@@ -673,11 +673,11 @@ HUAWEI_OBS_ACCESS_KEY: {{ .Values.externalOBS.accessKey | quote }}
 # HUAWEI_OBS_SECRET_KEY: {{ .Values.externalOBS.secretKey | quote }}
 {{- else if and .Values.externalTOS.enabled .Values.externalTOS.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: "volcengine-tos"
-PLUGIN_VOLCENGINE_TOS_ENDPOINT: {{ .Values.externalTOS.endpoint | quote }}
-PLUGIN_VOLCENGINE_TOS_REGION: {{ .Values.externalTOS.region | quote }}
+VOLCENGINE_TOS_ENDPOINT: {{ .Values.externalTOS.endpoint | quote }}
+VOLCENGINE_TOS_REGION: {{ .Values.externalTOS.region | quote }}
 PLUGIN_STORAGE_OSS_BUCKET: {{ .Values.externalTOS.bucketName.pluginDaemon | quote }}
-PLUGIN_VOLCENGINE_TOS_ACCESS_KEY: {{ .Values.externalTOS.accessKey | quote }}
-# PLUGIN_VOLCENGINE_TOS_SECRET_KEY: {{ .Values.externalTOS.secretKey | quote }}
+VOLCENGINE_TOS_ACCESS_KEY: {{ .Values.externalTOS.accessKey | quote }}
+# VOLCENGINE_TOS_SECRET_KEY: {{ .Values.externalTOS.secretKey | quote }}
 {{- else }}
 PLUGIN_STORAGE_TYPE: local
 STORAGE_LOCAL_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}

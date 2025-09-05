@@ -194,6 +194,6 @@ TENCENT_COS_SECRET_KEY: {{ .Values.externalCOS.secretKey | b64enc | quote }}
 {{- else if and .Values.externalOBS.enabled .Values.externalOBS.bucketName.pluginDaemon }}
 HUAWEI_OBS_SECRET_KEY: {{ .Values.externalOBS.secretKey | b64enc | quote }}
 {{- else if and .Values.externalTOS.enabled .Values.externalTOS.bucketName.pluginDaemon }}
-PLUGIN_VOLCENGINE_TOS_SECRET_KEY: {{ .Values.externalTOS.secretKey | b64enc | quote }}
+VOLCENGINE_TOS_SECRET_KEY: {{ .Values.externalTOS.secretKey | b64enc | quote }}
 {{- end }}
 {{- end }}
