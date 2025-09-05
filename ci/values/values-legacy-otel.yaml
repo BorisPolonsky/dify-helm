@@ -212,7 +212,9 @@ api:
       ## ReadWriteMany access mode required for `api` and `worker`
       ##
       storageClass:
-      accessModes: ReadWriteMany
+      # Workaround: Single-replica setup for CI test environments lacking ReadWriteMany PVC provisioning.
+      # DO NOT use in production.
+      accessModes: ReadWriteOnce
       size: 5Gi
       subPath: ""
   ## Dify API ServiceAccount configuration
@@ -274,36 +276,6 @@ worker:
   #      secretKeyRef:
   #        name: my-secret
   #        key: DB_PASSWORD
-
-  ## OpenTelemetry (OTEL) configuration
-  otel:
-    enabled: true
-    # OpenTelemetry trace endpoint
-    traceEndpoint: ""
-    # OpenTelemetry metric endpoint
-    metricEndpoint: ""
-    # OpenTelemetry base endpoint
-    baseEndpoint: "http://otel-collector:4318"
-    # OpenTelemetry API Key (sensitive - stored in secret)
-    apiKey: ""
-    # OpenTelemetry exporter protocol
-    exporterProtocol: ""
-    # OpenTelemetry exporter type
-    exporterType: "otlp"
-    # OpenTelemetry sampling rate
-    samplingRate: "0.1"
-    # OpenTelemetry batch export schedule delay in milliseconds
-    batchExportScheduleDelay: "5000"
-    # OpenTelemetry max queue size
-    maxQueueSize: "2048"
-    # OpenTelemetry max export batch size
-    maxExportBatchSize: "512"
-    # OpenTelemetry metric export interval in milliseconds
-    metricExportInterval: "60000"
-    # OpenTelemetry batch export timeout in milliseconds
-    batchExportTimeout: "10000"
-    # OpenTelemetry metric export timeout in milliseconds
-    metricExportTimeout: "30000"
 
   logLevel: INFO
   ## Dify Worker ServiceAccount configuration
@@ -735,7 +707,9 @@ pluginDaemon:
       ## ReadWriteMany access mode required for `pluginDaemon`
       ##
       storageClass:
-      accessModes: ReadWriteMany
+      # Workaround: Single-replica setup for CI test environments lacking ReadWriteMany PVC provisioning.
+      # DO NOT use in production.
+      accessModes: ReadWriteOnce
       size: 5Gi
       subPath: ""
   marketplace:
