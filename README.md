@@ -7,13 +7,13 @@
 Deploy [langgenius/dify](https://github.com/langgenius/dify), an LLM based chat bot app on kubernetes with helm chart.
 
 ## Installation
-
+### TL;DR
 ```shell
 helm repo add dify https://borispolonsky.github.io/dify-helm
 helm repo update
 helm install my-release dify/dify
 ```
-
+For customized installation, please refer to the [README.md](https://github.com/BorisPolonsky/dify-helm/blob/master/charts/dify/README.md) file.
 ## Network Architecture
 
 The following diagram illustrates the complete network architecture and service topology of the Dify Helm deployment:
@@ -165,21 +165,6 @@ The Nginx proxy handles traffic routing with the following rules:
 | **Plugin Daemon** | `langgenius/dify-plugin-daemon:0.1.3` | 5002, 5003 | Plugin management and execution |
 | **SSRF Proxy** | `ubuntu/squid:latest` | 3128 | External request security proxy |
 | **Nginx Proxy** | `nginx:latest` | 80 | Reverse proxy, load balancing |
-
-## Supported Component
-
-### Components that could be deployed on kubernetes in current version
-
-- [x] core (`api`, `worker`, `beat`, `sandbox`)
-- [x] ssrf_proxy
-- [x] proxy (via built-in `nginx` or `ingress`)
-- [x] redis
-- [x] postgresql
-- [x] persistent storage
-- [ ] object storage
-- [x] weaviate
-- [ ] qdrant
-- [ ] milvus
 
 ### External components that can be used by this app with proper configuration
 
