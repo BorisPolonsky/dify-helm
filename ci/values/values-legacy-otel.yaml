@@ -212,6 +212,8 @@ api:
       ## ReadWriteMany access mode required for `api` and `worker`
       ##
       storageClass:
+      # Workaround: Single-replica setup for CI test environments lacking ReadWriteMany PVC provisioning.
+      # DO NOT use in production.
       accessModes: ReadWriteOnce
       size: 5Gi
       subPath: ""
@@ -705,6 +707,8 @@ pluginDaemon:
       ## ReadWriteMany access mode required for `pluginDaemon`
       ##
       storageClass:
+      # Workaround: Single-replica setup for CI test environments lacking ReadWriteMany PVC provisioning.
+      # DO NOT use in production.
       accessModes: ReadWriteOnce
       size: 5Gi
       subPath: ""
