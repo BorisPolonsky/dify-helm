@@ -16,7 +16,7 @@ Fear not its extensive content as they are arranged in sections below:
 3. Middleware: Specifies the configuration of built-in middlewares
 4. External services: Subtitute external services for built-in data persistence
  
-### 1. Adjust Images
+### 1. Use Alternative Images
 You can specify custom images for different components:
 ```yaml
 # values.yaml
@@ -108,7 +108,7 @@ To disable them, set `enabled: false` in the corresponding section of `values.ya
 redis:
   enabled: false  # Disable built-in Redis
 ```
-
+*N.B.: Built-in Redis, PostgreSQL, and Weaviate are for development/testing only and may not keep up to the versions in Dify’s `docker-compose.yml`. For production, use external Redis/PostgreSQL instances (as noted in the next section).*
 
 ### 4. Opt in External Services
 It's advised to utilize services from enterprise level providers over the built-in middlewares for production use. To take over built-in `Redis` for instance:
