@@ -3116,7 +3116,7 @@ externalS3:
 externalAzureBlobStorage:
   enabled: false
   url: "https://<your_account_name>.blob.core.windows.net"
-  account: "https://xxx.r2.cloudflarestorage.com"
+  account: "difyai"
   key: "difyai"
   container: "difyai-container"
 
