@@ -162,7 +162,7 @@ The Nginx proxy handles traffic routing with the following rules:
 | **Worker** | `langgenius/dify-api:1.8.1` | - | Background task processing (Celery) |
 | **Beat** | `langgenius/dify-api:1.8.1` | - | Periodic task scheduler (Celery Beat) |
 | **Sandbox** | `langgenius/dify-sandbox:0.2.12` | 8194 | Secure code execution environment |
-| **Plugin Daemon** | `langgenius/dify-plugin-daemon:0.1.3` | 5002, 5003 | Plugin management and execution |
+| **Plugin Daemon** | `langgenius/dify-plugin-daemon:0.2.0-local` | 5002, 5003 | Plugin management and execution |
 | **SSRF Proxy** | `ubuntu/squid:latest` | 3128 | External request security proxy |
 | **Nginx Proxy** | `nginx:latest` | 80 | Reverse proxy, load balancing |
 
