@@ -190,7 +190,7 @@ AWS_SECRET_KEY: {{ .Values.externalS3.secretKey | b64enc | quote }}
     {{- if hasSuffix ".r2.cloudflarestorage.com" .url }}
       {{- fail "Error: Cloudflare R2 is not supported with externalAzureBlobStorage configuration. Please use the externalS3 configuration for Cloudflare R2 storage." }}
     {{- end }}
-    AZURE_BLOB_STORAGE_CONNECTION_STRING: {{ printf "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;BlobEndpoint=%s;" .account .key .url | b64enc | quote }}
+AZURE_BLOB_STORAGE_CONNECTION_STRING: {{ printf "DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s;BlobEndpoint=%s;" .account .key .url | b64enc | quote }}
   {{- end }}
 {{- else if and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon }}
 ALIYUN_OSS_ACCESS_KEY_SECRET: {{ .Values.externalOSS.secretKey | b64enc | quote }}
