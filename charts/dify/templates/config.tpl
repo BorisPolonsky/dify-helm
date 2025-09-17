@@ -649,6 +649,7 @@ AWS_REGION: {{ .Values.externalS3.region | quote }}
 S3_USE_AWS_MANAGED_IAM: {{ .Values.externalS3.useIAM | toString | quote }}
 {{- else if .Values.externalAzureBlobStorage.enabled }}
 PLUGIN_STORAGE_TYPE: "azure_blob"
+AZURE_BLOB_STORAGE_CONTAINER_NAME: {{ .Values.externalAzureBlobStorage.container | quote }}
 {{- else if and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon }}
 PLUGIN_STORAGE_TYPE: "aliyun_oss"
 ALIYUN_OSS_REGION: {{ .Values.externalOSS.region | quote }}
