@@ -435,6 +435,12 @@ SANDBOX_PORT: '8194'
 HTTP_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
 HTTPS_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
 {{- end }}
+{{- if .Values.sandbox.dependencies }}
+SANDBOX_DEPENDENCIES: |
+  {{- range .Values.sandbox.dependencies }}
+  {{ . }}
+  {{- end }}
+{{- end}}
 {{- end }}
 
 {{- define "dify.nginx.config.proxy" }}
