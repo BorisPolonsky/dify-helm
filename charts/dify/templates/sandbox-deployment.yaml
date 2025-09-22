@@ -101,6 +101,14 @@ spec:
             protocol: TCP
         resources:
           {{- toYaml .Values.sandbox.resources | nindent 12 }}
+        {{- if and .Values.sandbox.persistence.enabled .Values.sandbox.persistence.volumeMounts }}
+        volumeMounts:
+        {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.persistence.volumeMounts "context" $) | nindent 8 }}
+        {{- end }}
+      {{- if and .Values.sandbox.persistence.enabled .Values.sandbox.persistence.volumes }}
+      volumes:
+      {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.persistence.volumes "context" $) | nindent 6 }}
+      {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.sandbox.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
