@@ -592,6 +592,16 @@ sandbox:
   #   value: "C.UTF-8"
   - name: WORKER_TIMEOUT
     value: "15"
+  ## @param sandbox.persistence.enabled Use volumes to persist data
+  ##
+  persistence:
+    enabled: false
+    ## @param sandbox.persistence.volumes Optionally specify extra list of additional volumes for the Sandbox pod(s)
+    ##
+    volumes: []
+    ## @param sandbox.persistence.volumeMounts Optionally specify extra list of additional volumeMounts for the Sandbox container(s)
+    ##
+    volumeMounts: []
   service:
     port: 8194
     annotations: {}
@@ -599,6 +609,7 @@ sandbox:
     clusterIP: ""
   auth:
     apiKey: "dify-sandbox"
+
   ## Sandbox ServiceAccount configuration
   ##
   serviceAccount:
