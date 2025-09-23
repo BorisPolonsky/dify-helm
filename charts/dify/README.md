@@ -14,7 +14,7 @@ Fear not its extensive content as they are arranged in sections below:
 1. Image: Adjust images of all Dify components
 2. Dify Service: Customize configurations of each Dify components
 3. Middleware: Specifies the configuration of built-in middlewares
-4. External services: Subtitute external services for built-in data persistence
+4. External services: Substitute external services for built-in data persistence
  
 ### 1. Use Alternative Images
 You can specify custom images for different components:
@@ -60,7 +60,7 @@ api:
     size: 10Gi
 
 ```
-or desginate an existing `PersistentVolumeClaim`:
+or designate an existing `PersistentVolumeClaim`:
 ```yaml
 # values.yaml
 api:
@@ -70,7 +70,7 @@ api:
       existingClaim: "your-pvc-name"
 ```
 #### Environment Variables
-This chart automatically manages envrionment variables for data persistence, service discovery and database connection etc. under the hood. To apply additional environment variables or override existing ones, refer to `extraEnv` section for each component:
+This chart automatically manages environment variables for data persistence, service discovery and database connection etc. under the hood. To apply additional environment variables or override existing ones, refer to `extraEnv` section for each component:
 ```yaml
 # values.yaml
 ...
@@ -94,7 +94,7 @@ api:
 ```
 
 ### 3. Working with Built-in Middlewares
-Built-in `Redis` and `PostgreSQL` and `weaviate` allows users to spool up a self-contained `Dify` enviroment for a quick start. These components are supplied by third party helm charts. To customize built-in middlewares, refer to the section name and the official documents:
+Built-in `Redis` and `PostgreSQL` and `weaviate` allows users to spin up a self-contained `Dify` environment for a quick start. These components are supplied by third party helm charts. To customize built-in middlewares, refer to the section name and the official documents:
 
 | Section | Document |
 ----- | --- |
@@ -108,7 +108,7 @@ To disable them, set `enabled: false` in the corresponding section of `values.ya
 redis:
   enabled: false  # Disable built-in Redis
 ```
-*N.B.: Built-in Redis, PostgreSQL, and Weaviate are for development/testing only and may not keep up to the versions in Dify’s `docker-compose.yml`. For production, use external Redis/PostgreSQL instances (as noted in the next section).*
+*N.B.: Built-in Redis, PostgreSQL, and Weaviate are for development/testing only and may not keep up to the versions in Dify's `docker-compose.yml`. For production, use external Redis/PostgreSQL instances (as noted in the next section).*
 
 ### 4. Opt in External Services
 It's advised to utilize services from enterprise level providers over the built-in middlewares for production use. To take over built-in `Redis` for instance:
