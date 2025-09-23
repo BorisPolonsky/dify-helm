@@ -3188,7 +3188,7 @@ externalTOS:
   bucketName:
     # Shared storage for `api` and `worker`
     api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalTOS.enabled` is set to `true`).
+    # If specified, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalTOS.enabled` is set to `true`).
     pluginDaemon:
   region: "cn-beijing"
 

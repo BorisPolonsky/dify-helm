@@ -4,7 +4,7 @@
 [![Release Charts](https://github.com/BorisPolonsky/dify-helm/actions/workflows/release.yml/badge.svg)](https://github.com/BorisPolonsky/dify-helm/actions/workflows/release.yml)
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/dify-helm)](https://artifacthub.io/packages/search?repo=dify-helm)
 
-Deploy [langgenius/dify](https://github.com/langgenius/dify), an LLM based chat bot app on kubernetes with helm chart.
+Deploy [langgenius/dify](https://github.com/langgenius/dify), an LLM-based chatbot app on Kubernetes with Helm chart.
 
 ## Installation
 ### TL;DR
@@ -40,7 +40,7 @@ graph TB
     %% Backend Pods
     APIService --> APIPod[📦 API Pod<br/>langgenius/dify-api:1.8.1<br/>Port: 5001]
     WebService --> WebPod[📦 Web Pod<br/>langgenius/dify-web:1.8.1<br/>Port: 3000]
-    PluginService --> PluginPod[📦 Plugin Daemon Pod<br/>langgenius/dify-plugin-daemon:0.1.3<br/>Port: 5002, 5003]
+    PluginService --> PluginPod[📦 Plugin Daemon Pod<br/>langgenius/dify-plugin-daemon:0.2.0-local<br/>Port: 5002, 5003]
 
     %% Worker Pod (Background Processing)
     WorkerPod[📦 Worker Pod<br/>langgenius/dify-api:1.8.1]
@@ -166,7 +166,7 @@ The Nginx proxy handles traffic routing with the following rules:
 | **SSRF Proxy** | `ubuntu/squid:latest` | 3128 | External request security proxy |
 | **Nginx Proxy** | `nginx:latest` | 80 | Reverse proxy, load balancing |
 
-### External components that can be used by this app with proper configuration
+### External Components Supported by this App with Proper Configuration
 
 - [x] Redis
 - [x] PostgreSQL
