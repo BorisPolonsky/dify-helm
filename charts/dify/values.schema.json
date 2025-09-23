@@ -502,6 +502,18 @@
             "apiKey": { "type": "string" }
           }
         },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "volumes": { 
+              "type": "array"
+            },
+            "volumeMounts": { 
+              "type": "array"
+            }
+          }
+        },
         "serviceAccount": {
           "type": "object",
           "properties": {
