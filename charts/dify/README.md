@@ -185,9 +185,12 @@ Press Ctrl+C when the Redis and PostgreSQL pods are terminated.
 
 **CRITICAL**: It is essential to disable the built-in databases before proceeding to avoid data corruption. Running database instances simultaneously with the standalone databases pointing to the same PVCs will result in data corruption.
 
-3. Identify existing PVCs:
+3. **Identify existing PVCs and check PVC keep policy** to ensure PVCs won't be deleted:
+
+Before proceeding with the migration, identify the existing PVCs and verify that they will be retained after disabling the built-in databases:
 
 ```bash
+# List existing PVCs
 kubectl get pvc -n $NAMESPACE
 ```
 
@@ -199,25 +202,38 @@ For example:
 - Redis: `redis-data-my-release-redis-master-0`, `redis-data-my-release-redis-replicas-0`, etc.
 - PostgreSQL: `data-my-release-postgresql-primary-0`, `data-my-release-postgresql-read-0`
 
-4. Create a separate values file for standalone Redis, referencing the existing PVC:
+Check the reclaim policy of the PVCs to ensure they won't be deleted after disabling built-in Redis and PostgreSQL:
+
+```bash
+# Check specific PVC details (replace PVC_NAME with actual PVC name)
+kubectl get pvc PVC_NAME -n $NAMESPACE -o yaml | grep reclaimPolicy
+```
+
+If the reclaim policy is `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` to prevent data loss.
+
+4. Create separate values files for standalone Redis and PostgreSQL, referencing the existing PVCs:
+
+Create values files that inherit the original settings and modify the existingClaims for persistence:
+
+For Redis:
 
 ```
 # redis-values.yaml
+# Inherit all original settings from your backup, modify existingClaims to re-use the previously created PVCs
 redis:
   master:
     persistence:
-      existingClaim: "redis-data-$RELEASE_NAME-redis-master-0"
+      existingClaim: "redis-data-my-release-redis-master-0"
+  # Replicas will create new PVCs and sync data from master
   replica:
     replicaCount: 3
     persistence:
-      existingClaim: ""  # Replicas will create new PVCs and sync data from master
+      existingClaim: ""
 ```
 
 Note: Adjust the PVC names according to your actual deployment names. Only the master node reuses the existing PVC, while replicas will create new PVCs and synchronize data from the master.
 
-5. Create a separate values file for standalone PostgreSQL, inheriting the original settings and modifying existingClaims:
-
-When migrating PostgreSQL, create a separate values file that inherits the original settings and modifiy the existingClaims for primary and replicas, for example:
+For PostgreSQL:
 
 ```yaml
 # postgresql-values.yaml
@@ -236,7 +252,7 @@ Note: Adjust the PVC names according to your actual deployment names. This appro
 
 **Important**: When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. The persistent data and the Secret may go out-of-sync with each other. Keep your credentials in a secure vault rather than relying on the Secret created in the new release.
 
-6. Deploy standalone Redis and PostgreSQL with the existing claims:
+5. Deploy standalone Redis and PostgreSQL with the existing claims:
 
 ```bash
 # Install standalone Redis
@@ -252,7 +268,7 @@ helm install my-postgresql bitnami/postgresql \
   -f postgresql-values.yaml
 ```
 
-7. Verify that the standalone databases are running correctly and accessible:
+6. Verify that the standalone databases are running correctly and accessible:
 
 ```bash
 # Check Redis pods
@@ -264,7 +280,7 @@ kubectl get pods -n $NAMESPACE | grep my-postgresql
 # Test connectivity if needed
 ```
 
-8. Create a values file for Dify with external database configuration:
+7. Create a values file for Dify with external database configuration:
 
 ```
 # dify-external-db-values.yaml
@@ -291,13 +307,13 @@ externalPostgres:
     pluginDaemon: "dify_plugin"
 ```
 
-9. Upgrade your Dify deployment to use the external services:
+8. Upgrade your Dify deployment to use the external services:
 
 ```bash
 helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-db-values.yaml
 ```
 
-10. After verifying that everything is working correctly, you can safely remove the original built-in Redis and PostgreSQL components:
+9. After verifying that everything is working correctly, you can safely remove the original built-in Redis and PostgreSQL components:
 
 ```
 # This step should be done carefully and only after verifying data integrity
