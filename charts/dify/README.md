@@ -124,22 +124,23 @@ externalRedis:
 ```
 Refer to `external<Service>` sections for more details. 
 
-## Migration from Built-in Redis and PostgreSQL to Standalone Releases
+## Migrate from Built-in Redis and PostgreSQL to Separate Releases
 
-This guide explains how to migrate from the built-in Redis and PostgreSQL deployments to standalone deployments while preserving your data.
+This guide explains how to migrate from the built-in Redis and PostgreSQL deployments to separate releases while preserving your data.
 
 This approach is useful for:
 - Managing Redis and PostgreSQL independently from the Dify release
 - Applying different upgrade cycles for the database components
 - Utilizing more advanced configurations not available in the subcharts
 
-#### Migration Steps
+#### Preparation
 
 Set the following environment variables according to your deployment:
 
 ```bash
 export RELEASE_NAME="your-release-name"    # Helm release name (e.g., 'my-dify' from 'helm install my-dify dify/dify')
 export NAMESPACE="your-namespace"          # Deployment namespace
+export CHART_VERSION=$(helm list -n $NAMESPACE | grep $RELEASE_NAME | awk '{print $9}')  # Chart version of dify-helm
 ```
 
 #### 1. Backup Configuration and Data
@@ -158,32 +159,9 @@ kubectl get secret -n $NAMESPACE -o yaml > dify-secrets-backup.yaml
 
 **Important**: Make sure you back up the ConfigMap and Secret, especially when you're using the default randomly generated passwords from the built-in PostgreSQL and Redis charts, as the authentication information stored inside won't persist after migration.
 
-#### 2. Disable Built-in Databases
+#### 3. Configure Redis and PostgreSQL to reuse existing PVCs
 
-After backing up authentication credentials, proceed with disabling the built-in databases to ensure no processes are accessing the PVCs:
-
-```bash
-# Get the current chart version to ensure consistency
-export CHART_VERSION=$(helm list -n $NAMESPACE | grep $RELEASE_NAME | awk '{print $9}')
-
-# Disable built-in databases while keeping the rest of the deployment running
-helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE \
-  --version $CHART_VERSION \
-  --set redis.enabled=false \
-  --set postgresql.enabled=false
-```
-
-Wait for the database pods to terminate:
-
-```bash
-kubectl get pods -n $NAMESPACE -w
-```
-
-Press Ctrl+C when the Redis and PostgreSQL pods are terminated.
-
-**Note**: Running database instances simultaneously with the standalone databases pointing to the same PVCs will result in data corruption.
-
-#### 3. Identify Existing PVCs
+First, identify the existing PVCs that are used by the built-in databases:
 
 ```bash
 kubectl get pvc -n $NAMESPACE
@@ -197,15 +175,13 @@ For example:
 - Redis: `redis-data-my-release-redis-master-0`, `redis-data-my-release-redis-replicas-0`, etc.
 - PostgreSQL: `data-my-release-postgresql-primary-0`, `data-my-release-postgresql-read-0`
 
-If the reclaim policy is `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` to prevent data loss.
+If the reclaim policy is `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` before shutting down built-in databases to prevent data loss.
 
-#### 4. Create Values Files for Redis and PostgreSQL
-
-Create values files that inherit the original settings and modify the existingClaims for persistence:
+Next, create values files that inherit the original settings and modify the existingClaims for persistence:
 
 For Redis:
 
-```
+```yaml
 # redis-values.yaml
 # Inherit all original settings from your backup, modify existingClaims to re-use the previously created PVCs
 redis:
@@ -217,8 +193,6 @@ redis:
     persistence:
       existingClaim: ""  # Replicas will create new PVCs and sync data from master
 ```
-
-Note: Adjust the PVC names according to your actual deployment names. Only the master node reuses the existing PVC, while replicas will create new PVCs and synchronize data from the master.
 
 For PostgreSQL:
 
@@ -235,11 +209,29 @@ readReplicas:
     existingClaim: "data-my-release-postgresql-read-0"
 ```
 
-Note: Adjust the PVC names according to your actual deployment names. This approach preserves all original database configurations while only changing the persistence layer to use existing claims.
-
 **Note**: When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. Store your credentials in a secure vault rather than relying on the Secret created in the new release.
 
-#### 5. Deploy Standalone Redis and PostgreSQL
+#### 4. Re-deploy Redis and PostgreSQL as Separate Releases
+
+Shutdown the built-in databases to ensure no processes are accessing the PVCs:
+
+**Note**: Running database instances simultaneously with the standalone databases pointing to the same PVCs will result in data corruption.
+
+Modify your values.yaml and disable built-in databases by setting the redis.enabled=false, then
+```bash
+
+helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE \
+  --version $CHART_VERSION \
+  -f values-with-redis-and-pg-disabled.yaml
+```
+
+Wait until Redis and PostgreSQL pods to terminate:
+
+```bash
+kubectl get pods -n $NAMESPACE -w
+```
+
+Once the built-in databases are fully shut down, re-deploy Redis and PostgreSQL as separate releases:
 
 ```bash
 # Install standalone Redis
@@ -255,7 +247,7 @@ helm install my-postgresql bitnami/postgresql \
   -f postgresql-values.yaml
 ```
 
-#### 6. Verify Database Deployments
+Verify that the new database deployments are running correctly:
 
 ```bash
 # Check Redis pods
@@ -267,9 +259,9 @@ kubectl get pods -n $NAMESPACE | grep my-postgresql
 # Test connectivity if needed
 ```
 
-#### 7. Switch to External Redis and PostgreSQL
+### 5. Restore Dify Service
 
-Update your Dify deployment to disable built-in Redis and PostgreSQL and use the external services:
+Update your Dify deployment to use external Redis and PostgreSQL services instead of the built-in ones:
 
 ```yaml
 # dify-external-db-values.yaml
@@ -296,8 +288,6 @@ externalPostgres:
     pluginDaemon: "dify_plugin"
 ```
 
-Upgrade your Dify deployment to use the external services:
-
 ```bash
 helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-db-values.yaml
 ```
@@ -305,6 +295,5 @@ helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-db-values.ya
 ### Important Notes
 
 - Make sure to use the same passwords and usernames for the standalone deployments as were used in the built-in versions to avoid authentication issues.
-- The `existingClaim` approach works because it tells the new chart deployments to use the existing persistent volumes rather than creating new ones.
 - Always backup your data before performing this migration.
 - Test this process in a non-production environment first to ensure you understand the steps and potential issues.
