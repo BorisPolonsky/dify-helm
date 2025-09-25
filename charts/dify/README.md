@@ -143,13 +143,14 @@ export NAMESPACE="your-namespace"          # Deployment namespace
 export CHART_VERSION=$(helm list -n $NAMESPACE | grep $RELEASE_NAME | awk '{print $9}')  # Chart version of dify-helm
 ```
 
-#### 1. Backup Configuration and Data
+#### Backup Configuration and Data
 
 ```bash
 # Backup your current values
 helm get values $RELEASE_NAME -n $NAMESPACE > dify-backup-values.yaml
 
-# Backup important ConfigMaps and Secrets (recommended)
+# Backup ConfigMaps and Secrets (Recommended)
+# If authentication data is out of sync with Redis/PostgreSQL ConfigMaps and Secrets, use your own backup solution.
 kubectl get configmap -n $NAMESPACE -o yaml > dify-configmaps-backup.yaml
 kubectl get secret -n $NAMESPACE -o yaml > dify-secrets-backup.yaml
 
@@ -157,9 +158,9 @@ kubectl get secret -n $NAMESPACE -o yaml > dify-secrets-backup.yaml
 # This step is recommended but optional depending on your backup strategy
 ```
 
-**Important**: Make sure you back up the ConfigMap and Secret, especially when you're using the default randomly generated passwords from the built-in PostgreSQL and Redis charts, as the authentication information stored inside won't persist after migration.
+**Important**: Back up ConfigMaps and Secrets, especially when randomly generated passwords were used (e.g., the default behavior of built-in PostgreSQL replica setups) as they won't persist after migration.
 
-#### 3. Configure Redis and PostgreSQL to reuse existing PVCs
+#### Configure Redis and PostgreSQL to reuse existing PVCs
 
 First, identify the existing PVCs that are used by the built-in databases:
 
@@ -167,15 +168,11 @@ First, identify the existing PVCs that are used by the built-in databases:
 kubectl get pvc -n $NAMESPACE
 ```
 
-Look for PVCs with names similar to:
-- `redis-data-*` for Redis
-- `data-*` for PostgreSQL
-
 For example:
 - Redis: `redis-data-my-release-redis-master-0`, `redis-data-my-release-redis-replicas-0`, etc.
 - PostgreSQL: `data-my-release-postgresql-primary-0`, `data-my-release-postgresql-read-0`
 
-If the reclaim policy is `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` before shutting down built-in databases to prevent data loss.
+Check the reclaim policy: if it's `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` before shutting down built-in databases to prevent data loss. Also confirm the PVCs will persist (e.g., via helm.sh/resource-policy: keep annotation) to avoid accidental deletion during subsequent steps.
 
 Next, create values files that inherit the original settings and modify the existingClaims for persistence:
 
@@ -211,11 +208,11 @@ readReplicas:
 
 **Note**: When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. Store your credentials in a secure vault rather than relying on the Secret created in the new release.
 
-#### 4. Re-deploy Redis and PostgreSQL as Separate Releases
+#### Re-deploy Redis and PostgreSQL as Separate Releases
 
 Shutdown the built-in databases to ensure no processes are accessing the PVCs:
 
-**Note**: Running database instances simultaneously with the standalone databases pointing to the same PVCs will result in data corruption.
+**Note**: Running built-in database instances simultaneously with the separatly deployed ones while sharing the same PVCs will result in data corruption.
 
 Modify your values.yaml and disable built-in databases by setting the redis.enabled=false, then
 ```bash
@@ -293,7 +290,6 @@ helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-db-values.ya
 ```
 
 ### Important Notes
-
 - Make sure to use the same passwords and usernames for the standalone deployments as were used in the built-in versions to avoid authentication issues.
 - Always backup your data before performing this migration.
 - Test this process in a non-production environment first to ensure you understand the steps and potential issues.
