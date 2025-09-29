@@ -134,19 +134,19 @@ api:
     # OpenTelemetry exporter type
     exporterType: "otlp"
     # OpenTelemetry sampling rate
-    samplingRate: "0.1"
+    samplingRate: 0.1
     # OpenTelemetry batch export schedule delay in milliseconds
-    batchExportScheduleDelay: "5000"
+    batchExportScheduleDelay: 5000
     # OpenTelemetry max queue size
-    maxQueueSize: "2048"
+    maxQueueSize: 2048
     # OpenTelemetry max export batch size
-    maxExportBatchSize: "512"
+    maxExportBatchSize: 512
     # OpenTelemetry metric export interval in milliseconds
-    metricExportInterval: "60000"
+    metricExportInterval: 60000
     # OpenTelemetry batch export timeout in milliseconds
-    batchExportTimeout: "10000"
+    batchExportTimeout: 10000
     # OpenTelemetry metric export timeout in milliseconds
-    metricExportTimeout: "30000"
+    metricExportTimeout: 30000
 
   service:
     port: 5001
