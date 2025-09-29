@@ -716,6 +716,17 @@
         }
       }
     },
+    "externalRedis": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "host": { "type": "string" },
+        "port": { "type": "integer" },
+        "username": { "type": "string" },
+        "password": { "type": "string" },
+        "useSSL": { "type": "boolean" }
+      }
+    },
     "externalS3": {
       "type": "object",
       "properties": {
@@ -827,17 +838,6 @@
           }
         },
         "region": { "type": "string" }
-      }
-    },
-    "externalRedis": {
-      "type": "object",
-      "properties": {
-        "enabled": { "type": "boolean" },
-        "host": { "type": "string" },
-        "port": { "type": "integer" },
-        "username": { "type": "string" },
-        "password": { "type": "string" },
-        "useSSL": { "type": "boolean" }
       }
     },
     "externalWeaviate": {
