@@ -2508,16 +2508,7 @@ redis:
     ##
     ingressNSMatchLabels: {}
     ingressNSPodMatchLabels: {}
-  ## PodSecurityPolicy configuration
-  ## ref: https://kubernetes.io/docs/concepts/policy/pod-security-policy/
-  ##
-  podSecurityPolicy:
-    ## @param podSecurityPolicy.create Whether to create a PodSecurityPolicy. WARNING: PodSecurityPolicy is deprecated in Kubernetes v1.21 or later, unavailable in v1.25 or later
-    ##
-    create: false
-    ## @param podSecurityPolicy.enabled Enable PodSecurityPolicy's RBAC rules
-    ##
-    enabled: false
+
   ## RBAC configuration
   ##
   rbac:
@@ -2973,6 +2964,18 @@ externalPostgres:
     pluginDaemon: "dify_plugin"
 
 ###################################
+# External Redis
+# - these configs are only used when `externalRedis.enabled` is true
+###################################
+externalRedis:
+  enabled: false
+  host: "redis.example"
+  port: 6379
+  username: ""
+  password: ""
+  useSSL: false
+
+###################################
 # External S3
 # - these configs are only used when `externalS3.enabled` is true
 ###################################
@@ -2991,82 +2994,6 @@ externalS3:
     pluginDaemon: ""
   useIAM: false
   region: "auto"
-
-###################################
-# External Azure Blob Storage
-# - these configs are only used when `externalS3.enabled` is false and `externalAzureBlobStorage.enabled` is true
-###################################
-externalAzureBlobStorage:
-  enabled: false
-  url: "https://<your_account_name>.blob.core.windows.net"
-  account: "https://xxx.r2.cloudflarestorage.com"
-  key: "difyai"
-  container: "difyai-container"
-
-###################################
-# External OSS
-# - these configs are only used when both `externalS3.enabled` and `externalAzureBlobStorage.enabled` are false and `externalOSS.enabled` is true
-###################################
-externalOSS:
-  enabled: false
-  endpoint: "https://oss-ap-southeast-1-internal.aliyuncs.com"
-  # Note: When using ExternalSecret, these values are managed externally
-  accessKey: ""
-  secretKey: ""
-  region: "ap-southeast-1"
-  bucketName:
-    api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOSS.enabled` is set to `true`).
-    pluginDaemon:
-  authVersion: v4
-  path: "your-path"
-
-###################################
-# External Google Cloud Storage
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` are false and `externalGCS.enabled` is true
-###################################
-externalGCS:
-  enabled: false
-  bucketName: "difyai"
-  serviceAccountJsonBase64: ""
-
-###################################
-# External TENCENT COS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` are false and `externalCOS.enabled` is true
-###################################
-externalCOS:
-  enabled: false
-  secretKey: ""
-  secretId: "your-secret-id"
-  region: "your-region"
-  bucketName:
-    api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalCOS.enabled` is set to `true`).
-    pluginDaemon:
-  scheme: "your-scheme"
-
-###################################
-# External HUAWEI OBS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` are false and `externalOBS.enabled` is true
-###################################
-externalOBS:
-  enabled: false
-  endpoint: "https://your-endpoint"
-  asscessKey: "your-secret-id"
-  secretKey: ""
-  bucketName: "your-bucket-name"
-
-###################################
-# External Redis
-# - these configs are only used when `externalRedis.enabled` is true
-###################################
-externalRedis:
-  enabled: false
-  host: "redis.example"
-  port: 6379
-  username: ""
-  password: ""
-  useSSL: false
 
 ###################################
 # External Weaviate

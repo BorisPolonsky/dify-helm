@@ -300,18 +300,6 @@ redis:
   enabled: false
 
 ###################################
-# External Redis
-# - these configs are only used when `externalRedis.enabled` is true
-###################################
-externalRedis:
-  enabled: true
-  host: "redis-master"
-  port: 6379
-  username: ""
-  password: ""
-  useSSL: false
-
-###################################
 # External postgres
 # - these configs are only used when `externalPostgres.enabled` is true
 ###################################
@@ -325,6 +313,18 @@ externalPostgres:
   database:
     api: "dify"
     pluginDaemon: "dify_plugin"
+
+###################################
+# External Redis
+# - these configs are only used when `externalRedis.enabled` is true
+###################################
+externalRedis:
+  enabled: true
+  host: "redis-master"
+  port: 6379
+  username: ""
+  password: ""
+  useSSL: false
 
 ###################################
 # External S3
