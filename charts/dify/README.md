@@ -172,7 +172,8 @@ For example:
 - Redis: `redis-data-my-release-redis-master-0`, `redis-data-my-release-redis-replicas-0`, etc.
 - PostgreSQL: `data-my-release-postgresql-primary-0`, `data-my-release-postgresql-read-0`
 
-Check the reclaim policy: if it's `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` before shutting down built-in databases to prevent data loss. Also confirm the PVCs will persist (e.g., via helm.sh/resource-policy: keep annotation) to avoid accidental deletion during subsequent steps.
+Before shutting down built-in databases (basically an uninstallation process of built-in dependencies), confirm that the PVCs will persist (e.g., via `helm.sh/resource-policy: keep` annotation). Also check the reclaim policy of PVs: if it's `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` to prevent data loss in case the bound PVC were accidentally deleted upon migration, which would end up deleting the PV itself.
+
 
 Next, create values files that inherit the original settings and modify the existingClaims for persistence:
 
