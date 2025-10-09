@@ -388,13 +388,14 @@ jobs:
         run: |
           echo "Installing MinIO for S3 testing..."
           helm install minio bitnami/minio \
-            --version 17.0.22 \
+            --version 17.0.21 \
             --set image.repository="bitnamilegacy/minio" \
             --set auth.rootUser="minio-root" \
             --set auth.rootPassword="minio123456" \
             --set defaultBuckets="difyai" \
             --set service.type="ClusterIP" \
             --set service.ports.api=9000 \
+            --set console.enabled=false \
             --wait \
             --timeout 300s
 
