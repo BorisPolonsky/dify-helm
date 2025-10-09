@@ -388,13 +388,14 @@ jobs:
         run: |
           echo "Installing MinIO for S3 testing..."
           helm install minio bitnami/minio \
-            --version 17.0.22 \
+            --version 17.0.21 \
             --set image.repository="bitnamilegacy/minio" \
             --set auth.rootUser="minio-root" \
             --set auth.rootPassword="minio123456" \
             --set defaultBuckets="difyai" \
             --set service.type="ClusterIP" \
             --set service.ports.api=9000 \
+            --set console.enabled=false \
             --wait \
             --timeout 300s
 
@@ -418,7 +419,7 @@ jobs:
           echo "Installing Elasticsearch for vector database testing..."
           helm install external-elasticsearch bitnami/elasticsearch \
             --version 21.3.6 \
-            --set image.repostory="bitnamilegacy/elasticsearch" \
+            --set image.repository="bitnamilegacy/elasticsearch" \
             --set auth.elasticPassword="elasticsearch123456" \
             --set master.replicaCount=1 \
             --set data.replicaCount=0 \
@@ -427,6 +428,7 @@ jobs:
             --set master.persistence.enabled=false \
             --set service.type="ClusterIP" \
             --set service.ports.restAPI=9200 \
+            --set sysctlImage.enabled=false \
             --wait \
             --timeout 300s
 
