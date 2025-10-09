@@ -247,6 +247,9 @@ jobs:
 
     name: ${{ matrix.config_name }}
 
+    # Add condition to only run specific test when requested
+    if: github.event.inputs.run_all_tests == 'true' || github.event.inputs.specific_test == matrix.config_name
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
