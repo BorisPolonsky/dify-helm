@@ -321,6 +321,7 @@ jobs:
         run: |
           echo "Installing External Secrets Operator..."
           helm install external-secrets external-secrets/external-secrets \
+            --version 0.20.1 \
             --namespace external-secrets-system \
             --create-namespace \
             --wait \
