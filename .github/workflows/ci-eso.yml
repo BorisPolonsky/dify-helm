@@ -331,6 +331,7 @@ jobs:
         run: |
           echo "Installing Vault..."
           helm install vault hashicorp/vault \
+            --version 0.31.0 \
             --set "server.dev.enabled=true" \
             --set "server.dev.devRootToken=dev-only-token" \
             --wait \
