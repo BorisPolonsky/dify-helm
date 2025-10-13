@@ -314,10 +314,19 @@ REDIS_DB: "0"
 # CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/1" $scheme .username .password .host .port }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
-{{- $redisHost := printf "%s-redis-master" .Release.Name -}}
-  {{- with .Values.redis }}
-# CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost .master.service.ports.redis }}
+{{- $releaseName := printf "%s" .Release.Name -}}
+{{- with .Values.redis }}
+  {{- if .sentinel.enabled }}
+    {{- $sentinelHost := printf "%s-redis" $releaseName -}}
+    {{- $sentinelPort := .sentinel.service.ports.sentinel -}}
+    {{- $masterSet := .sentinel.masterSet }}
+# CELERY_BROKER_URL: {{ printf "sentinel://:%s@%s:%v/%s" .auth.password $sentinelHost $sentinelPort $masterSet | quote }}
+  {{- else }}
+    {{- $redisHost := printf "%s-redis-master" $releaseName -}}
+    {{- $redisPort := .master.service.ports.redis }}
+# CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost $redisPort | quote }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
 

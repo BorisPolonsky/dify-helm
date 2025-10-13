@@ -125,7 +125,7 @@ CELERY_BROKER_URL: {{ printf "sentinel://:%s@%s:%v/%s" .auth.password $sentinelH
   {{- else }}
     {{- $redisHost := printf "%s-redis-master" $releaseName -}}
     {{- $redisPort := .master.service.ports.redis }}
-CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost .master.service.ports.redis | b64enc | quote }}
+CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost $redisPort | b64enc | quote }}
   {{- end }}
 {{- end }}
 {{- end }}
