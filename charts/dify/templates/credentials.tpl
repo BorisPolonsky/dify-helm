@@ -132,7 +132,7 @@ CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/1" $scheme .username .password .h
 # Example: sentinel://:difyai123456@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1
 {{- $sentinelUrls := list }}
 {{- range $i, $e := until (.replica.replicaCount | int) }}
-{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/%s" $password $releaseName $i $releaseName $namespace $sentinelPort $masterSet) }}
+{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/1" $password $releaseName $i $releaseName $namespace $sentinelPort) }}
 {{- end }}
 CELERY_BROKER_URL: {{ join ";" $sentinelUrls | b64enc | quote }}
 CELERY_SENTINEL_PASSWORD: {{ .auth.password | b64enc | quote }}

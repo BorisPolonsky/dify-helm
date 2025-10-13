@@ -350,7 +350,7 @@ REDIS_DB: "0"
 
 {{- $sentinelUrls := list }}
 {{- range $i, $e := until (.replica.replicaCount | int) }}
-{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/%s" $password $releaseName $i $releaseName $namespace $sentinelPort $masterSet) }}
+{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/1" $password $releaseName $i $releaseName $namespace $sentinelPort) }}
 {{- end }}
 # CELERY_BROKER_URL: {{ join ";" $sentinelUrls | quote }}
 CELERY_SENTINEL_MASTER_NAME: {{ $masterSet | quote }}
