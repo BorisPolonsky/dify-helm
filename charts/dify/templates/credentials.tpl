@@ -96,11 +96,16 @@ REDIS_USERNAME: {{ .username | b64enc | quote }}
 REDIS_PASSWORD: {{ .password | b64enc | quote }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
-{{- $redisHost := printf "%s-redis-master" .Release.Name -}}
-  {{- with .Values.redis }}
+{{- with .Values.redis }}
+  {{- if .sentinel.enabled }}
+REDIS_USERNAME: {{ print "" | b64enc | quote }}
+REDIS_PASSWORD: {{ .auth.password | b64enc | quote }}
+REDIS_SENTINEL_PASSWORD: {{ .auth.password | b64enc | quote }}
+  {{- else }}
 REDIS_USERNAME: {{ print "" | b64enc | quote }}
 REDIS_PASSWORD: {{ .auth.password | b64enc | quote }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
 

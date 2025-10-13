@@ -290,16 +290,39 @@ REDIS_USE_SSL: {{ .useSSL | toString | quote }}
 REDIS_DB: "0"
   {{- end }}
 {{- else if .Values.redis.enabled }}
-{{- $redisHost := printf "%s-redis-master" .Release.Name -}}
-  {{- with .Values.redis }}
-REDIS_HOST: {{ $redisHost }}
-REDIS_PORT: {{ .master.service.ports.redis | toString | quote }}
+{{- $releaseName := printf "%s" .Release.Name -}}
+{{- $namespace := .Release.Namespace -}}
+{{- with .Values.redis }}
+  {{- if .sentinel.enabled }}
+    {{- $sentinelPort := .sentinel.service.ports.sentinel | int -}}
+    {{- $masterSet := .sentinel.masterSet -}}
+    {{- $password := .auth.password -}}
+# Redis Sentinel configuration
+{{- $sentinelHosts := list }}
+{{- range $i, $e := until (.replica.replicaCount | int) }}
+{{- $sentinelHosts = append $sentinelHosts (printf "%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d" $releaseName $i $releaseName $namespace $sentinelPort) }}
+{{- end }}
+# use redis db 0 for redis cache
+REDIS_DB: "0"
+REDIS_USE_SENTINEL: "true"
+REDIS_SENTINELS: {{ join "," $sentinelHosts | quote }}
+REDIS_SENTINEL_SERVICE_NAME: {{ $masterSet | quote }}
+REDIS_SENTINEL_USERNAME: ""
+# REDIS_SENTINEL_PASSWORD: {{ .auth.password | quote }}
+REDIS_SENTINEL_SOCKET_TIMEOUT: "0.1"
+  {{- else }}
+# Standalone Redis configuration
+    {{- $redisHost := printf "%s-redis-master" $releaseName -}}
+    {{- $redisPort := .master.service.ports.redis }}
+REDIS_HOST: {{ $redisHost | quote }}
+REDIS_PORT: {{ $redisPort | toString | quote }}
 # REDIS_USERNAME: ""
 # REDIS_PASSWORD: {{ .auth.password | quote }}
 REDIS_USE_SSL: {{ .tls.enabled | toString | quote }}
 # use redis db 0 for redis cache
 REDIS_DB: "0"
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
 
