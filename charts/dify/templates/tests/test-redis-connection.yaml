@@ -18,7 +18,7 @@ spec:
             - sh
             - -c
             - |
-{{- if .Values.redis.sentinel.enabled }}
+{{- if and .Values.redis.enabled .Values.redis.sentinel.enabled }}
               # Test connection to Redis with Sentinel enabled
               echo "Testing Redis Sentinel connection..."
               RELEASE_NAME="{{ .Release.Name }}"
