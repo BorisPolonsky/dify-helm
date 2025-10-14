@@ -18,14 +18,50 @@ spec:
             - sh
             - -c
             - |
-              until redis-cli -h $REDIS_HOST -p $REDIS_PORT -a $REDIS_PASSWORD ping | grep -q PONG; do
+{{- if .Values.redis.sentinel.enabled }}
+              # Test connection to Redis with Sentinel enabled
+              echo "Testing Redis Sentinel connection..."
+              RELEASE_NAME="{{ .Release.Name }}"
+              NAMESPACE="{{ .Release.Namespace }}"
+              SENTINEL_PORT="26379"
+              REPLICAS={{ .Values.redis.replica.replicaCount }}
+              
+              # Test connectivity to each sentinel
+              for i in $(seq 0 $((REPLICAS-1))); do
+                SENTINEL_HOST="${RELEASE_NAME}-redis-node-${i}.${RELEASE_NAME}-redis-headless.${NAMESPACE}.svc.cluster.local"
+                until redis-cli -h "$SENTINEL_HOST" -p "$SENTINEL_PORT" -a "$REDIS_SENTINEL_PASSWORD" ping | grep -q PONG; do
+                  echo "Waiting for Redis Sentinel at $SENTINEL_HOST:$SENTINEL_PORT to be available..."
+                  sleep 1
+                done
+              done
+              
+              # Get the master from one of the sentinels
+              SENTINEL_HOST="${RELEASE_NAME}-redis-node-0.${RELEASE_NAME}-redis-headless.${NAMESPACE}.svc.cluster.local"
+              
+              echo "Getting master address from Sentinel..."
+              REDIS_MASTER_INFO=$(redis-cli -h "$SENTINEL_HOST" -p "$SENTINEL_PORT" -a "$REDIS_SENTINEL_PASSWORD" sentinel get-master-addr-by-name "$REDIS_SENTINEL_SERVICE_NAME")
+              echo "Master info: $REDIS_MASTER_INFO"
+              
+              REDIS_MASTER_HOST=$(echo "$REDIS_MASTER_INFO" | head -n1)
+              REDIS_MASTER_PORT=$(echo "$REDIS_MASTER_INFO" | tail -n1)
+              
+              echo "Master host: $REDIS_MASTER_HOST, port: $REDIS_MASTER_PORT"
+              
+              until redis-cli -h "$REDIS_MASTER_HOST" -p "$REDIS_MASTER_PORT" -a "$REDIS_PASSWORD" ping | grep -q PONG; do
+                echo "Waiting for Redis master at $REDIS_MASTER_HOST:$REDIS_MASTER_PORT to be available..."
+                sleep 1
+              done
+              echo "Redis with Sentinel is ready."
+{{- else }}
+              # Test connection to standard Redis setup
+              until redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT" -a "$REDIS_PASSWORD" ping | grep -q PONG; do
                 echo "Waiting for Redis service to be available..."
                 sleep 1
               done
               echo "Redis is ready."
+{{- end }}
           envFrom:
           - configMapRef:
               name: {{ template "dify.api.fullname" . }}
           - secretRef:
               name: {{ template "dify.api.fullname" . }}
-
