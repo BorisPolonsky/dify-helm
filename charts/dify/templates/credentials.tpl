@@ -96,11 +96,16 @@ REDIS_USERNAME: {{ .username | b64enc | quote }}
 REDIS_PASSWORD: {{ .password | b64enc | quote }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
-{{- $redisHost := printf "%s-redis-master" .Release.Name -}}
-  {{- with .Values.redis }}
+{{- with .Values.redis }}
+  {{- if .sentinel.enabled }}
+REDIS_USERNAME: {{ print "" | b64enc | quote }}
+REDIS_PASSWORD: {{ .auth.password | b64enc | quote }}
+REDIS_SENTINEL_PASSWORD: {{ .auth.password | b64enc | quote }}
+  {{- else }}
 REDIS_USERNAME: {{ print "" | b64enc | quote }}
 REDIS_PASSWORD: {{ .auth.password | b64enc | quote }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -115,10 +120,31 @@ REDIS_PASSWORD: {{ .auth.password | b64enc | quote }}
 CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/1" $scheme .username .password .host .port | b64enc | quote }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
-{{- $redisHost := printf "%s-redis-master" .Release.Name -}}
-  {{- with .Values.redis }}
-CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost .master.service.ports.redis | b64enc | quote }}
+{{- $releaseName := printf "%s" .Release.Name -}}
+{{- $namespace := .Release.Namespace -}}
+{{- with .Values.redis }}
+  {{- if .sentinel.enabled }}
+    {{- $sentinelPort := .sentinel.service.ports.sentinel | int -}}
+    {{- $masterSet := .sentinel.masterSet -}}
+    {{- $password := .auth.password -}}
+# If use Redis Sentinel, format as follows: `sentinel://<redis_username>:<redis_password>@<sentinel_host1>:<sentinel_port>/<redis_database>`
+# For high availability, you can configure multiple Sentinel nodes (if provided) separated by semicolons like below example:
+# Example: sentinel://:difyai123456@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1
+{{- $sentinelUrls := list }}
+{{- range $i, $e := until (.replica.replicaCount | int) }}
+{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/1" $password $releaseName $i $releaseName $namespace $sentinelPort) }}
+{{- end }}
+CELERY_BROKER_URL: {{ join ";" $sentinelUrls | b64enc | quote }}
+CELERY_SENTINEL_PASSWORD: {{ .auth.password | b64enc | quote }}
+  {{- else }}
+# Use standalone redis as the broker, and redis db 1 for celery broker. (redis_username is usually set by defualt as empty)
+# Format as follows: `redis://<redis_username>:<redis_password>@<redis_host>:<redis_port>/<redis_database>`.
+# Example: redis://:difyai123456@redis:6379/1
+    {{- $redisHost := printf "%s-redis-master" $releaseName -}}
+    {{- $redisPort := .master.service.ports.redis }}
+CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost $redisPort | b64enc | quote }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
 

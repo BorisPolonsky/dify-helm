@@ -133,6 +133,8 @@ This approach is useful for:
 - Applying different upgrade cycles for the database components
 - Utilizing more advanced configurations not available in the subcharts
 
+This section assumes the replication architecture of built-in Redis and PostgreSQL given the default configurations. For non-default setups (e.g., Redis in Sentinel mode), you will need to implement a custom migration solution.
+
 #### Preparation
 
 Set the following environment variables according to your deployment:
