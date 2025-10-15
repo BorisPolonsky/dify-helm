@@ -281,11 +281,19 @@ STORAGE_LOCAL_PATH: {{ .Values.api.persistence.mountPath | quote }}
 {{- define "dify.redis.config" -}}
 {{- if .Values.externalRedis.enabled }}
   {{- with .Values.externalRedis }}
+    {{- if .sentinel.enabled }}
+REDIS_USE_SENTINEL: "true"
+REDIS_SENTINELS: {{ join "," .sentinel.sentinels | quote }}
+REDIS_SENTINEL_SERVICE_NAME: {{ .sentinel.masterSet | quote }}
+REDIS_SENTINEL_USERNAME: ""
+REDIS_SENTINEL_SOCKET_TIMEOUT: "0.1"
+    {{- else }}
 REDIS_HOST: {{ .host | quote }}
 REDIS_PORT: {{ .port | toString | quote }}
 # REDIS_USERNAME: {{ .username | quote }}
 # REDIS_PASSWORD: {{ .password | quote }}
 REDIS_USE_SSL: {{ .useSSL | toString | quote }}
+    {{- end }}
 # use redis db 0 for redis cache
 REDIS_DB: "0"
   {{- end }}
@@ -330,11 +338,22 @@ REDIS_DB: "0"
 # Use redis as the broker, and redis db 1 for celery broker.
 {{- if .Values.externalRedis.enabled }}
   {{- with .Values.externalRedis }}
-    {{- $scheme := "redis" }}
-    {{- if .useSSL }}
-      {{- $scheme = "rediss" }}
-    {{- end }}
+    {{- if .sentinel.enabled }}
+# If use Redis Sentinel, format as follows: `sentinel://<redis_username>:<redis_password>@<sentinel_host1>:<sentinel_port>/<redis_database>`
+# For high availability, you can configure multiple Sentinel nodes (if provided) separated by semicolons like below example:
+# Example: sentinel://:difyai123456@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1
+CELERY_SENTINEL_MASTER_NAME: {{ .sentinel.masterSet | quote }}
+# Note: In sentinel mode, the password is already included in the broker URL
+# CELERY_SENTINEL_PASSWORD: {{ .sentinel.password | quote }}
+CELERY_SENTINEL_SOCKET_TIMEOUT: "0.1"
+CELERY_USE_SENTINEL: "true"
+    {{- else }}
+      {{- $scheme := "redis" }}
+      {{- if .useSSL }}
+        {{- $scheme = "rediss" }}
+      {{- end }}
 # CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/1" $scheme .username .password .host .port }}
+    {{- end }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
 {{- $releaseName := printf "%s" .Release.Name -}}
