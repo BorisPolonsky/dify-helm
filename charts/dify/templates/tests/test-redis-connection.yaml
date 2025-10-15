@@ -22,15 +22,12 @@ spec:
               # Test connection to Redis with Sentinel enabled
               echo "Testing Redis Sentinel connection..."
 {{- if and .Values.externalRedis.enabled .Values.externalRedis.sentinel.enabled }}
-              echo "Using external Redis Sentinel configuration"
-              echo "Value of \$REDIS_SENTINELS: $REDIS_SENTINELS"
               # Parse the sentinels list into an array using POSIX approach
               OLD_IFS=$IFS
               IFS=','
               set -- $REDIS_SENTINELS
               IFS=$OLD_IFS
 {{- else }}
-              echo "Using internal Redis Sentinel configuration"
               RELEASE_NAME="{{ .Release.Name }}"
               NAMESPACE="{{ .Release.Namespace }}"
               REPLICAS={{ .Values.redis.replica.replicaCount }}
@@ -46,7 +43,6 @@ spec:
               
               # Store the list of sentinels
               SENTINELS_LIST="$@"
-              echo "Value of \$SENTINELS_LIST: $SENTINELS_LIST"
               # Test connectivity to each sentinel
               for sentinel in $SENTINELS_LIST; do
                 # Split host and port
@@ -66,7 +62,7 @@ spec:
                 fi
               done
               
-              # Use first sentinel to get Redis master
+              # Use the first sentinel to get Redis master
               # Extract first sentinel from the stored list
               OLD_IFS=$IFS
               IFS=','
@@ -77,12 +73,12 @@ spec:
               SENTINEL_HOST="$1"
               SENTINEL_CONN_PORT="$2"
               IFS=$OLD_IFS
-              
+              # Use the first sentinel to get Redis master
               echo "Getting master address from Sentinel at $SENTINEL_HOST:$SENTINEL_CONN_PORT..."
               REDIS_MASTER_INFO=$(redis-cli -h "$SENTINEL_HOST" -p "$SENTINEL_CONN_PORT" -a "$REDIS_SENTINEL_PASSWORD" sentinel get-master-addr-by-name "$REDIS_SENTINEL_SERVICE_NAME")
               echo "Master info: $REDIS_MASTER_INFO"
               
-              # Use awk to correctly extract host and port from the response
+              # Extract host and port from the response
               REDIS_MASTER_HOST=$(echo "$REDIS_MASTER_INFO" | awk 'NR==1{print $1}')
               REDIS_MASTER_PORT=$(echo "$REDIS_MASTER_INFO" | awk 'NR==2{print $1}')
               
@@ -90,7 +86,7 @@ spec:
               if [ -z "$REDIS_MASTER_HOST" ] || [ -z "$REDIS_MASTER_PORT" ]; then
                 echo "Error: Could not extract Redis master host and port from sentinel response"
                 echo "This might indicate that the Redis master is not yet available or properly configured"
-                # Try to get more information about the sentinel state
+                # Get more information on the state of Sentinel
                 echo "Sentinel masters:"
                 redis-cli -h "$SENTINEL_HOST" -p "$SENTINEL_CONN_PORT" -a "$REDIS_SENTINEL_PASSWORD" sentinel masters || echo "Failed to get sentinel masters"
                 echo "Sentinel slaves:"
@@ -101,17 +97,17 @@ spec:
               echo "Master host: $REDIS_MASTER_HOST, port: $REDIS_MASTER_PORT"
               
               # Test Redis connection
-              echo "Testing connectivity to Redis master at $REDIS_MASTER_HOST:$REDIS_MASTER_PORT..."
+              echo "Testing Redis connection at $REDIS_MASTER_HOST:$REDIS_MASTER_PORT..."
               if redis-cli -h "$REDIS_MASTER_HOST" -p "$REDIS_MASTER_PORT" -a "$REDIS_PASSWORD" ping | grep -q PONG; then
                 echo "Successfully connected to Redis master at $REDIS_MASTER_HOST:$REDIS_MASTER_PORT"
-                echo "Redis with Sentinel is ready."
+                echo "Redis is ready."
               else
                 echo "Failed to connect to Redis master at $REDIS_MASTER_HOST:$REDIS_MASTER_PORT"
                 exit 1
               fi
 {{- else }}
-              # Test connection to standard Redis setup
-              echo "Using standard Redis configuration"
+              # Test connection under standard Redis setup
+              echo "Testing Redis connection at $REDIS_PORT:$REDIS_PORT..."
               until redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT" -a "$REDIS_PASSWORD" ping | grep -q PONG; do
                 echo "Waiting for Redis service to be available..."
                 sleep 1
