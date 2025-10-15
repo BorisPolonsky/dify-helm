@@ -724,7 +724,19 @@
         "port": { "type": "integer" },
         "username": { "type": "string" },
         "password": { "type": "string" },
-        "useSSL": { "type": "boolean" }
+        "useSSL": { "type": "boolean" },
+        "sentinel": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "masterSet": { "type": "string" },
+            "sentinels": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "password": { "type": "string" }
+          }
+        }
       }
     },
     "externalS3": {
