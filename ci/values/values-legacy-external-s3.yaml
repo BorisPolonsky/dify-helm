@@ -1,12 +1,12 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.8.1"
+    tag: "1.9.1"
     pullPolicy: IfNotPresent
 
   web:
     repository: langgenius/dify-web
-    tag: "1.8.1"
+    tag: "1.9.1"
     pullPolicy: IfNotPresent
 
   sandbox:
@@ -26,7 +26,7 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.2.0-local
+    tag: 0.3.0-local
     pullPolicy: IfNotPresent
 api:
   enabled: true
