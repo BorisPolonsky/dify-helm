@@ -94,16 +94,16 @@ VOLCENGINE_TOS_SECRET_KEY: {{ .Values.externalTOS.secretKey | b64enc | quote }}
   {{- with .Values.externalRedis }}
 REDIS_USERNAME: {{ .username | b64enc | quote }}
 REDIS_PASSWORD: {{ .password | b64enc | quote }}
+    {{- if .sentinel.enabled }}
+REDIS_SENTINEL_PASSWORD: {{ .sentinel.password | b64enc | quote }}
+    {{- end }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
 {{- with .Values.redis }}
+REDIS_USERNAME: {{ print "" | b64enc | quote }}
+REDIS_PASSWORD: {{ .auth.password | b64enc | quote }}
   {{- if .sentinel.enabled }}
-REDIS_USERNAME: {{ print "" | b64enc | quote }}
-REDIS_PASSWORD: {{ .auth.password | b64enc | quote }}
 REDIS_SENTINEL_PASSWORD: {{ .auth.password | b64enc | quote }}
-  {{- else }}
-REDIS_USERNAME: {{ print "" | b64enc | quote }}
-REDIS_PASSWORD: {{ .auth.password | b64enc | quote }}
   {{- end }}
 {{- end }}
 {{- end }}
@@ -113,11 +113,24 @@ REDIS_PASSWORD: {{ .auth.password | b64enc | quote }}
 # Use redis as the broker, and redis db 1 for celery broker.
 {{- if .Values.externalRedis.enabled }}
   {{- with .Values.externalRedis }}
-    {{- $scheme := "redis" }}
-    {{- if .useSSL }}
-      {{- $scheme = "rediss" }}
-    {{- end }}
+    {{- if .sentinel.enabled }}
+# If use Redis Sentinel, format as follows: `sentinel://<redis_username>:<redis_password>@<sentinel_host1>:<sentinel_port>/<redis_database>`
+# For high availability, you can configure multiple Sentinel nodes (if provided) separated by semicolons like below example:
+# Example: sentinel://:difyai123456@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1
+{{- $redisPassword := .password }}
+{{- $sentinelUrls := list }}
+{{- range $sentinel := .sentinel.sentinels }}
+{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s/1" $redisPassword $sentinel) }}
+{{- end }}
+CELERY_BROKER_URL: {{ join ";" $sentinelUrls | b64enc | quote }}
+CELERY_SENTINEL_PASSWORD: {{ .sentinel.password | b64enc | quote }}
+    {{- else }}
+      {{- $scheme := "redis" }}
+      {{- if .useSSL }}
+        {{- $scheme = "rediss" }}
+      {{- end }}
 CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/1" $scheme .username .password .host .port | b64enc | quote }}
+    {{- end }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
 {{- $releaseName := printf "%s" .Release.Name -}}

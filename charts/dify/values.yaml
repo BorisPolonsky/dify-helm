@@ -2460,6 +2460,15 @@ externalRedis:
   username: ""
   password: "difyai123456"
   useSSL: false
+  sentinel:
+    enabled: false
+    masterSet: "mymaster"
+    sentinels:
+      - "sentinel1.example:26379"
+      - "sentinel2.example:26379"
+      - "sentinel3.example:26379"
+    password: ""
+
 
 ## @Section Extenral storage backend
 ##
