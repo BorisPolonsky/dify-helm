@@ -674,29 +674,7 @@
           }
         },
         "command": { "type": "array" },
-        "args": { "type": "array" },
-        "initContainers": {
-          "type": "object",
-          "properties": {
-            "sysctlInitContainer": {
-              "type": "object",
-              "properties": {
-                "enabled": { "type": "boolean" },
-                "sysctlVmMaxMapCount": { "type": "integer" },
-                "image": {
-                  "type": "object",
-                  "properties": {
-                    "registry": { "type": "string" },
-                    "repo": { "type": "string" },
-                    "tag": { "type": "string" },
-                    "pullPolicy": { "type": "string" }
-                  }
-                }
-              }
-            },
-            "extraInitContainers": { "type": "object" }
-          }
-        }
+        "args": { "type": "array" }
       }
     },
     "externalPostgres": {
