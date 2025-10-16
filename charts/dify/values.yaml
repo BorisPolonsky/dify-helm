@@ -435,11 +435,6 @@ proxy:
         accessModes: ReadWriteMany
         size: 1Gi
         subPath: ""
-  service:
-    port: 80
-    annotations: {}
-    labels: {}
-    clusterIP: ""
   ## Proxy ServiceAccount configuration
   ##
   serviceAccount:
