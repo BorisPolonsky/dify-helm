@@ -2619,10 +2619,10 @@ externalTencentVectorDB:
 # - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` are set as `false` and `externalMyScaleDB.enabled` is `true`
 ###################################
 externalMyScaleDB:
-  enabled: false
+  enabled: true
   host: "myscale"
   port: 8123
-  user: "default"
+  username: "default"
   password: ""
   database: "dify"
   ftsParams: ""
