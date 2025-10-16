@@ -328,15 +328,6 @@
             }
           }
         },
-        "service": {
-          "type": "object",
-          "properties": {
-            "port": { "type": "integer" },
-            "annotations": { "type": "object" },
-            "labels": { "type": "object" },
-            "clusterIP": { "type": "string" }
-          }
-        },
         "serviceAccount": {
           "type": "object",
           "properties": {
@@ -725,7 +716,6 @@
         "pathStyle": { "type": "boolean" },
         "accessKey": { "type": "string" },
         "secretKey": { "type": "string" },
-        "useSSL": { "type": "boolean" },
         "bucketName": {
           "type": "object",
           "properties": {

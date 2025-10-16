@@ -435,11 +435,6 @@ proxy:
         accessModes: ReadWriteMany
         size: 1Gi
         subPath: ""
-  service:
-    port: 80
-    annotations: {}
-    labels: {}
-    clusterIP: ""
   ## Proxy ServiceAccount configuration
   ##
   serviceAccount:
@@ -2463,7 +2458,6 @@ externalS3:
   pathStyle: false
   accessKey: "ak-difyai"
   secretKey: "sk-difyai"
-  useSSL: false
   bucketName:
     # Shared storage for `api` and `worker`
     api: "difyai"
