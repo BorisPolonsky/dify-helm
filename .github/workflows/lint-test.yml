@@ -48,8 +48,7 @@ jobs:
         run: ct lint --target-branch ${{ github.event.repository.default_branch }} --config ct.yaml
 
       - name: Check for unused values in values.yaml
-        # Disabled for now
-        if: false && steps.list-changed.outputs.changed == 'true'
+        if: steps.list-changed.outputs.changed == 'true'
         run: |
           python3 ci/scripts/check_unused_values.py \
             --skip-section redis \
