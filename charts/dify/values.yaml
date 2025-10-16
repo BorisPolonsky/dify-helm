@@ -2458,7 +2458,6 @@ externalS3:
   pathStyle: false
   accessKey: "ak-difyai"
   secretKey: "sk-difyai"
-  useSSL: false
   bucketName:
     # Shared storage for `api` and `worker`
     api: "difyai"

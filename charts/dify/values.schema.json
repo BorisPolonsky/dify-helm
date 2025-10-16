@@ -716,7 +716,6 @@
         "pathStyle": { "type": "boolean" },
         "accessKey": { "type": "string" },
         "secretKey": { "type": "string" },
-        "useSSL": { "type": "boolean" },
         "bucketName": {
           "type": "object",
           "properties": {
