@@ -226,9 +226,6 @@ AWS_ACCESS_KEY: {{ .Values.externalS3.accessKey | b64enc | quote }}
 AWS_SECRET_KEY: {{ .Values.externalS3.secretKey | b64enc | quote }}
 {{- else if .Values.externalAzureBlobStorage.enabled }}
   {{- with .Values.externalAzureBlobStorage }}
-    {{- if hasSuffix ".r2.cloudflarestorage.com" .url }}
-      {{- fail "Error: Cloudflare R2 is not supported with externalAzureBlobStorage configuration. Please use the externalS3 configuration for Cloudflare R2 storage." }}
-    {{- end }}
     {{- $protocol := "" }}
     {{- if hasPrefix "https://" .url }}
       {{- $protocol = "https" }}
