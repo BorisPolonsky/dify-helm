@@ -68,6 +68,12 @@ spec:
               echo "Waiting for API service to be available..."
               sleep 1
             done
+        env:
+        - name: MODE
+          value: "worker"
+        # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+        - name: LOG_LEVEL
+          value: {{ .Values.worker.logLevel | quote }}
         envFrom:
         - configMapRef:
             name: {{ template "dify.worker.fullname" . }}

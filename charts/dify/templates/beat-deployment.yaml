@@ -1,4 +1,4 @@
-{{- if and .Values.beat.enabled}}
+{{- if and .Values.beat.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -73,6 +73,9 @@ spec:
         env:
         - name: MODE
           value: "beat"
+          # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+        - name: LOG_LEVEL
+          value: {{ .Values.beat.logLevel | quote }}
         {{- if .Values.beat.extraEnv }}
           {{- toYaml .Values.beat.extraEnv | nindent 8 }}
         {{- end }}
