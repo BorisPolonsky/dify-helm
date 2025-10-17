@@ -105,8 +105,7 @@ OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.api.otel.metricExportTimeout | toString |
 {{- define "dify.worker.config" -}}
 # worker service
 # The Celery worker for processing the queue.
-# Startup mode, 'worker' starts the Celery worker for processing the queue.
-MODE: worker
+
 
 # The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
@@ -114,8 +113,6 @@ MODE: worker
 CONSOLE_WEB_URL: {{ .Values.api.url.consoleWeb | quote }}
 # --- All the configurations below are the same as those in the 'api' service. ---
 
-# The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
-LOG_LEVEL: {{ .Values.worker.logLevel | quote }}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 # same as the API service
 # SECRET_KEY: {{ .Values.api.secretKey }}
