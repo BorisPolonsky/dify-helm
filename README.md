@@ -186,7 +186,7 @@ Object Storage:
   - [x] Tencent Vector DB
   - [x] MyScaleDB
   - [x] TableStore
-  - [x] elasticsearch
+  - [x] Elasticsearch
 
 ## ExternalSecret Support
 
