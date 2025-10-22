@@ -14,6 +14,7 @@ helm repo update
 helm install my-release dify/dify
 ```
 For customized installation, please refer to the [README.md](https://github.com/BorisPolonsky/dify-helm/blob/master/charts/dify/README.md) file.
+
 ## Network Architecture
 
 The following diagram illustrates the complete network architecture and service topology of the Dify Helm deployment:
@@ -166,11 +167,10 @@ The Nginx proxy handles traffic routing with the following rules:
 | **SSRF Proxy** | `ubuntu/squid:latest` | 3128 | External request security proxy |
 | **Nginx Proxy** | `nginx:latest` | 80 | Reverse proxy, load balancing |
 
-### External Components Supported by this App with Proper Configuration
-
-- [x] Redis
+### Supported External Components
+- [x] Redis (Standalone and Sentinel)
 - [x] PostgreSQL
-- Object Storage:
+Object Storage:
   - [x] Amazon S3
   - [x] Microsoft Azure Blob Storage
   - [x] Alibaba Cloud OSS
