@@ -131,7 +131,7 @@ api:
   extraEnv:
   # Apply your own Environment Variables if necessary.
   # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
-  # The direct approach
+  # Direct value assignment
   # - name: LANG
   #   value: "C.UTF-8"
   #   - name: SECRET_KEY
@@ -309,7 +309,7 @@ worker:
   extraEnv:
   # Apply your own Environment Variables if necessary.
   # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
-  # The direct approach
+  # Direct value assignment
   # - name: LANG
   #   value: "C.UTF-8"
   #   - name: SECRET_KEY

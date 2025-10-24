@@ -76,7 +76,7 @@ This chart automatically manages environment variables for data persistence, ser
 ...
 api:
   extraEnv:
-  # The direct approach
+  # Direct value assignment
   - name: LANG
     value: "C.UTF-8"
   # Use existing configmaps
@@ -128,8 +128,8 @@ Refer to `external<Service>` sections in `values.yaml` for each of the component
 ### Migrate from Built-in Redis and PostgreSQL to Separate Releases
 #### Intro
 It's advised to use Redis, PostgreSQL from external providers over the built-in middlewares for production use regarding:
-- enterpise-level maintainability,
-- managing Redis and PostgreSQL independently from the Dify release,
+- enterprise-level maintainability,
+- managing Redis and PostgreSQL independently of the Dify release,
 - applying different upgrade cycles, and
 - utilizing advanced configurations that are not available in the subcharts.
 
@@ -175,7 +175,7 @@ For example:
 - Redis: `redis-data-my-release-redis-master-0`, `redis-data-my-release-redis-replicas-0`, etc.
 - PostgreSQL: `data-my-release-postgresql-primary-0`, `data-my-release-postgresql-read-0`
 
-Before shutting down built-in databases (basically an uninstallation process of built-in dependencies), confirm that the PVCs will persist (e.g., via `helm.sh/resource-policy: keep` annotation). Also check the reclaim policy of PVs: if it's `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` to prevent data loss in case the bound PVC were accidentally deleted upon migration, which would end up deleting the PV itself.
+Before shutting down built-in databases (basically an uninstallation process of built-in dependencies), confirm that the PVCs will persist (e.g., via the `helm.sh/resource-policy: keep` annotation). Also check the reclaim policy of PVs: if it's `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` to prevent data loss in case the bound PVCs were accidentally deleted upon migration, which would end up deleting the PV itself.
 
 
 Next, create values files that inherit the original settings and modify the existingClaims for persistence:
@@ -216,7 +216,7 @@ readReplicas:
 
 Shutdown the built-in databases to ensure no processes are accessing the PVCs:
 
-**Note**: Running built-in database instances simultaneously with the separatly deployed ones while sharing the same PVCs will result in data corruption.
+**Note**: Running built-in database instances simultaneously with the separately deployed ones while sharing the same PVCs will result in data corruption.
 
 Modify your values.yaml and disable built-in databases by setting the redis.enabled=false, then
 ```bash
@@ -303,7 +303,7 @@ helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-db-values.ya
 
 #### Background
 
-In Kubernetes production environments, storing sensitive information (such as database passwords, API keys, etc.) directly in values.yaml is insecure. The ExternalSecret feature solves this problem through the [External Secrets Operator](https://external-secrets.io/), which can securely retrieve sensitive information from external secret management systems (such as AWS Secrets Manager, HashiCorp Vault, Azure Key Vault, etc.) and automatically create Kubernetes Secret resources.
+In Kubernetes production environments, storing sensitive information (such as database passwords, API keys, etc.) directly in values.yaml is insecure. ExternalSecret addresses this issue through the [External Secrets Operator](https://external-secrets.io/), which can securely retrieve sensitive information from external secret management systems (such as AWS Secrets Manager, HashiCorp Vault, Azure Key Vault, etc.) and automatically create Kubernetes Secret resources.
 
 Why ExternalSecret is needed:
 

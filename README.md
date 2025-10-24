@@ -41,7 +41,7 @@ graph TB
     %% Backend Pods
     APIService --> APIPod[📦 API Pod<br/>langgenius/dify-api:1.9.1<br/>Port: 5001]
     WebService --> WebPod[📦 Web Pod<br/>langgenius/dify-web:1.9.1<br/>Port: 3000]
-    PluginService --> PluginPod[📦 Plugin Daemon Pod<br/>langgenius/dify-plugin-daemon:0.3.0-local<br/>Port: 5002, 5003]
+    PluginService --> PluginPod[📦 Plugin Daemon Pod<br/>langgenius/dify-plugin-daemon:0.3.0-local<br/>Ports: 5002, 5003]
 
     %% Worker Pod (Background Processing)
     WorkerPod[📦 Worker Pod<br/>langgenius/dify-api:1.9.1]
@@ -170,7 +170,7 @@ The Nginx proxy handles traffic routing with the following rules:
 ### Supported External Components
 - [x] Redis (Standalone and Sentinel)
 - [x] PostgreSQL
-Object Storage:
+- [x] Object Storage:
   - [x] Amazon S3
   - [x] Microsoft Azure Blob Storage
   - [x] Alibaba Cloud OSS
