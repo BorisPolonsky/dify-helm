@@ -76,7 +76,7 @@ This chart automatically manages environment variables for data persistence, ser
 ...
 api:
   extraEnv:
-  # The direct approach
+  # Direct value assignment
   - name: LANG
     value: "C.UTF-8"
   # Use existing configmaps
@@ -111,7 +111,7 @@ redis:
 *Note: Built-in Redis, PostgreSQL, and Weaviate are for development/testing only and may not keep up to the versions in Dify's `docker-compose.yml`. For production, use external Redis/PostgreSQL instances (as noted in the next section).*
 
 ### 4. Opt in External Services
-It's advised to utilize services from enterprise-level providers over the built-in middlewares for production use. To take over built-in `Redis` for instance:
+To opt in `Redis` from external providers for instance:
 ```yaml
 # values.yaml
 externalRedis:
@@ -122,20 +122,21 @@ externalRedis:
   password: "difyai123456"
   useSSL: false
 ```
-Refer to `external<Service>` sections for more details. 
+Refer to `external<Service>` sections in `values.yaml` for each of the component to be used.
 
-## Migrate from Built-in Redis and PostgreSQL to Separate Releases
+## Advanced Operations
+### Migrate from Built-in Redis and PostgreSQL to Separate Releases
+#### Intro
+It's advised to use Redis, PostgreSQL from external providers over the built-in middlewares for production use regarding:
+- enterprise-level maintainability,
+- managing Redis and PostgreSQL independently of the Dify release,
+- applying different upgrade cycles, and
+- utilizing advanced configurations that are not available in the subcharts.
 
-This guide explains how to migrate from the built-in Redis and PostgreSQL deployments to separate releases while preserving your data.
+To migrate from the built-in Redis and PostgreSQL deployments to separate releases while preserving existing data, refer to the following sections:
 
-This approach is useful for:
-- Managing Redis and PostgreSQL independently from the Dify release
-- Applying different upgrade cycles for the database components
-- Utilizing more advanced configurations not available in the subcharts
-
-This section assumes the replication architecture of built-in Redis and PostgreSQL given the default configurations. For non-default setups (e.g., Redis in Sentinel mode), you will need to implement a custom migration solution.
-
-#### Preparation
+#### Prerequisite
+This guide assumes the replication architecture of built-in Redis and PostgreSQL given the default configurations. For non-default setups (e.g., Redis in Sentinel mode), you will need to implement a custom migration solution.
 
 Set the following environment variables according to your deployment:
 
@@ -174,7 +175,7 @@ For example:
 - Redis: `redis-data-my-release-redis-master-0`, `redis-data-my-release-redis-replicas-0`, etc.
 - PostgreSQL: `data-my-release-postgresql-primary-0`, `data-my-release-postgresql-read-0`
 
-Before shutting down built-in databases (basically an uninstallation process of built-in dependencies), confirm that the PVCs will persist (e.g., via `helm.sh/resource-policy: keep` annotation). Also check the reclaim policy of PVs: if it's `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` to prevent data loss in case the bound PVC were accidentally deleted upon migration, which would end up deleting the PV itself.
+Before shutting down built-in databases (basically an uninstallation process of built-in dependencies), confirm that the PVCs will persist (e.g., via the `helm.sh/resource-policy: keep` annotation). Also check the reclaim policy of PVs: if it's `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` to prevent data loss in case the bound PVCs were accidentally deleted upon migration, which would end up deleting the PV itself.
 
 
 Next, create values files that inherit the original settings and modify the existingClaims for persistence:
@@ -215,7 +216,7 @@ readReplicas:
 
 Shutdown the built-in databases to ensure no processes are accessing the PVCs:
 
-**Note**: Running built-in database instances simultaneously with the separatly deployed ones while sharing the same PVCs will result in data corruption.
+**Note**: Running built-in database instances simultaneously with the separately deployed ones while sharing the same PVCs will result in data corruption.
 
 Modify your values.yaml and disable built-in databases by setting the redis.enabled=false, then
 ```bash
@@ -259,7 +260,7 @@ kubectl get pods -n $NAMESPACE | grep my-postgresql
 # Test connectivity if needed
 ```
 
-### 5. Restore Dify Service
+#### Restore Dify Service
 
 Update your Dify deployment to use external Redis and PostgreSQL services instead of the built-in ones:
 
@@ -292,7 +293,52 @@ externalPostgres:
 helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-db-values.yaml
 ```
 
-### Important Notes
+#### Important Notes
 - Make sure to use the same passwords and usernames for the standalone deployments as were used in the built-in versions to avoid authentication issues.
 - Always backup your data before performing this migration.
 - Test this process in a non-production environment first to ensure you understand the steps and potential issues.
+
+
+### ExternalSecret Support
+
+#### Background
+
+In Kubernetes production environments, storing sensitive information (such as database passwords, API keys, etc.) directly in values.yaml is insecure. ExternalSecret addresses this issue through the [External Secrets Operator](https://external-secrets.io/), which can securely retrieve sensitive information from external secret management systems (such as AWS Secrets Manager, HashiCorp Vault, Azure Key Vault, etc.) and automatically create Kubernetes Secret resources.
+
+Why ExternalSecret is needed:
+
+- **Security**: Avoid storing plain text passwords in Git repositories or configuration files
+- **Centralized Management**: Unified management of all sensitive information
+- **Automatic Rotation**: Support for automatic key updates and rotation
+- **Compliance**: Meet enterprise security and compliance requirements
+
+#### Currently Supported External Components
+
+When ExternalSecret is enabled, sensitive information for the following components can be retrieved from external secret stores:
+
+##### Database Connections
+
+- **PostgreSQL**: Database username, password
+- **Redis**: Authentication password, username
+- **Elasticsearch**: Username, password
+
+##### Object Storage
+
+- **AWS S3**: Access Key ID, Secret Access Key
+
+##### Vector Databases
+
+- **ElasticSearch**: Username, Password
+
+##### Email Services
+
+- **Resend**: API Key, sender email
+- **SendGrid**: API Key, sender email
+
+##### Other Services
+
+- **Code Execution Service**: API Key
+- **Plugin System**: Daemon Key, internal API Key
+- **Application Core**: Secret Key
+
+Usage: Set `externalSecret.enabled: true` in values.yaml and configure the corresponding secretStore and remoteRefs parameters.

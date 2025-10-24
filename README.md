@@ -14,6 +14,7 @@ helm repo update
 helm install my-release dify/dify
 ```
 For customized installation, please refer to the [README.md](https://github.com/BorisPolonsky/dify-helm/blob/master/charts/dify/README.md) file.
+
 ## Network Architecture
 
 The following diagram illustrates the complete network architecture and service topology of the Dify Helm deployment:
@@ -40,7 +41,7 @@ graph TB
     %% Backend Pods
     APIService --> APIPod[📦 API Pod<br/>langgenius/dify-api:1.9.1<br/>Port: 5001]
     WebService --> WebPod[📦 Web Pod<br/>langgenius/dify-web:1.9.1<br/>Port: 3000]
-    PluginService --> PluginPod[📦 Plugin Daemon Pod<br/>langgenius/dify-plugin-daemon:0.3.0-local<br/>Port: 5002, 5003]
+    PluginService --> PluginPod[📦 Plugin Daemon Pod<br/>langgenius/dify-plugin-daemon:0.3.0-local<br/>Ports: 5002, 5003]
 
     %% Worker Pod (Background Processing)
     WorkerPod[📦 Worker Pod<br/>langgenius/dify-api:1.9.1]
@@ -166,11 +167,10 @@ The Nginx proxy handles traffic routing with the following rules:
 | **SSRF Proxy** | `ubuntu/squid:latest` | 3128 | External request security proxy |
 | **Nginx Proxy** | `nginx:latest` | 80 | Reverse proxy, load balancing |
 
-### External Components Supported by this App with Proper Configuration
-
-- [x] Redis
+### Supported External Components
+- [x] Redis (Standalone and Sentinel)
 - [x] PostgreSQL
-- Object Storage:
+- [x] Object Storage:
   - [x] Amazon S3
   - [x] Microsoft Azure Blob Storage
   - [x] Alibaba Cloud OSS
@@ -186,51 +186,7 @@ The Nginx proxy handles traffic routing with the following rules:
   - [x] Tencent Vector DB
   - [x] MyScaleDB
   - [x] TableStore
-  - [x] elasticsearch
-
-## ExternalSecret Support
-
-### Background
-
-In Kubernetes production environments, storing sensitive information (such as database passwords, API keys, etc.) directly in values.yaml is insecure. The ExternalSecret feature solves this problem through the [External Secrets Operator](https://external-secrets.io/), which can securely retrieve sensitive information from external secret management systems (such as AWS Secrets Manager, HashiCorp Vault, Azure Key Vault, etc.) and automatically create Kubernetes Secret resources.
-
-Why ExternalSecret is needed:
-
-- **Security**: Avoid storing plain text passwords in Git repositories or configuration files
-- **Centralized Management**: Unified management of all sensitive information
-- **Automatic Rotation**: Support for automatic key updates and rotation
-- **Compliance**: Meet enterprise security and compliance requirements
-
-### Currently Supported External Components
-
-When ExternalSecret is enabled, sensitive information for the following components can be retrieved from external secret stores:
-
-#### Database Connections
-
-- **PostgreSQL**: Database username, password
-- **Redis**: Authentication password, username
-- **Elasticsearch**: Username, password
-
-#### Object Storage
-
-- **AWS S3**: Access Key ID, Secret Access Key
-
-#### Vector Databases
-
-- **ElasticSearch**: Username, Password
-
-#### Email Services
-
-- **Resend**: API Key, sender email
-- **SendGrid**: API Key, sender email
-
-#### Other Services
-
-- **Code Execution Service**: API Key
-- **Plugin System**: Daemon Key, internal API Key
-- **Application Core**: Secret Key
-
-Usage: Set `externalSecret.enabled: true` in values.yaml and configure the corresponding secretStore and remoteRefs parameters.
+  - [x] Elasticsearch
 
 ## Contributors
 
