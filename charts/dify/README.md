@@ -298,6 +298,79 @@ helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-db-values.ya
 - Always backup your data before performing this migration.
 - Test this process in a non-production environment first to ensure you understand the steps and potential issues.
 
+### Migrate from Built-in Weaviate as Separate Release
+#### Prerequisite
+Set the following environment variables according to your deployment:
+
+```bash
+export RELEASE_NAME="your-release-name"    # Helm release name (e.g., 'my-dify' from 'helm install my-dify dify/dify')
+export NAMESPACE="your-namespace"          # Deployment namespace
+export CHART_VERSION=$(helm list -n $NAMESPACE | grep $RELEASE_NAME | awk '{print $9}')  # Chart version of dify-helm
+export WEAVIATE_CHART_VERSION="16.1.0"     # Check the Chart.yaml for the exact version of the Weaviate helm chart
+```
+
+#### Backup Autuentication Info of Weaviate
+```bash
+# Backup your current values
+helm get values $RELEASE_NAME -n $NAMESPACE > dify-backup-values.yaml
+
+# Backup ConfigMaps and Secrets (Recommended)
+kubectl get configmap -n $NAMESPACE -o yaml > dify-configmaps-backup.yaml
+kubectl get secret -n $NAMESPACE -o yaml > dify-secrets-backup.yaml
+```
+
+**Note**: Backing up ConfigMaps and Secrets is optional but recommended to avoid losing your original authentication configurations.
+
+#### Re-deploy Weaviate as a Separate Release
+Shutdown the built-in Weaviate to ensure no processes are accessing the PVCs to avoid data corruption. Set `weaviate.enabled=false`, then
+
+```bash
+helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE \
+  --version $CHART_VERSION \
+  -f values-with-weaviate-disabled.yaml
+```
+
+Wait until Weaviate pods to terminate:
+
+```bash
+kubectl get pods -n $NAMESPACE -w
+```
+
+Extract the whole `.Values.weaviate` section and save as `weaviate-values.yaml` to keep your current configurations. The `.Values.weavaiate` should be un-nested as `.Values`. Re-deploy Weaviate with the following command:
+
+```bash
+# Install standalone Weaviate
+helm install my-weaviate weaviate/weaviate \
+  --version $WEAVIATE_CHART_VERSION \
+  -n $NAMESPACE \
+  -f weaviate-values.yaml
+```
+
+Verify that Weaviate is running correctly:
+
+```bash
+# Check Weaviate pods
+kubectl get pods -n $NAMESPACE | grep weaviate
+# Test connectivity if needed
+```
+
+#### Update Dify Service
+Update Dify configuartions to use external Weaviate service instead of the built-in one:
+
+```yaml
+# dify-external-weaviate-values.yaml
+weaviate:
+  enabled: false
+
+externalWeaviate:
+  enabled: true
+  endpoint: "http://weaviate:80"  # Service name from `kubectl get svc -n $NAMESPACE | grep weaviate`
+  apiKey: "your-api-key" # The first key in the original `.Values.weaviate.authentication.apikey.allowed_keys` by default
+```
+
+```bash
+helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-weaviate-values.yaml
+```
 
 ### ExternalSecret Support
 
