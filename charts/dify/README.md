@@ -138,6 +138,13 @@ To migrate from the built-in Redis and PostgreSQL deployments to separate releas
 #### Prerequisite
 This guide assumes the replication architecture of built-in Redis and PostgreSQL given the default configurations. For non-default setups (e.g., Redis in Sentinel mode), you will need to implement a custom migration solution.
 
+First, add the Bitnami Helm repository:
+
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+```
+
 Set the following environment variables according to your deployment:
 
 ```bash
@@ -300,6 +307,15 @@ helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-db-values.ya
 
 ### Migrate from Built-in Weaviate as Separate Release
 #### Prerequisite
+This guide assumes the default configuration of built-in Weaviate.
+
+Add the Weaviate Helm repository:
+
+```bash
+helm repo add weaviate https://weaviate.github.io/weaviate-helm
+helm repo update
+```
+
 Set the following environment variables according to your deployment:
 
 ```bash
