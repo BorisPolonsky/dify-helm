@@ -124,7 +124,7 @@ externalRedis:
 ```
 Refer to `external<Service>` sections in `values.yaml` for each of the component to be used.
 
-## Advanced Operations
+## Advanced Topics
 ### Migrate from Built-in Redis and PostgreSQL to Separate Releases
 #### Intro
 It's advised to use Redis, PostgreSQL from external providers over the built-in middlewares for production use regarding:
