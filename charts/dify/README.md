@@ -125,12 +125,12 @@ externalRedis:
   password: "difyai123456"
   useSSL: false
 ```
-Refer to `external<Service>` sections in `values.yaml` for each of the component to be used.
+Refer to `external<Service>` sections in `values.yaml` for each component to be used.
 
 ## Advanced Topics
 ### Migrate Built-in Redis and PostgreSQL instances as Separate Releases
 #### Intro
-To migrate built-in Redis and PostgreSQL as to separate releases within the same cluster while preserving existing data, refer to the following sections:
+To migrate built-in Redis and PostgreSQL as separate releases within the same cluster while preserving existing data, refer to the following sections:
 
 #### Prerequisite
 This guide assumes the replication architecture of built-in Redis and PostgreSQL (the default configuration). For setups like Redis in Sentinel mode, user would have to come up with their own solutions.
@@ -321,7 +321,7 @@ export CHART_VERSION=$(helm list -n $NAMESPACE | grep $RELEASE_NAME | awk '{prin
 export WEAVIATE_CHART_VERSION="16.1.0"     # Check the Chart.yaml for the exact version of the Weaviate helm chart
 ```
 
-#### Backup Autuentication Info of Weaviate
+#### Backup Authentication Info of Weaviate
 ```bash
 # Backup your current values
 helm get values $RELEASE_NAME -n $NAMESPACE > dify-backup-values.yaml
@@ -367,7 +367,7 @@ kubectl get pods -n $NAMESPACE | grep weaviate
 ```
 
 #### Update Dify Service
-Update Dify configuartions to use external Weaviate service instead of the built-in one:
+Update Dify configurartions to use external Weaviate service instead of the built-in one:
 
 ```yaml
 # dify-external-weaviate-values.yaml
