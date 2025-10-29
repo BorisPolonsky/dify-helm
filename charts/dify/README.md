@@ -94,7 +94,7 @@ api:
 ```
 
 ### 3. Working with Built-in Middlewares
-Built-in `Redis`, `PostgreSQL`, and `weaviate` allow users to spin up a self-contained `Dify` environment for a quick start. These components are supplied by third party helm charts. To customize built-in middlewares, refer to the section name and the official documents:
+For a quickstart, the chart features built-in `Redis`, `PostgreSQL` and `Weaviate` that powers a self-contained `Dify` environment. These components are supplied by third-party Helm charts and enabled by default. To customize their settings, refer to the section name and the official documents:
 
 | Section | Document |
 ----- | --- |
@@ -102,18 +102,21 @@ Built-in `Redis`, `PostgreSQL`, and `weaviate` allow users to spin up a self-con
 `postgresql` |[bitnami/postgresql](https://github.com/bitnami/charts/tree/main/bitnami/postgresql)
 `weaviate`| [weaviate](https://github.com/weaviate/weaviate-helm)
 
-To disable them, set `enabled: false` in the corresponding section of `values.yaml` and apply external service providers:
+*Note: These components may not keep up to the versions in Dify's `docker-compose.yml`. For more advanced, production-oriented setups, you may opt in external services instead. Refer to the next section for more details.
+
+### 4. Opt in External Services
+It's advised to use Redis, PostgreSQL and Weaviate from external providers over the built-in middlewares for production use regarding:
+- enterprise-level maintainability,
+- managing Redis and PostgreSQL independently of the Dify release,
+- applying different upgrade cycles, and
+- utilizing advanced configurations that are not available in the subcharts.
+
+To opt in `Redis` from external providers for instance:
 ```yaml
 # values.yaml
 redis:
   enabled: false  # Disable built-in Redis
-```
-*Note: Built-in Redis, PostgreSQL, and Weaviate are for development/testing only and may not keep up to the versions in Dify's `docker-compose.yml`. For production, use external Redis/PostgreSQL instances (as noted in the next section).*
 
-### 4. Opt in External Services
-To opt in `Redis` from external providers for instance:
-```yaml
-# values.yaml
 externalRedis:
   enabled: true
   host: "redis.example"
@@ -125,21 +128,14 @@ externalRedis:
 Refer to `external<Service>` sections in `values.yaml` for each of the component to be used.
 
 ## Advanced Topics
-### Migrate from Built-in Redis and PostgreSQL to Separate Releases
+### Migrate Built-in Redis and PostgreSQL instances as Separate Releases
 #### Intro
-It's advised to use Redis, PostgreSQL from external providers over the built-in middlewares for production use regarding:
-- enterprise-level maintainability,
-- managing Redis and PostgreSQL independently of the Dify release,
-- applying different upgrade cycles, and
-- utilizing advanced configurations that are not available in the subcharts.
-
-To migrate from the built-in Redis and PostgreSQL deployments to separate releases while preserving existing data, refer to the following sections:
+To migrate built-in Redis and PostgreSQL as to separate releases within the same cluster while preserving existing data, refer to the following sections:
 
 #### Prerequisite
-This guide assumes the replication architecture of built-in Redis and PostgreSQL given the default configurations. For non-default setups (e.g., Redis in Sentinel mode), you will need to implement a custom migration solution.
+This guide assumes the replication architecture of built-in Redis and PostgreSQL (the default configuration). For setups like Redis in Sentinel mode, user would have to come up with their own solutions.
 
-First, add the Bitnami Helm repository:
-
+Add the Bitnami Helm repository:
 ```bash
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
@@ -182,7 +178,7 @@ For example:
 - Redis: `redis-data-my-release-redis-master-0`, `redis-data-my-release-redis-replicas-0`, etc.
 - PostgreSQL: `data-my-release-postgresql-primary-0`, `data-my-release-postgresql-read-0`
 
-Before shutting down built-in databases (basically an uninstallation process of built-in dependencies), confirm that the PVCs will persist (e.g., via the `helm.sh/resource-policy: keep` annotation). Also check the reclaim policy of PVs: if it's `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` to prevent data loss in case the bound PVCs were accidentally deleted upon migration, which would end up deleting the PV itself.
+Before shutting down built-in databases, confirm that the PVCs for `Redis` and `PostgreSQL` will persist (e.g., via the `helm.sh/resource-policy: keep` annotation) after the uninstallation process. You may also check the reclaim policy of PVs if applicable (e.g. Use `Retain` to prevent data loss in case the bound PVCs were deleted upon migration, which would end up deleting the PV itself if the policy were `Delete`).
 
 
 Next, create values files that inherit the original settings and modify the existingClaims for persistence:
