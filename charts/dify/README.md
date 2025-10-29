@@ -166,8 +166,7 @@ kubectl get secret -n $NAMESPACE -o yaml > dify-secrets-backup.yaml
 
 **Important**: Back up ConfigMaps and Secrets, especially when randomly generated passwords were used (e.g., the default behavior of built-in PostgreSQL replica setups) as they won't persist after migration.
 
-#### Configure Redis and PostgreSQL to reuse existing PVCs
-
+#### Update Redis and PostgreSQL Configurations
 First, identify the existing PVCs that are used by the built-in databases:
 
 ```bash
@@ -178,10 +177,7 @@ For example:
 - Redis: `redis-data-my-release-redis-master-0`, `redis-data-my-release-redis-replicas-0`, etc.
 - PostgreSQL: `data-my-release-postgresql-primary-0`, `data-my-release-postgresql-read-0`
 
-Before shutting down built-in databases, confirm that the PVCs for `Redis` and `PostgreSQL` will persist (e.g., via the `helm.sh/resource-policy: keep` annotation) after the uninstallation process. You may also check the reclaim policy of PVs if applicable (e.g. Use `Retain` to prevent data loss in case the bound PVCs were deleted upon migration, which would end up deleting the PV itself if the policy were `Delete`).
-
-
-Next, create values files that inherit the original settings and modify the existingClaims for persistence:
+Next, create `redis-values.yaml` and `postgresql-values.yaml` that inherit the original settings and modify `<role>.persistence.existingClaim` to re-use existing PVCs.
 
 For Redis:
 
@@ -214,13 +210,11 @@ readReplicas:
 
 **Note**: When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. Store your credentials in a secure vault rather than relying on the Secret created in the new release.
 
-#### Re-deploy Redis and PostgreSQL as Separate Releases
-
+#### Disable built-in Redis and PostgreSQL
+Before shutting down built-in databases, confirm that the PVCs for `Redis` and `PostgreSQL` will persist (e.g., via the `helm.sh/resource-policy: keep` annotation) after the uninstallation process. You may also check the reclaim policy of PVs if applicable (e.g. Use `Retain` to prevent data loss in case the bound PVCs were deleted upon migration, which would end up deleting the PV itself if the policy were `Delete`).
 Shutdown the built-in databases to ensure no processes are accessing the PVCs:
 
-**Note**: Running built-in database instances simultaneously with the separately deployed ones while sharing the same PVCs will result in data corruption.
-
-Modify your values.yaml and disable built-in databases by setting the redis.enabled=false, then
+Disable built-in databases by setting `redis.enabled=false` and `postgresql=false` based on your original `values.yaml`:
 ```bash
 
 helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE \
@@ -228,12 +222,13 @@ helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE \
   -f values-with-redis-and-pg-disabled.yaml
 ```
 
-Wait until Redis and PostgreSQL pods to terminate:
+Wait until Redis and PostgreSQL pods terminate:
 
 ```bash
 kubectl get pods -n $NAMESPACE -w
 ```
 
+#### Deploy Redis and PostgreSQL with exisiting PVCs
 Once the built-in databases are fully shut down, re-deploy Redis and PostgreSQL as separate releases:
 
 ```bash
@@ -250,7 +245,7 @@ helm install my-postgresql bitnami/postgresql \
   -f postgresql-values.yaml
 ```
 
-Verify that the new database deployments are running correctly:
+Verify that pods are running correctly:
 
 ```bash
 # Check Redis pods
@@ -262,9 +257,8 @@ kubectl get pods -n $NAMESPACE | grep my-postgresql
 # Test connectivity if needed
 ```
 
-#### Restore Dify Service
-
-Update your Dify deployment to use external Redis and PostgreSQL services instead of the built-in ones:
+#### Update Dify Configuration
+Update your Dify release regarding external Redis and PostgreSQL:
 
 ```yaml
 # dify-external-db-values.yaml
@@ -317,7 +311,7 @@ Set the following environment variables according to your deployment:
 export RELEASE_NAME="your-release-name"    # Helm release name (e.g., 'my-dify' from 'helm install my-dify dify/dify')
 export NAMESPACE="your-namespace"          # Deployment namespace
 export CHART_VERSION=$(helm list -n $NAMESPACE | grep $RELEASE_NAME | awk '{print $9}')  # Chart version of dify-helm
-export WEAVIATE_CHART_VERSION="16.1.0"     # Check the Chart.yaml for the exact version of the Weaviate helm chart
+export WEAVIATE_CHART_VERSION="16.1.0"     # Check the Chart.yaml for the exact version of the Weaviate Helm chart
 ```
 
 #### Backup Authentication Info of Weaviate
