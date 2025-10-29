@@ -188,14 +188,13 @@ For Redis:
 ```yaml
 # redis-values.yaml
 # Inherit all original settings from your backup, modify existingClaims to re-use the previously created PVCs
-redis:
-  master:
-    persistence:
-      existingClaim: "redis-data-my-release-redis-master-0"
-  replica:
-    replicaCount: 3
-    persistence:
-      existingClaim: ""  # Replicas will create new PVCs and sync data from master
+master:
+  persistence:
+    existingClaim: "redis-data-my-release-redis-master-0"
+replica:
+  replicaCount: 3
+  persistence:
+    existingClaim: ""  # Replicas will create new PVCs and sync data from master
 ```
 
 For PostgreSQL:
