@@ -177,10 +177,11 @@ For example:
 - Redis: `redis-data-my-release-redis-master-0`, `redis-data-my-release-redis-replicas-0`, etc.
 - PostgreSQL: `data-my-release-postgresql-primary-0`, `data-my-release-postgresql-read-0`
 
-Next, create `redis-values.yaml` and `postgresql-values.yaml` that inherit the original settings and modify `<role>.persistence.existingClaim` to re-use existing PVCs.
+Next, create `redis-values.yaml` and `postgresql-values.yaml` that inherit the original settings and modify `<role>.persistence.existingClaim` or `fullnameOverride` to re-use existing PVCs.
 
 For Redis:
 
+For single master setup (default)
 ```yaml
 # redis-values.yaml
 # Inherit all original settings from your backup, modify existingClaim to re-use the previously created PVCs
@@ -191,7 +192,15 @@ master:
 replica:
   replicaCount: 3
   persistence:
-    existingClaim: ""  # Replicas will create new PVCs and sync data from master
+    existingClaim: ""  # Replicas will sync data from master
+```
+Or use the following approach as altnernative:
+
+```yaml
+# redis-values.yaml
+## @param fullnameOverride String to fully override common.names.fullname
+##
+fullnameOverride: "my-release-redis" # ${RELEASE_NAME}-redis
 ```
 
 For PostgreSQL:
