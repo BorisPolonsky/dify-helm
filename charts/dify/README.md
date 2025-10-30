@@ -205,7 +205,7 @@ primary:
 readReplicas:
   replicaCount: 1
   persistence:
-    existingClaim: "data-my-release-postgresql-read-0"
+    existingClaim: "data-my-release-postgresql-read-0"  # Applies only if only 1 read replica is configured. Leave it empty if more than 1 read replica is configured.
 ```
 
 **Note**: When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. Store your credentials in a secure vault rather than relying on the Secret created in the new release.
