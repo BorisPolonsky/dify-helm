@@ -183,10 +183,11 @@ For Redis:
 
 ```yaml
 # redis-values.yaml
-# Inherit all original settings from your backup, modify existingClaims to re-use the previously created PVCs
+# Inherit all original settings from your backup, modify existingClaim to re-use the previously created PVCs
 master:
+  count: 1
   persistence:
-    existingClaim: "redis-data-my-release-redis-master-0"
+    existingClaim: "redis-data-my-release-redis-master-0"  # Applies only if only 1 master is configured.
 replica:
   replicaCount: 3
   persistence:
