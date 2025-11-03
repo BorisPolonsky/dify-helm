@@ -94,7 +94,7 @@ api:
 ```
 
 ### 3. Working with Built-in Middlewares
-Built-in `Redis`, `PostgreSQL`, and `weaviate` allow users to spin up a self-contained `Dify` environment for a quick start. These components are supplied by third party helm charts. To customize built-in middlewares, refer to the section name and the official documents:
+For a quickstart, the chart features built-in `Redis`, `PostgreSQL` and `Weaviate` that powers a self-contained `Dify` environment. These components are supplied by third-party Helm charts and enabled by default. To customize their settings, refer to the section name and the official documents:
 
 | Section | Document |
 ----- | --- |
@@ -102,18 +102,21 @@ Built-in `Redis`, `PostgreSQL`, and `weaviate` allow users to spin up a self-con
 `postgresql` |[bitnami/postgresql](https://github.com/bitnami/charts/tree/main/bitnami/postgresql)
 `weaviate`| [weaviate](https://github.com/weaviate/weaviate-helm)
 
-To disable them, set `enabled: false` in the corresponding section of `values.yaml` and apply external service providers:
+*Note: These components may not keep up to the versions in Dify's `docker-compose.yml`. For more advanced, production-oriented setups, you may opt in external services instead. Refer to the next section for more details.
+
+### 4. Opt in External Services
+It's advised to use Redis, PostgreSQL and Weaviate from external providers over the built-in middlewares for production use regarding:
+- enterprise-level maintainability,
+- managing Redis and PostgreSQL independently of the Dify release,
+- applying different upgrade cycles, and
+- utilizing advanced configurations that are not available in the subcharts.
+
+To opt in `Redis` from external providers for instance:
 ```yaml
 # values.yaml
 redis:
   enabled: false  # Disable built-in Redis
-```
-*Note: Built-in Redis, PostgreSQL, and Weaviate are for development/testing only and may not keep up to the versions in Dify's `docker-compose.yml`. For production, use external Redis/PostgreSQL instances (as noted in the next section).*
 
-### 4. Opt in External Services
-To opt in `Redis` from external providers for instance:
-```yaml
-# values.yaml
 externalRedis:
   enabled: true
   host: "redis.example"
@@ -122,21 +125,21 @@ externalRedis:
   password: "difyai123456"
   useSSL: false
 ```
-Refer to `external<Service>` sections in `values.yaml` for each of the component to be used.
+Refer to `external<Service>` sections in `values.yaml` for each component to be used.
 
-## Advanced Operations
-### Migrate from Built-in Redis and PostgreSQL to Separate Releases
+## Advanced Topics
+### Migrate Built-in Redis and PostgreSQL instances as Separate Releases
 #### Intro
-It's advised to use Redis, PostgreSQL from external providers over the built-in middlewares for production use regarding:
-- enterprise-level maintainability,
-- managing Redis and PostgreSQL independently of the Dify release,
-- applying different upgrade cycles, and
-- utilizing advanced configurations that are not available in the subcharts.
-
-To migrate from the built-in Redis and PostgreSQL deployments to separate releases while preserving existing data, refer to the following sections:
+To migrate built-in Redis and PostgreSQL as separate releases within the same cluster while preserving existing data, refer to the following sections.
 
 #### Prerequisite
-This guide assumes the replication architecture of built-in Redis and PostgreSQL given the default configurations. For non-default setups (e.g., Redis in Sentinel mode), you will need to implement a custom migration solution.
+This guide assumes the replication architecture of built-in Redis and PostgreSQL (the default configuration). For setups like Redis in Sentinel mode, user would have to come up with their own solutions.
+
+Add the Bitnami Helm repository:
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+```
 
 Set the following environment variables according to your deployment:
 
@@ -163,8 +166,7 @@ kubectl get secret -n $NAMESPACE -o yaml > dify-secrets-backup.yaml
 
 **Important**: Back up ConfigMaps and Secrets, especially when randomly generated passwords were used (e.g., the default behavior of built-in PostgreSQL replica setups) as they won't persist after migration.
 
-#### Configure Redis and PostgreSQL to reuse existing PVCs
-
+#### Update Redis and PostgreSQL Configurations
 First, identify the existing PVCs that are used by the built-in databases:
 
 ```bash
@@ -175,24 +177,32 @@ For example:
 - Redis: `redis-data-my-release-redis-master-0`, `redis-data-my-release-redis-replicas-0`, etc.
 - PostgreSQL: `data-my-release-postgresql-primary-0`, `data-my-release-postgresql-read-0`
 
-Before shutting down built-in databases (basically an uninstallation process of built-in dependencies), confirm that the PVCs will persist (e.g., via the `helm.sh/resource-policy: keep` annotation). Also check the reclaim policy of PVs: if it's `Delete`, you may need to change the underlying PV's reclaim policy to `Retain` to prevent data loss in case the bound PVCs were accidentally deleted upon migration, which would end up deleting the PV itself.
-
-
-Next, create values files that inherit the original settings and modify the existingClaims for persistence:
+Next, create `redis-values.yaml` and `postgresql-values.yaml` that inherit the original settings and modify `<role>.persistence.existingClaim` or `fullnameOverride` to re-use existing PVCs.
 
 For Redis:
 
+For single master setup (default)
 ```yaml
 # redis-values.yaml
-# Inherit all original settings from your backup, modify existingClaims to re-use the previously created PVCs
-redis:
-  master:
-    persistence:
-      existingClaim: "redis-data-my-release-redis-master-0"
-  replica:
-    replicaCount: 3
-    persistence:
-      existingClaim: ""  # Replicas will create new PVCs and sync data from master
+# Inherit all original settings from your backup, modify existingClaim to re-use the previously created PVCs
+master:
+  count: 1
+  persistence:
+    existingClaim: "redis-data-my-release-redis-master-0"  # Applies only if only 1 master is configured.
+replica:
+  replicaCount: 3
+  persistence:
+    existingClaim: ""  # Replicas will sync data from master
+```
+
+Or use the following approach as altnernative:
+
+```yaml
+# redis-values.yaml
+# Inherit all original settings from your backup, modify fullnameOverride to re-use the previously created PVCs
+## @param fullnameOverride String to fully override common.names.fullname
+##
+fullnameOverride: "my-release-redis" # Override as ${RELEASE_NAME}-redis to match exisiting PVCs by name.
 ```
 
 For PostgreSQL:
@@ -207,18 +217,26 @@ primary:
 readReplicas:
   replicaCount: 1
   persistence:
-    existingClaim: "data-my-release-postgresql-read-0"
+    existingClaim: "data-my-release-postgresql-read-0"  # Applies only if only 1 read replica is configured. Leave it empty to allow read replicas to sync from priamry if more than 1 read replica is configured.
+```
+
+Or use the following approach:
+
+```yaml
+# postgresql-values.yaml
+# Inherit all original settings from your backup, add/modify fullnameOverride to re-use the previously created PVCs
+## @param fullnameOverride String to fully override common.names.fullname
+##
+fullnameOverride: "my-release-postgresql" # Override as ${RELEASE_NAME}-postgresql to match exisiting PVCs by name.
 ```
 
 **Note**: When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. Store your credentials in a secure vault rather than relying on the Secret created in the new release.
 
-#### Re-deploy Redis and PostgreSQL as Separate Releases
-
+#### Disable built-in Redis and PostgreSQL
+Before shutting down built-in databases, confirm that the PVCs for `Redis` and `PostgreSQL` will persist (e.g., via the `helm.sh/resource-policy: keep` annotation) after the uninstallation process. You may also check the reclaim policy of PVs if applicable (e.g. Use `Retain` to prevent data loss in case the bound PVCs were deleted upon migration, which would end up deleting the PV itself if the policy were `Delete`).
 Shutdown the built-in databases to ensure no processes are accessing the PVCs:
 
-**Note**: Running built-in database instances simultaneously with the separately deployed ones while sharing the same PVCs will result in data corruption.
-
-Modify your values.yaml and disable built-in databases by setting the redis.enabled=false, then
+Disable built-in databases by setting `redis.enabled=false` and `postgresql=false` based on your original `values.yaml`:
 ```bash
 
 helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE \
@@ -226,12 +244,13 @@ helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE \
   -f values-with-redis-and-pg-disabled.yaml
 ```
 
-Wait until Redis and PostgreSQL pods to terminate:
+Wait until Redis and PostgreSQL pods terminate:
 
 ```bash
 kubectl get pods -n $NAMESPACE -w
 ```
 
+#### Deploy Redis and PostgreSQL with exisiting PVCs
 Once the built-in databases are fully shut down, re-deploy Redis and PostgreSQL as separate releases:
 
 ```bash
@@ -248,7 +267,7 @@ helm install my-postgresql bitnami/postgresql \
   -f postgresql-values.yaml
 ```
 
-Verify that the new database deployments are running correctly:
+Verify that pods are running correctly:
 
 ```bash
 # Check Redis pods
@@ -260,9 +279,8 @@ kubectl get pods -n $NAMESPACE | grep my-postgresql
 # Test connectivity if needed
 ```
 
-#### Restore Dify Service
-
-Update your Dify deployment to use external Redis and PostgreSQL services instead of the built-in ones:
+#### Update Dify Configuration
+Update your Dify release regarding external Redis and PostgreSQL:
 
 ```yaml
 # dify-external-db-values.yaml
@@ -298,6 +316,88 @@ helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-db-values.ya
 - Always backup your data before performing this migration.
 - Test this process in a non-production environment first to ensure you understand the steps and potential issues.
 
+### Migrate from Built-in Weaviate as Separate Release
+#### Prerequisite
+This guide assumes the default configuration of built-in Weaviate.
+
+Add the Weaviate Helm repository:
+
+```bash
+helm repo add weaviate https://weaviate.github.io/weaviate-helm
+helm repo update
+```
+
+Set the following environment variables according to your deployment:
+
+```bash
+export RELEASE_NAME="your-release-name"    # Helm release name (e.g., 'my-dify' from 'helm install my-dify dify/dify')
+export NAMESPACE="your-namespace"          # Deployment namespace
+export CHART_VERSION=$(helm list -n $NAMESPACE | grep $RELEASE_NAME | awk '{print $9}')  # Chart version of dify-helm
+export WEAVIATE_CHART_VERSION="17.3.3"     # Check the Chart.yaml for the exact version of the Weaviate Helm chart
+```
+
+#### Backup Authentication Info of Weaviate
+```bash
+# Backup your current values
+helm get values $RELEASE_NAME -n $NAMESPACE > dify-backup-values.yaml
+
+# Backup ConfigMaps and Secrets (Recommended)
+kubectl get configmap -n $NAMESPACE -o yaml > dify-configmaps-backup.yaml
+kubectl get secret -n $NAMESPACE -o yaml > dify-secrets-backup.yaml
+```
+
+**Note**: Backing up ConfigMaps and Secrets is optional but recommended to avoid losing your original authentication configurations.
+
+#### Re-deploy Weaviate as a Separate Release
+Shutdown the built-in Weaviate to ensure no processes are accessing the PVCs to avoid data corruption. Set `weaviate.enabled=false`, then
+
+```bash
+helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE \
+  --version $CHART_VERSION \
+  -f values-with-weaviate-disabled.yaml
+```
+
+Wait until Weaviate pods to terminate:
+
+```bash
+kubectl get pods -n $NAMESPACE -w
+```
+
+Extract the whole `.Values.weaviate` section and save as `weaviate-values.yaml` to keep your current configurations. The `.Values.weavaiate` should be un-nested as `.Values`. Re-deploy Weaviate with the following command:
+
+```bash
+# Install standalone Weaviate
+helm install my-weaviate weaviate/weaviate \
+  --version $WEAVIATE_CHART_VERSION \
+  -n $NAMESPACE \
+  -f weaviate-values.yaml
+```
+
+Verify that Weaviate is running correctly:
+
+```bash
+# Check Weaviate pods
+kubectl get pods -n $NAMESPACE | grep weaviate
+# Test connectivity if needed
+```
+
+#### Update Dify Service
+Update Dify configurartions to use external Weaviate service instead of the built-in one:
+
+```yaml
+# dify-external-weaviate-values.yaml
+weaviate:
+  enabled: false
+
+externalWeaviate:
+  enabled: true
+  endpoint: "http://weaviate:80"  # Service name from `kubectl get svc -n $NAMESPACE | grep weaviate`
+  apiKey: "your-api-key" # The first key in the original `.Values.weaviate.authentication.apikey.allowed_keys` by default
+```
+
+```bash
+helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-weaviate-values.yaml
+```
 
 ### ExternalSecret Support
 
