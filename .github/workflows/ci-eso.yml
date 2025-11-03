@@ -84,7 +84,7 @@ jobs:
           EXTRACTED_IMAGES=$(ci/scripts/extract-images.sh values-eso.yaml github-actions 2>/dev/null)
 
           # Add additional images for ESO scenarios
-          ADDITIONAL_IMAGES="hashicorp/vault:1.20.4 bitnamilegacy/minio:2025.7.23-debian-12-r3 semitechnologies/weaviate:1.19.1 bitnamilegacy/elasticsearch:8.14.3 ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s:0.136.0"
+          ADDITIONAL_IMAGES="hashicorp/vault:1.20.4 bitnamilegacy/minio:2025.7.23-debian-12-r3 cr.weaviate.io/semitechnologies/weaviate:1.27.27 bitnamilegacy/elasticsearch:8.14.3 ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s:0.136.0"
 
           # Combine extracted and additional images
           ALL_IMAGES="$EXTRACTED_IMAGES $ADDITIONAL_IMAGES"
@@ -98,7 +98,7 @@ jobs:
           echo "Additional ESO-specific Images:"
           echo "hashicorp/vault:1.20.4"
           echo "bitnamilegacy/minio:2025.7.23-debian-12-r3"
-          echo "semitechnologies/weaviate:1.19.1"
+          echo "cr.weaviate.io/semitechnologies/weaviate:1.27.27"
           echo "bitnamilegacy/elasticsearch:8.14.3"
           echo "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s:0.136.0"
 
