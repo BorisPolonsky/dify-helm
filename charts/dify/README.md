@@ -194,6 +194,7 @@ replica:
   persistence:
     existingClaim: ""  # Replicas will sync data from master
 ```
+
 Or use the following approach as altnernative:
 
 ```yaml
@@ -217,6 +218,16 @@ readReplicas:
   replicaCount: 1
   persistence:
     existingClaim: "data-my-release-postgresql-read-0"  # Applies only if only 1 read replica is configured. Leave it empty to allow read replicas to sync from priamry if more than 1 read replica is configured.
+```
+
+Or use the following approach:
+
+```yaml
+# postgresql-values.yaml
+# Inherit all original settings from your backup, add/modify fullnameOverride to re-use the previously created PVCs
+## @param fullnameOverride String to fully override common.names.fullname
+##
+fullnameOverride: "my-release-postgresql" # Override as ${RELEASE_NAME}-postgresql to match exisiting PVCs by name.
 ```
 
 **Note**: When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. Store your credentials in a secure vault rather than relying on the Secret created in the new release.
