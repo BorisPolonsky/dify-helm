@@ -1004,7 +1004,7 @@ weaviate:
   # This service is by default enabled but if you don't want it to be deployed in your
   # environment then it can be disabled by setting enabled: false option.
   grpcService:
-    enabled: true
+    enabled: false
     name: weaviate-grpc
     ports:
       - name: grpc
@@ -2477,8 +2477,6 @@ redis:
       ## @param replica.serviceAccount.annotations Additional custom annotations for the ServiceAccount
       ##
       annotations: {}
-  ## @section Redis&reg; Sentinel configuration parameters
-  ##
 
   ## @section Other Parameters
   ##

@@ -432,7 +432,7 @@ TENCENT_VECTOR_DB_TIMEOUT: {{ .Values.externalTencentVectorDB.timeout | quote }}
 TENCENT_VECTOR_DB_DATABASE: {{ .Values.externalTencentVectorDB.database | quote }}
 TENCENT_VECTOR_DB_SHARD: {{ .Values.externalTencentVectorDB.shard | quote }}
 TENCENT_VECTOR_DB_REPLICAS: {{ .Values.externalTencentVectorDB.replicas | quote }}
-{{- else if .Values.externalMyScaleDB.enabled}}
+{{- else if .Values.externalMyScaleDB.enabled }}
 # MyScaleDB vector db configurations, only available when VECTOR_STORE is `myscale`
 VECTOR_STORE: myscale
 MYSCALE_HOST: {{ .Values.externalMyScaleDB.host | quote }}
@@ -460,7 +460,7 @@ VECTOR_STORE: weaviate
     {{- if and (eq .type "ClusterIP") (not (eq .clusterIP "None"))}}
 # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
 {{/*
-Pitfall: scheme (i.e.) must be supecified, or weviate client won't function as
+Pitfall: schema (i.e. http) must be supecified, or weviate client won't function as
 it depends on `hostname` from urllib.parse.urlparse will be empty if schema is not specified.
 */}}
 WEAVIATE_ENDPOINT: {{ printf "http://%s" .name | quote }}
@@ -469,6 +469,12 @@ WEAVIATE_ENDPOINT: {{ printf "http://%s" .name | quote }}
 # The Weaviate API key.
   {{- if .Values.weaviate.authentication.apikey }}
 # WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys }}
+  {{- end }}
+  {{- if .Values.weaviate.grpcService.enabled }}
+WEAVIATE_GRPC_ENABLED: "true"
+WEAVIATE_GRPC_ENDPOINT: "{{ .Values.weaviate.grpcService.name }}:{{ index .Values.weaviate.grpcService.ports 0 "port" }}"
+  {{- else }}
+WEAVIATE_GRPC_ENABLED: "false"
   {{- end }}
 {{- end }}
 {{- end }}
