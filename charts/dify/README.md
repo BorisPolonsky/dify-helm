@@ -321,7 +321,7 @@ Set the following environment variables according to your deployment:
 export RELEASE_NAME="your-release-name"    # Helm release name (e.g., 'my-dify' from 'helm install my-dify dify/dify')
 export NAMESPACE="your-namespace"          # Deployment namespace
 export CHART_VERSION=$(helm list -n $NAMESPACE | grep $RELEASE_NAME | awk '{print $9}')  # Chart version of dify-helm
-export WEAVIATE_CHART_VERSION="16.1.0"     # Check the Chart.yaml for the exact version of the Weaviate Helm chart
+export WEAVIATE_CHART_VERSION="17.3.3"     # Check the Chart.yaml for the exact version of the Weaviate Helm chart
 ```
 
 #### Backup Authentication Info of Weaviate
