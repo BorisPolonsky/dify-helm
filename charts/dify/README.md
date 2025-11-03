@@ -198,9 +198,10 @@ Or use the following approach as altnernative:
 
 ```yaml
 # redis-values.yaml
+# Inherit all original settings from your backup, modify fullnameOverride to re-use the previously created PVCs
 ## @param fullnameOverride String to fully override common.names.fullname
 ##
-fullnameOverride: "my-release-redis" # ${RELEASE_NAME}-redis
+fullnameOverride: "my-release-redis" # Override as ${RELEASE_NAME}-redis to match exisiting PVCs by name.
 ```
 
 For PostgreSQL:
@@ -215,7 +216,7 @@ primary:
 readReplicas:
   replicaCount: 1
   persistence:
-    existingClaim: "data-my-release-postgresql-read-0"  # Applies only if only 1 read replica is configured. Leave it empty if more than 1 read replica is configured.
+    existingClaim: "data-my-release-postgresql-read-0"  # Applies only if only 1 read replica is configured. Leave it empty to allow read replicas to sync from priamry if more than 1 read replica is configured.
 ```
 
 **Note**: When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. Store your credentials in a secure vault rather than relying on the Secret created in the new release.
