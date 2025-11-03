@@ -130,7 +130,7 @@ Refer to `external<Service>` sections in `values.yaml` for each component to be 
 ## Advanced Topics
 ### Migrate Built-in Redis and PostgreSQL instances as Separate Releases
 #### Intro
-To migrate built-in Redis and PostgreSQL as separate releases within the same cluster while preserving existing data, refer to the following sections:
+To migrate built-in Redis and PostgreSQL as separate releases within the same cluster while preserving existing data, refer to the following sections.
 
 #### Prerequisite
 This guide assumes the replication architecture of built-in Redis and PostgreSQL (the default configuration). For setups like Redis in Sentinel mode, user would have to come up with their own solutions.
