@@ -471,10 +471,9 @@ WEAVIATE_ENDPOINT: {{ printf "http://%s" .name | quote }}
 # WEAVIATE_API_KEY: {{ first .Values.weaviate.authentication.apikey.allowed_keys }}
   {{- end }}
   {{- if .Values.weaviate.grpcService.enabled }}
-WEAVIATE_GRPC_ENABLED: "true"
 WEAVIATE_GRPC_ENDPOINT: "{{ .Values.weaviate.grpcService.name }}:{{ index .Values.weaviate.grpcService.ports 0 "port" }}"
   {{- else }}
-WEAVIATE_GRPC_ENABLED: "false"
+WEAVIATE_GRPC_ENDPOINT: "{{ .Values.weaviate.service.name }}:50051"
   {{- end }}
 {{- end }}
 {{- end }}
