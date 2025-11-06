@@ -94,15 +94,15 @@ api:
 ```
 
 ### 3. Working with Built-in Middlewares
-For a quickstart, the chart features built-in `Redis`, `PostgreSQL` and `Weaviate` that powers a self-contained `Dify` environment. These components are supplied by third-party Helm charts and enabled by default. To customize their settings, refer to the section name and the official documents:
+For a quickstart, the chart features built-in `Redis`, `PostgreSQL` and `Weaviate` that powers a self-contained `Dify` environment. These components are supplied by third-party Helm charts. To customize their settings, refer to the section name and the official documents:
 
-| Section | Document |
------ | --- |
-`redis` | [bitnami/redis](https://github.com/bitnami/charts/tree/main/bitnami/redis)
-`postgresql` |[bitnami/postgresql](https://github.com/bitnami/charts/tree/main/bitnami/postgresql)
-`weaviate`| [weaviate](https://github.com/weaviate/weaviate-helm)
+Section | Document | Enabled by Default
+----- | ----- | -----
+`redis` | [bitnami/redis](https://github.com/bitnami/charts/tree/main/bitnami/redis) | `true`
+`postgresql` |[bitnami/postgresql](https://github.com/bitnami/charts/tree/main/bitnami/postgresql) | `true`
+`weaviate`| [weaviate](https://github.com/weaviate/weaviate-helm) | `true`
 
-*Note: These components may not keep up to the versions in Dify's `docker-compose.yml`. For more advanced, production-oriented setups, you may opt in external services instead. Refer to the next section for more details.
+**Notice:** Built-in dependencies may not keep up to the versions in Dify's `docker-compose.yml` and will remain as is unless absolultely necessary. For more advanced, production-oriented setups, you may opt in external services instead. Refer to the next section for more details.
 
 ### 4. Opt in External Services
 It's advised to use Redis, PostgreSQL and Weaviate from external providers over the built-in middlewares for production use regarding:
@@ -230,7 +230,7 @@ Or use the following approach:
 fullnameOverride: "my-release-postgresql" # Override as ${RELEASE_NAME}-postgresql to match exisiting PVCs by name.
 ```
 
-**Note**: When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. Store your credentials in a secure vault rather than relying on the Secret created in the new release.
+**Noteice:** When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. Store your credentials in a secure vault rather than relying on the Secret created in the new release.
 
 #### Disable built-in Redis and PostgreSQL
 Before shutting down built-in databases, confirm that the PVCs for `Redis` and `PostgreSQL` will persist (e.g., via the `helm.sh/resource-policy: keep` annotation) after the uninstallation process. You may also check the reclaim policy of PVs if applicable (e.g. Use `Retain` to prevent data loss in case the bound PVCs were deleted upon migration, which would end up deleting the PV itself if the policy were `Delete`).
@@ -238,7 +238,6 @@ Shutdown the built-in databases to ensure no processes are accessing the PVCs:
 
 Disable built-in databases by setting `redis.enabled=false` and `postgresql=false` based on your original `values.yaml`:
 ```bash
-
 helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE \
   --version $CHART_VERSION \
   -f values-with-redis-and-pg-disabled.yaml
