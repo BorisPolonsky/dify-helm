@@ -391,7 +391,10 @@ CELERY_USE_SENTINEL: "true"
 # The type of vector store to use. Supported values are `weaviate`, `qdrant`, `milvus`, `pgvector`, `tencent`, `myscale`.
 VECTOR_STORE: weaviate
 # The Weaviate endpoint URL. Only available when VECTOR_STORE is `weaviate`.
-WEAVIATE_ENDPOINT: {{ .Values.externalWeaviate.endpoint | quote }}
+WEAVIATE_ENDPOINT: {{ .Values.externalWeaviate.endpoint.http | quote }}
+{{- if .Values.externalWeaviate.endpoint.grpc }}
+WEAVIATE_GRPC_ENDPOINT: {{ .Values.externalWeaviate.endpoint.grpc | quote }}
+{{- end }}
 # The Weaviate API key.
 # WEAVIATE_API_KEY: {{ .Values.externalWeaviate.apiKey }}
 {{- else if .Values.externalQdrant.enabled }}
