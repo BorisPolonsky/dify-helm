@@ -39,15 +39,15 @@ graph TB
     ProxyPod -->|Marketplace| MarketplaceAPI[🛒 Marketplace API<br/>External]
 
     %% Backend Pods
-    APIService --> APIPod[📦 API Pod<br/>langgenius/dify-api:1.9.1<br/>Port: 5001]
-    WebService --> WebPod[📦 Web Pod<br/>langgenius/dify-web:1.9.1<br/>Port: 3000]
-    PluginService --> PluginPod[📦 Plugin Daemon Pod<br/>langgenius/dify-plugin-daemon:0.3.0-local<br/>Ports: 5002, 5003]
+    APIService --> APIPod[📦 API Pod<br/>langgenius/dify-api:1.10.0<br/>Port: 5001]
+    WebService --> WebPod[📦 Web Pod<br/>langgenius/dify-web:1.10.0<br/>Port: 3000]
+    PluginService --> PluginPod[📦 Plugin Daemon Pod<br/>langgenius/dify-plugin-daemon:0.4.1-local<br/>Ports: 5002, 5003]
 
     %% Worker Pod (Background Processing)
-    WorkerPod[📦 Worker Pod<br/>langgenius/dify-api:1.9.1]
+    WorkerPod[📦 Worker Pod<br/>langgenius/dify-api:1.10.0]
 
     %% Beat Pod (Periodic task scheduler)
-    BeatPod[📦 Beat Pod<br/>langgenius/dify-api:1.9.1]
+    BeatPod[📦 Beat Pod<br/>langgenius/dify-api:1.10.0]
 
     %% Sandbox Service
     SandboxService[🏖️ Sandbox Service<br/>Port: 8194] --> SandboxPod[📦 Sandbox Pod<br/>langgenius/dify-sandbox:0.2.12<br/>Port: 8194]
@@ -158,12 +158,12 @@ The Nginx proxy handles traffic routing with the following rules:
 
 | Component | Image | Port | Role |
 |-----------|-------|------|------|
-| **API** | `langgenius/dify-api:1.9.1` | 5001 | RESTful API server, business logic processing |
-| **Web** | `langgenius/dify-web:1.9.1` | 3000 | Web UI frontend |
-| **Worker** | `langgenius/dify-api:1.9.1` | - | Background task processing (Celery) |
-| **Beat** | `langgenius/dify-api:1.9.1` | - | Periodic task scheduler (Celery Beat) |
+| **API** | `langgenius/dify-api:1.10.0` | 5001 | RESTful API server, business logic processing |
+| **Web** | `langgenius/dify-web:1.10.0` | 3000 | Web UI frontend |
+| **Worker** | `langgenius/dify-api:1.10.0` | - | Background task processing (Celery) |
+| **Beat** | `langgenius/dify-api:1.10.0` | - | Periodic task scheduler (Celery Beat) |
 | **Sandbox** | `langgenius/dify-sandbox:0.2.12` | 8194 | Secure code execution environment |
-| **Plugin Daemon** | `langgenius/dify-plugin-daemon:0.3.0-local` | 5002, 5003 | Plugin management and execution |
+| **Plugin Daemon** | `langgenius/dify-plugin-daemon:0.4.1-local` | 5002, 5003 | Plugin management and execution |
 | **SSRF Proxy** | `ubuntu/squid:latest` | 3128 | External request security proxy |
 | **Nginx Proxy** | `nginx:latest` | 80 | Reverse proxy, load balancing |
 

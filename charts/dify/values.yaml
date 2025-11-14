@@ -8,7 +8,7 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.9.1"
+    tag: "1.10.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -19,7 +19,7 @@ image:
 
   web:
     repository: langgenius/dify-web
-    tag: "1.9.1"
+    tag: "1.10.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -63,7 +63,7 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.3.0-local
+    tag: 0.4.1-local
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -870,7 +870,7 @@ weaviate:
     # of weaviate. In accordance with Infra-as-code, you should pin this value
     # down and only change it if you explicitly want to upgrade the Weaviate
     # version.
-    tag: 1.27.26
+    tag: 1.27.27
     repo: semitechnologies/weaviate
     # Image pull policy: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
     pullPolicy: IfNotPresent
@@ -2477,8 +2477,6 @@ redis:
       ## @param replica.serviceAccount.annotations Additional custom annotations for the ServiceAccount
       ##
       annotations: {}
-  ## @section Redis&reg; Sentinel configuration parameters
-  ##
 
   ## @section Other Parameters
   ##
@@ -2780,7 +2778,9 @@ externalTOS:
 ###################################
 externalWeaviate:
   enabled: false
-  endpoint: "http://weaviate:8080"
+  endpoint:
+    http: "http://weaviate:8080"
+    grpc: "grpc://weaviate:50051"
   apiKey: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
 
 ###################################

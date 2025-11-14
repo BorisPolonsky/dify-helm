@@ -390,7 +390,9 @@ weaviate:
 
 externalWeaviate:
   enabled: true
-  endpoint: "http://weaviate:80"  # Service name from `kubectl get svc -n $NAMESPACE | grep weaviate`
+  endpoint:
+    http: "http://weaviate:80"  # Endpoint for HTTP(s). Refer to service from `kubectl get svc -n $NAMESPACE | grep weaviate`
+    grpc: "grpc://weaviate:50051"  # Endpoint for gRPC(s). Refer to service from `kubectl get svc -n $NAMESPACE | grep weaviate-grpc`
   apiKey: "your-api-key" # The first key in the original `.Values.weaviate.authentication.apikey.allowed_keys` by default
 ```
 
