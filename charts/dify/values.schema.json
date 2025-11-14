@@ -824,7 +824,13 @@
       "type": "object",
       "properties": {
         "enabled": { "type": "boolean" },
-        "endpoint": { "type": "string" },
+        "endpoint": {
+          "type": "object",
+          "properties": {
+            "http": { "type": "string" },
+            "grpc": { "type": "string" }
+          }
+        },
         "apiKey": { "type": "string" }
       }
     },
