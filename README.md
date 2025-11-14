@@ -6,6 +6,10 @@
 
 Deploy [langgenius/dify](https://github.com/langgenius/dify), an LLM-based chatbot app on Kubernetes with Helm chart.
 
+## Prerequisites
+- **Kubernetes**: 1.23+
+- **Helm**: 3.12+
+
 ## Installation
 ### TL;DR
 ```shell
