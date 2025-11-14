@@ -2523,7 +2523,9 @@ externalTOS:
 ###################################
 externalWeaviate:
   enabled: false
-  endpoint: "http://weaviate:8080"
+  endpoint:
+    http: "http://weaviate:8080"
+    grpc: "grpc://weaviate:50051"
   apiKey: ""
 
 ###################################
