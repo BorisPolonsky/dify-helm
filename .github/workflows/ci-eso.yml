@@ -1,4 +1,6 @@
 name: CI - External Secrets Operator Tests
+permissions:
+  contents: read
 
 on:
   workflow_dispatch:
