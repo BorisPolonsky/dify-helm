@@ -155,6 +155,7 @@ The Nginx proxy handles traffic routing with the following rules:
 /e/          → Plugin Daemon (5002)
 /explore     → Web Service (3000)
 /marketplace → External Marketplace API
+/triggers    → API Service (5001)
 /            → Web Service (3000) [Default Route]
 ```
 
