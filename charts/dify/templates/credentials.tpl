@@ -118,9 +118,10 @@ REDIS_SENTINEL_PASSWORD: {{ .auth.password | b64enc | quote }}
 # For high availability, you can configure multiple Sentinel nodes (if provided) separated by semicolons like below example:
 # Example: sentinel://:difyai123456@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1
 {{- $redisPassword := .password }}
+{{- $redisCeleryDB := .db.celery}}
 {{- $sentinelUrls := list }}
 {{- range $sentinel := .sentinel.sentinels }}
-{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s/1" $redisPassword $sentinel) }}
+{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s/%v" $redisPassword $sentinel $redisCeleryDB) }}
 {{- end }}
 CELERY_BROKER_URL: {{ join ";" $sentinelUrls | b64enc | quote }}
 CELERY_SENTINEL_PASSWORD: {{ .sentinel.password | b64enc | quote }}
@@ -129,7 +130,7 @@ CELERY_SENTINEL_PASSWORD: {{ .sentinel.password | b64enc | quote }}
       {{- if .useSSL }}
         {{- $scheme = "rediss" }}
       {{- end }}
-CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/1" $scheme .username .password .host .port | b64enc | quote }}
+CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/%v" $scheme .username .password .host .port .db.celery | b64enc | quote }}
     {{- end }}
   {{- end }}
 {{- else if .Values.redis.enabled }}

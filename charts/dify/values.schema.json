@@ -693,6 +693,13 @@
         "port": { "type": "integer" },
         "username": { "type": "string" },
         "password": { "type": "string" },
+        "db": { 
+          "type": "object",
+          "properties": {
+            "app": { "type": "integer" },
+            "celery": { "type": "integer" }
+          }
+        },
         "useSSL": { "type": "boolean" },
         "sentinel": {
           "type": "object",

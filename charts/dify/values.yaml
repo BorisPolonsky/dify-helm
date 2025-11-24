@@ -2652,6 +2652,9 @@ externalRedis:
   port: 6379
   username: ""
   password: "difyai123456"
+  db:
+    app: 0
+    celery: 1
   useSSL: false
   sentinel:
     enabled: false
