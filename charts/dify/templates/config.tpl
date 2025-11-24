@@ -292,7 +292,7 @@ REDIS_PORT: {{ .port | toString | quote }}
 REDIS_USE_SSL: {{ .useSSL | toString | quote }}
     {{- end }}
 # use redis db for redis cache, configurable via .Values.externalRedis.db
-REDIS_DB: {{ .db | default 0 | toString | quote }}
+REDIS_DB: {{ .db.app | default 0 | toString | quote }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
 {{- $releaseName := printf "%s" .Release.Name -}}

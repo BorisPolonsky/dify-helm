@@ -2653,8 +2653,9 @@ externalRedis:
   username: ""
   password: "difyai123456"
   # REDIS_DB: Redis Database, default is 0. Please use a different Database from Session Redis and Celery Broker.
-  db: 0
-  celeryBrokerDB: 1
+  db: 
+    app: 0
+    celery: 1
   useSSL: false
   sentinel:
     enabled: false
