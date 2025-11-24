@@ -2652,8 +2652,7 @@ externalRedis:
   port: 6379
   username: ""
   password: "difyai123456"
-  # REDIS_DB: Redis Database, default is 0. Please use a different Database from Session Redis and Celery Broker.
-  db: 
+  db:
     app: 0
     celery: 1
   useSSL: false
