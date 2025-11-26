@@ -291,8 +291,8 @@ REDIS_PORT: {{ .port | toString | quote }}
 # REDIS_PASSWORD: {{ .password | quote }}
 REDIS_USE_SSL: {{ .useSSL | toString | quote }}
     {{- end }}
-# use redis db for redis cache, configurable via .Values.externalRedis.db
-REDIS_DB: {{ .db.app | default 0 | toString | quote }}
+# use redis db 0 for redis cache
+REDIS_DB: "0"
   {{- end }}
 {{- else if .Values.redis.enabled }}
 {{- $releaseName := printf "%s" .Release.Name -}}
@@ -702,7 +702,6 @@ SERVER_PORT: "5002"
 PLUGIN_REMOTE_INSTALLING_HOST: "0.0.0.0"
 PLUGIN_REMOTE_INSTALLING_PORT: "5003"
 MAX_PLUGIN_PACKAGE_SIZE: "52428800"
-PLUGIN_STORAGE_LOCAL_ROOT: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
 PLUGIN_WORKING_PATH: "/app/cwd"
 DIFY_INNER_API_URL: "http://{{ template "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
 {{- include "dify.marketplace.config" . }}
@@ -761,6 +760,6 @@ VOLCENGINE_TOS_ACCESS_KEY: {{ .Values.externalTOS.accessKey | quote }}
 # VOLCENGINE_TOS_SECRET_KEY: {{ .Values.externalTOS.secretKey | quote }}
 {{- else }}
 PLUGIN_STORAGE_TYPE: local
-STORAGE_LOCAL_PATH: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
+PLUGIN_STORAGE_LOCAL_ROOT: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
 {{- end }}
 {{- end }}
