@@ -1,0 +1,113 @@
+{{- if and .Values.beat.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+{{ include "dify.ud.annotations" . | indent 4 }}
+    descriptions: beat
+  labels:
+{{- include "dify.labels" . | nindent 4 }}
+    component: beat
+    # app: {{ template "dify.beat.fullname" . }}
+{{ include "dify.ud.labels" . | indent 4 }}
+  name: {{ template "dify.beat.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+{{- include "dify.selectorLabels" . | nindent 6 }}
+      component: beat
+      {{/*
+      # Required labels for istio
+      # app: {{ template "dify.beat.fullname" . }}
+      # version: {{ .Values.istioServiceMesh.version | quote }}
+      */}}
+  {{- if .Values.beat.updateStrategy }}
+  strategy: {{- toYaml .Values.beat.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+{{ include "dify.ud.annotations" . | indent 8 }}
+      labels:
+{{- include "dify.selectorLabels" . | nindent 8 }}
+        component: beat
+        {{/*
+        # Required labels for istio
+        # app: {{ template "dify.beat.fullname" . }}
+        # version: {{ .Values.istioServiceMesh.version | quote }}
+        */}}
+{{ include "dify.ud.labels" . | indent 8 }}
+    spec:
+      serviceAccountName: {{ include "dify.beat.serviceAccountName" . }}
+      {{- if .Values.beat.priorityClassName }}
+      priorityClassName: {{ .Values.beat.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.image.api.pullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.api.pullSecrets }}
+        - name: {{ . }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.beat.podSecurityContext }}
+      securityContext:
+{{ toYaml .Values.beat.podSecurityContext | indent 8 }}
+      {{- end }}
+      containers:
+      - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
+        imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
+        name: beat
+        {{- if .Values.beat.customLivenessProbe }}
+        livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.beat.customLivenessProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.beat.customReadinessProbe }}
+        readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.beat.customReadinessProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.beat.customStartupProbe }}
+        startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.beat.customStartupProbe "context" $) | nindent 10 }}
+        {{- end }}
+        {{- if .Values.beat.containerSecurityContext }}
+        securityContext:
+{{ toYaml .Values.beat.containerSecurityContext | indent 10 }}
+        {{- end }}
+        env:
+        - name: MODE
+          value: "beat"
+          # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+        - name: LOG_LEVEL
+          value: {{ .Values.beat.logLevel | quote }}
+        {{- if .Values.beat.extraEnv }}
+          {{- toYaml .Values.beat.extraEnv | nindent 8 }}
+        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: {{ template "dify.worker.fullname" . }}
+        - secretRef:
+            name: {{ template "dify.worker.fullname" . }}
+        resources:
+          {{- toYaml .Values.beat.resources | nindent 12 }}
+    {{- if and (.Values.nodeSelector) (not .Values.beat.nodeSelector) }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if .Values.beat.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.beat.nodeSelector | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.affinity) (not .Values.beat.affinity) }}
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+    {{- end }}
+    {{- if .Values.beat.affinity }}
+      affinity:
+{{ toYaml .Values.beat.affinity | indent 8 }}
+    {{- end }}
+    {{- if and (.Values.tolerations) (not .Values.beat.tolerations) }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+    {{- end }}
+    {{- if .Values.beat.tolerations }}
+      tolerations:
+{{ toYaml .Values.beat.tolerations | indent 8 }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,121 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "dify.fullname" . }}-test-redis-connection"
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    component: "redis"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: check-redis
+          image: "{{ .Values.redis.image.registry }}/{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+          command:
+            - sh
+            - -c
+            - |
+{{- if or (and .Values.externalRedis.enabled .Values.externalRedis.sentinel.enabled) (and .Values.redis.enabled .Values.redis.sentinel.enabled) }}
+              # Test connection to Redis with Sentinel enabled
+              echo "Testing Redis Sentinel connection..."
+{{- if and .Values.externalRedis.enabled .Values.externalRedis.sentinel.enabled }}
+              # Parse the sentinels list into an array using POSIX approach
+              OLD_IFS=$IFS
+              IFS=','
+              set -- $REDIS_SENTINELS
+              IFS=$OLD_IFS
+{{- else }}
+              RELEASE_NAME="{{ .Release.Name }}"
+              NAMESPACE="{{ .Release.Namespace }}"
+              REPLICAS={{ .Values.redis.replica.replicaCount }}
+              
+              # Generate the sentinels list using POSIX approach
+              set --
+              i=0
+              while [ $i -lt $REPLICAS ]; do
+                set -- "$@" "${RELEASE_NAME}-redis-node-${i}.${RELEASE_NAME}-redis-headless.${NAMESPACE}.svc.cluster.local:26379"
+                i=$((i + 1))
+              done
+{{- end }}
+              
+              # Store the list of sentinels
+              SENTINELS_LIST="$@"
+              # Test connectivity to each sentinel
+              for sentinel in $SENTINELS_LIST; do
+                # Split host and port
+                OLD_IFS=$IFS
+                IFS=':'
+                set -- $sentinel
+                SENTINEL_HOST="$1"
+                SENTINEL_CONN_PORT="$2"
+                IFS=$OLD_IFS
+                
+                echo "Testing connectivity to Redis Sentinel at $SENTINEL_HOST:$SENTINEL_CONN_PORT..."
+                if redis-cli -h "$SENTINEL_HOST" -p "$SENTINEL_CONN_PORT" -a "$REDIS_SENTINEL_PASSWORD" ping | grep -q PONG; then
+                  echo "Successfully connected to Redis Sentinel at $SENTINEL_HOST:$SENTINEL_CONN_PORT"
+                else
+                  echo "Failed to connect to Redis Sentinel at $SENTINEL_HOST:$SENTINEL_CONN_PORT"
+                  exit 1
+                fi
+              done
+              
+              # Use the first sentinel to get Redis master
+              # Extract first sentinel from the stored list
+              OLD_IFS=$IFS
+              IFS=','
+              set -- $SENTINELS_LIST
+              FIRST_SENTINEL="$1"
+              IFS=':'
+              set -- $FIRST_SENTINEL
+              SENTINEL_HOST="$1"
+              SENTINEL_CONN_PORT="$2"
+              IFS=$OLD_IFS
+              # Use the first sentinel to get Redis master
+              echo "Getting master address from Sentinel at $SENTINEL_HOST:$SENTINEL_CONN_PORT..."
+              REDIS_MASTER_INFO=$(redis-cli -h "$SENTINEL_HOST" -p "$SENTINEL_CONN_PORT" -a "$REDIS_SENTINEL_PASSWORD" sentinel get-master-addr-by-name "$REDIS_SENTINEL_SERVICE_NAME")
+              echo "Master info: $REDIS_MASTER_INFO"
+              
+              # Extract host and port from the response
+              REDIS_MASTER_HOST=$(echo "$REDIS_MASTER_INFO" | awk 'NR==1{print $1}')
+              REDIS_MASTER_PORT=$(echo "$REDIS_MASTER_INFO" | awk 'NR==2{print $1}')
+              
+              # Check if we got valid values
+              if [ -z "$REDIS_MASTER_HOST" ] || [ -z "$REDIS_MASTER_PORT" ]; then
+                echo "Error: Could not extract Redis master host and port from sentinel response"
+                echo "This might indicate that the Redis master is not yet available or properly configured"
+                # Get more information on the state of Sentinel
+                echo "Sentinel masters:"
+                redis-cli -h "$SENTINEL_HOST" -p "$SENTINEL_CONN_PORT" -a "$REDIS_SENTINEL_PASSWORD" sentinel masters || echo "Failed to get sentinel masters"
+                echo "Sentinel slaves:"
+                redis-cli -h "$SENTINEL_HOST" -p "$SENTINEL_CONN_PORT" -a "$REDIS_SENTINEL_PASSWORD" sentinel slaves || echo "Failed to get sentinel slaves"
+                exit 1
+              fi
+              
+              echo "Master host: $REDIS_MASTER_HOST, port: $REDIS_MASTER_PORT"
+              
+              # Test Redis connection
+              echo "Testing Redis connection at $REDIS_MASTER_HOST:$REDIS_MASTER_PORT..."
+              if redis-cli -h "$REDIS_MASTER_HOST" -p "$REDIS_MASTER_PORT" -a "$REDIS_PASSWORD" ping | grep -q PONG; then
+                echo "Successfully connected to Redis master at $REDIS_MASTER_HOST:$REDIS_MASTER_PORT"
+                echo "Redis is ready."
+              else
+                echo "Failed to connect to Redis master at $REDIS_MASTER_HOST:$REDIS_MASTER_PORT"
+                exit 1
+              fi
+{{- else }}
+              # Test connection under standard Redis setup
+              echo "Testing Redis connection at $REDIS_PORT:$REDIS_PORT..."
+              until redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT" -a "$REDIS_PASSWORD" ping | grep -q PONG; do
+                echo "Waiting for Redis service to be available..."
+                sleep 1
+              done
+              echo "Redis is ready."
+{{- end }}
+          envFrom:
+          - configMapRef:
+              name: {{ template "dify.api.fullname" . }}
+          - secretRef:
+              name: {{ template "dify.api.fullname" . }}

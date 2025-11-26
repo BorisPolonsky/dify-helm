@@ -2,9 +2,6 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-## @section Dify image parameters
-##
-
 image:
   api:
     repository: langgenius/dify-api
@@ -72,9 +69,6 @@ image:
     # pullSecrets:
     #   - myRegistryKeySecretName
 
-## @section -- Dify micro-service parameters
-## Parameters for dify components including api(worker), web, sandbox, etc.
-
 api:
   enabled: true
   replicas: 1
@@ -82,7 +76,6 @@ api:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -129,66 +122,36 @@ api:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary.
-  # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
+    # Apply your own Environment Variables if necessary.
+    # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
   # Direct value assignment
-  # - name: LANG
-  #   value: "C.UTF-8"
-  #   - name: SECRET_KEY
-  # Use existing k8s secrets
-  #  - name: DB_PASSWORD
-  #    valueFrom:
-  #      secretKeyRef:
-  #        name: my-secret
-  #        key: DB_PASSWORD
-  - name: CHECK_UPDATE_URL
-    # Won't check for updates if left empty
-    #   value: https://updates.dify.ai
-    value: ""
-  - name: CODE_MAX_NUMBER
-    value: "9223372036854775807"
-  - name: CODE_MIN_NUMBER
-    value: "-9223372036854775808"
-  - name: CODE_MAX_STRING_LENGTH
-    value: "80000"
-  - name: TEMPLATE_TRANSFORM_MAX_LENGTH
-    value: "80000"
-  - name: CODE_MAX_STRING_ARRAY_LENGTH
-    value: "30"
-  - name: CODE_MAX_OBJECT_ARRAY_LENGTH
-    value: "30"
-  - name: CODE_MAX_NUMBER_ARRAY_LENGTH
-    value: "1000"
-  ## OpenTelemetry (OTEL) configuration
-  otel:
-    enabled: false
-    # OpenTelemetry trace endpoint
-    traceEndpoint: ""
-    # OpenTelemetry metric endpoint
-    metricEndpoint: ""
-    # OpenTelemetry base endpoint
-    baseEndpoint: "http://localhost:4318"
-    # OpenTelemetry API Key (sensitive - stored in secret)
-    apiKey: ""
-    # OpenTelemetry exporter protocol
-    exporterProtocol: ""
-    # OpenTelemetry exporter type
-    exporterType: "otlp"
-    # OpenTelemetry sampling rate
-    samplingRate: 0.1
-    # OpenTelemetry batch export schedule delay in milliseconds
-    batchExportScheduleDelay: 5000
-    # OpenTelemetry max queue size
-    maxQueueSize: 2048
-    # OpenTelemetry max export batch size
-    maxExportBatchSize: 512
-    # OpenTelemetry metric export interval in milliseconds
-    metricExportInterval: 60000
-    # OpenTelemetry batch export timeout in milliseconds
-    batchExportTimeout: 10000
-    # OpenTelemetry metric export timeout in milliseconds
-    metricExportTimeout: 30000
-
+    # - name: LANG
+    #   value: "C.UTF-8"
+    #   - name: SECRET_KEY
+    # Use existing k8s secrets
+    #  - name: DB_PASSWORD
+    #    valueFrom:
+    #      secretKeyRef:
+    #        name: my-secret
+    #        key: DB_PASSWORD
+    - name: CHECK_UPDATE_URL
+      # Won't check for updates if left empty
+      #   value: https://updates.dify.ai
+      value: ""
+    - name: CODE_MAX_NUMBER
+      value: "9223372036854775807"
+    - name: CODE_MIN_NUMBER
+      value: "-9223372036854775808"
+    - name: CODE_MAX_STRING_LENGTH
+      value: "80000"
+    - name: TEMPLATE_TRANSFORM_MAX_LENGTH
+      value: "80000"
+    - name: CODE_MAX_STRING_ARRAY_LENGTH
+      value: "30"
+    - name: CODE_MAX_OBJECT_ARRAY_LENGTH
+      value: "30"
+    - name: CODE_MAX_NUMBER_ARRAY_LENGTH
+      value: "1000"
   service:
     port: 5001
     annotations: {}
@@ -224,7 +187,8 @@ api:
     type: "resend"
     resend:
       # Resend API Key
-      apiKey: "xxxx"
+      # Note: When using ExternalSecret, this value is managed externally
+      apiKey: ""
       # Resend API URL
       apiUrl: https://api.resend.com
     # SMTP Configuration
@@ -232,14 +196,16 @@ api:
       server: "smtp.server.com"
       port: 465
       username: "YOUR EMAIL"
-      password: "YOUR EMAIL PASSWORD"
+      # Note: When using ExternalSecret, this value is managed externally
+      password: ""
       tls:
         enabled: true
         optimistic: false
   # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
   migration: true
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-  secretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
+  # Note: When using ExternalSecret, this value is managed externally
+  secretKey: ""
   ## Storage for `api` and `worker`
   ## Ignored if `.Values.externalS3.enabled` is true
   ##
@@ -284,7 +250,6 @@ worker:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -319,7 +284,6 @@ worker:
   #      secretKeyRef:
   #        name: my-secret
   #        key: DB_PASSWORD
-
   logLevel: INFO
   ## Dify Worker ServiceAccount configuration
   ##
@@ -338,52 +302,6 @@ worker:
     ##
     annotations: {}
 
-beat:
-  enabled: false
-  resources: {}
-  nodeSelector: {}
-  affinity: {}
-  tolerations: []
-  priorityClassName: ""
-  ## Configure extra options for celery beat containers' liveness, readiness, and startup probes
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
-  ## @param beat.customLivenessProbe Custom livenessProbe that overrides the default one (None)
-  customLivenessProbe: {}
-  ## @param beat.customReadinessProbe Custom readinessProbe that overrides the default one (None)
-  customReadinessProbe: {}
-  ## @param beat.customStartupProbe Custom startupProbe that overrides the default one (None)
-  customStartupProbe: {}
-  ## @param beat.updateStrategy Update strategy type and configuration parameters
-  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
-  updateStrategy:
-    type: Recreate
-  # Configure Pods Security Context
-  podSecurityContext: {}
-  # Configure Container Security Context
-  containerSecurityContext: {}
-  extraEnv:
-  # Apply your own Environment Variables if necessary.
-  # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
-  # - name: ENABLE_CLEAN_EMBEDDING_CACHE_TASK
-  #   value: "false"
-  logLevel: INFO
-  ## celery beat ServiceAccount configuration
-  ##
-  serviceAccount:
-    ## @param beat.serviceAccount.create Specifies whether a ServiceAccount should be created
-    ##
-    create: false
-    ## @param beat.serviceAccount.name The name of the ServiceAccount to use.
-    ## If not set and create is true, a name is generated using the common.names.fullname template
-    ##
-    name: ""
-    ## @param beat.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
-    ##
-    automountServiceAccountToken: false
-    ## @param beat.serviceAccount.annotations Additional custom annotations for the ServiceAccount
-    ##
-    annotations: {}
-
 proxy:
   enabled: true
   replicas: 1
@@ -391,7 +309,6 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   ## Configure extra options for proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param proxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -435,6 +352,7 @@ proxy:
         accessModes: ReadWriteMany
         size: 1Gi
         subPath: ""
+
   ## Proxy ServiceAccount configuration
   ##
   serviceAccount:
@@ -459,7 +377,6 @@ web:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -506,9 +423,9 @@ web:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary
-  - name: EDITION
-    value: "SELF_HOSTED"
+    # Apply your own Environment Variables if necessary
+    - name: EDITION
+      value: "SELF_HOSTED"
   service:
     port: 3000
     annotations: {}
@@ -541,7 +458,6 @@ sandbox:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -588,29 +504,19 @@ sandbox:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary
-  # - name: LANG
-  #   value: "C.UTF-8"
-  - name: WORKER_TIMEOUT
-    value: "15"
-  ## @param sandbox.persistence.enabled Use volumes to persist data
-  ##
-  persistence:
-    enabled: false
-    ## @param sandbox.persistence.volumes Optionally specify extra list of additional volumes for the Sandbox pod(s)
-    ##
-    volumes: []
-    ## @param sandbox.persistence.volumeMounts Optionally specify extra list of additional volumeMounts for the Sandbox container(s)
-    ##
-    volumeMounts: []
+    # Apply your own Environment Variables if necessary
+    # - name: LANG
+    #   value: "C.UTF-8"
+    - name: WORKER_TIMEOUT
+      value: "15"
   service:
     port: 8194
     annotations: {}
     labels: {}
     clusterIP: ""
   auth:
-    apiKey: "dify-sandbox"
-
+    # Note: When using ExternalSecret, this value is managed externally
+    apiKey: ""
   ## Sandbox ServiceAccount configuration
   ##
   serviceAccount:
@@ -635,7 +541,6 @@ ssrfProxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   ## Configure extra options for ssrf proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param ssrfProxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -706,7 +611,6 @@ pluginDaemon:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
   ## Configure extra options for plugin daemon containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param pluginDaemon.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -782,83 +686,6 @@ pluginDaemon:
     ##
     annotations: {}
 
-postgresql:
-  enabled: true
-  name: postgres
-  global:
-    storageClass: ""
-    postgresql:
-      auth:
-        postgresPassword: "difyai123456"
-        username: ""
-        password: ""
-        database: "dify"
-  image:
-    registry: docker.io
-    repository: bitnamilegacy/postgresql
-    tag: 15.3.0-debian-11-r7
-    pullPolicy: IfNotPresent
-  ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
-  ##
-  architecture: replication
-  ## Replication configuration
-  ## Ignored if `architecture` is `standalone`
-  ##
-  primary:
-    resources:
-      limits: {}
-      requests: {}
-    persistence:
-      enabled: true
-      ## @param primary.persistence.existingClaim Name of an existing PVC to use
-      ##
-      existingClaim: ""
-      storageClass: ""
-      accessModes:
-        - ReadWriteOnce
-      size: 8Gi
-
-    ## @param primary.affinity Affinity for PostgreSQL primary pods assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-    ## Note: primary.podAffinityPreset, primary.podAntiAffinityPreset, and primary.nodeAffinityPreset will be ignored when it's set
-    ##
-    affinity: {}
-
-    ## @param primary.tolerations Tolerations for PostgreSQL primary pods assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-    ##
-    tolerations: []
-
-  ## @section PostgreSQL read only replica parameters (only used when `architecture` is set to `replication`)
-  ##
-
-  readReplicas:
-    name: read
-    replicaCount: 1
-    resources:
-      limits: {}
-      requests: {}
-    persistence:
-      enabled: true
-      ## @param readReplicas.persistence.existingClaim Name of an existing PVC to use
-      ##
-      existingClaim: ""
-      storageClass: ""
-      accessModes:
-        - ReadWriteOnce
-      size: 8Gi
-
-    ## @param readReplicas.affinity Affinity for PostgreSQL read only pods assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-    ## Note: primary.podAffinityPreset, primary.podAntiAffinityPreset, and primary.nodeAffinityPreset will be ignored when it's set
-    ##
-    affinity: {}
-
-    ## @param readReplicas.tolerations Tolerations for PostgreSQL read only pods assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-    ##
-    tolerations: []
-
 weaviate:
   enabled: true
   image:
@@ -908,7 +735,7 @@ weaviate:
   #   https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
   initContainers:
     sysctlInitContainer:
-      enabled: true
+      enabled: false
       sysctlVmMaxMapCount: 524288
       image:
         registry: docker.io
@@ -952,33 +779,11 @@ weaviate:
     #   cpu: '1000m'
     #   memory: '1Gi'
 
-  # security Context for the Weaviate Pods. The configurations are the same as setting them
-  # as described here: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-  securityContext: {}
-
-  # Security context for the Weaviate container. Override overlapping settings made at the Pod level.
-  containerSecurityContext: {}
-    # runAsUser: 1000
-    # runAsGroup: 1000
-    # fsGroup: 1000
-    # fsGroupChangePolicy: "OnRootMismatch"
-    # runAsNonRoot: true
-    # allowPrivilegeEscalation: false
-    # privileged: false
-    # readOnlyRootFilesystem: true
-
-  # Add a service account to the Weaviate pods if you need Weaviate to have permissions to
+  # Add a service account ot the Weaviate pods if you need Weaviate to have permissions to
   # access kubernetes resources or cloud provider resources. For example for it to have
   # access to a backup up bucket, or if you want to restrict Weaviate pod in any way.
   # By default, use the default ServiceAccount
   serviceAccountName:
-
-  # Kubernetes Cluster domain name, used for resolving intra-cluster requests, i.e
-  # between instances of weaviate.
-  # Note: The final '.' on the end of the hostname makes it a FQDN, and is required for
-  # DNS to resolve in all kubernetes environments.
-  # See https://github.com/weaviate/weaviate-helm/issues/175 for details.
-  clusterDomain: cluster.local.
 
   # The Persistent Volume Claim settings for Weaviate. If there's a
   # storage.fullnameOverride field set, then the default pvc will not be
@@ -992,25 +797,7 @@ weaviate:
   # weaviate only accessible within your cluster.
   service:
     name: weaviate
-    type: ClusterIP
-    loadBalancerSourceRanges: []
-    # optionally set cluster IP if you want to set a static IP
-    clusterIP:
-    annotations: {}
-
-  # The service controls how weaviate gRPC endpoint is exposed to the outside world.
-  # If you don't want a public load balancer, you can also choose 'ClusterIP' or `NodePort`
-  # to make weaviate gRPC port be only accessible within your cluster.
-  # This service is by default enabled but if you don't want it to be deployed in your
-  # environment then it can be disabled by setting enabled: false option.
-  grpcService:
-    enabled: true
-    name: weaviate-grpc
-    ports:
-      - name: grpc
-        protocol: TCP
-        port: 50051
-        # Target port is going to be the same for every port
+    # type: LoadBalancer
     type: ClusterIP
     loadBalancerSourceRanges: []
     # optionally set cluster IP if you want to set a static IP
@@ -1018,21 +805,10 @@ weaviate:
     annotations: {}
 
   # Adjust liveness, readiness and startup probes configuration
-  # below is an example that can be used to switch the probeType to exec command
-  # readinessProbe: # (Compatible with liveness, readiness and startup probe configurations)
-  #   probeType: exec
-  #   probe:
-  #     exec:
-  #       command: ["/bin/sh", "-c", "wget --spider --server-response --tries=1 --timeout=30 -o /dev/null localhost:8080/v1/.well-known/ready"]
-
   startupProbe:
     # For kubernetes versions prior to 1.18 startupProbe is not supported thus can be disabled.
     enabled: false
-    probeType: httpGet
-    probe:
-      httpGet:
-        path: /v1/.well-known/ready
-        port: 8080
+
     initialDelaySeconds: 300
     periodSeconds: 60
     failureThreshold: 50
@@ -1040,11 +816,6 @@ weaviate:
     timeoutSeconds: 3
 
   livenessProbe:
-    probeType: httpGet
-    probe:
-      httpGet:
-        path: /v1/.well-known/live
-        port: 8080
     initialDelaySeconds: 900
     periodSeconds: 10
     failureThreshold: 30
@@ -1052,17 +823,11 @@ weaviate:
     timeoutSeconds: 3
 
   readinessProbe:
-    probeType: httpGet
-    probe:
-      httpGet:
-        path: /v1/.well-known/ready
-        port: 8080
     initialDelaySeconds: 3
     periodSeconds: 10
     failureThreshold: 3
     successThreshold: 1
     timeoutSeconds: 3
-
 
   terminationGracePeriodSeconds: 600
 
@@ -1084,7 +849,7 @@ weaviate:
       enabled: true
       # Any number of allowed API Keys as plain text
       allowed_keys:
-        - "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
+        - ""
       # You can either set a single user for all the listed Allowed API keys OR
       # one user per API Key, i.e. length(apikey.allowed_keys) == length(apikey.users) OR
       # length(apikey.users) == 1
@@ -1103,11 +868,11 @@ weaviate:
     admin_list:
       enabled: true
       users:
-      # Examples
-      # - admin_user1
-      # - admin_user2
-      # - api-key-user-admin
-      - hello@dify.ai
+        # Examples
+        # - admin_user1
+        # - admin_user2
+        # - api-key-user-admin
+        - hello@dify.ai
       read_only_users:
       # Examples
       # - readonly_user1
@@ -1118,53 +883,17 @@ weaviate:
     limit: 100
   debug: false
 
-
   # Insert any custom environment variables or envSecrets by putting the exact name
   # and desired value into the settings below. Any env name passed will be automatically
   # set for the statefulSet.
   env:
     CLUSTER_GOSSIP_BIND_PORT: 7000
     CLUSTER_DATA_BIND_PORT: 7001
-
-    # Set RAFT cluster expected number of voter nodes at bootstrap.
-    # By default helm automatically sets this value based on the cluster size.
-    # RAFT_BOOTSTRAP_EXPECT: 1
-
-    # Set RAFT cluster bootstrap timeout (in seconds), default is 600 (seconds)
-    # which should be sufficient for most of the deployments.
-    RAFT_BOOTSTRAP_TIMEOUT: 600
-
-    # Set manually RAFT voter nodes.
-    # RAFT_JOIN value is automatically generated by "raft_configuration"
-    # template, but if someone wants to set this value manually then it can be done
-    # by setting RAFT_JOIN environment variable, example: RAFT_JOIN: "weaviate-0,weaviate-1"
-    # Please notice that in this case RAFT_BOOTSTRAP_EXPECT setting needs to be also adjusted manually
-    # to match the number of RAFT voters, so if there are 2 nodes set using RAFT_JOIN variable
-    # then RAFT_BOOTSTRAP_EXPECT needs to be equal 2 also.
-    # RAFT_JOIN: "weaviate-0"
-
-    # Set to true if voters nodes should handle only schema. With this setting enabled
-    # voter nodes will not accept any data, one needs to resize the cluster using replicas
-    # setting so that replicas > voters.
-    # RAFT_METADATA_ONLY_VOTERS: false
-
-    # RAFT_ENABLE_FQDN_RESOLVER setting changes the node name to node ip resolution to use DNS lookups
-    # instead of memberlist lookup. That means that when weaviate raft component wants to contact `weaviate-0`
-    # it's going to lookup the dns name `weaviate-0` instead of looking for the node-id in memberlist.
-    # This is particularly useful if running in an environment where you're using services (for example k8s)
-    # where the IP of the services is different from the actual node IP, but it proxies the connection to the node.
-    # RAFT_ENABLE_FQDN_RESOLVER: false
-
-    # RAFT_FQDN_RESOLVER_TLD setting acts in combination with RAFT_ENABLE_FQDN_RESOLVER and is appended
-    # in the format "[node-id].[tld]" when resolving a node-id to an ip.
-    # RAFT_FQDN_RESOLVER_TLD: "weaviate-0."
-
     # The aggressiveness of the Go Garbage Collector. 100 is the default value.
     GOGC: 100
 
     # Expose metrics on port 2112 for Prometheus to scrape
     PROMETHEUS_MONITORING_ENABLED: false
-    PROMETHEUS_MONITORING_GROUP: false
 
     # Set a MEM limit for the Weaviate Pod so it can help you both increase GC-related
     # performance as well as avoid GC-related out-of-memory (“OOM”) situations
@@ -1187,8 +916,7 @@ weaviate:
     # If using ENV Vars to set up API Keys make sure to have `authentication.apikey` block commented out
     # to avoid any future changes. ENV Vars has priority over the config above `authentication.apikey`.
     # If using `authentication.apikey `the below ENV Vars will be used because they have priority,
-    # so comment them out to avoid any future changes. The same applies for the RBAC configuration
-    # under the authorization block.
+    # so comment them out to avoid any future changes.
     # Enables API key authentication. If it is set to 'false' the AUTHENTICATION_APIKEY_ALLOWED_KEYS
     # and AUTHENTICATION_APIKEY_USERS will not have any effect.
     # AUTHENTICATION_APIKEY_ENABLED: 'true'
@@ -1201,83 +929,15 @@ weaviate:
     # The User/s can be a simple name or an email, no matter if it exists or not.
     # NOTE: Make sure to add the users to the authorization above overwise they will not be allowed to interact with Weaviate.
     # AUTHENTICATION_APIKEY_USERS: 'jane@doe.com,ian-smith'
-
-    # Enabling RBAC authorization. It is mutually exclusive with the AUTHORIZATION_ADMIN_LISTS variable. Either RBAC or the
-    # admin lists mechanism can be used.
-    # AUTHORIZATION_ENABLE_RBAC: "true"
-
-    # Users with admin's RBAC role. List one or more user identities, separated by commas, which will
-    # have the admin role assigned to. This role provides all permissions to the user, but it's required at least
-    # in one of the user for managing the cluster.
-    # AUTHORIZATION_ADMIN_USERS: "admin-user"
-
-    # Users with viewer's RBAC role. List one or more user identities, separated by commas, which will
-    # have the viewer role assigned to. This role allows read permissions in all different areas. Once assigned via
-    # config, it can't be revoked via API AuthZ calls.
-    # AUTHORIZATION_VIEWER_USERS: "viewer-user"
     AUTHENTICATION_APIKEY_ENABLED: "true"
-    AUTHENTICATION_APIKEY_ALLOWED_KEYS: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
+    # Note: When using ExternalSecret, this value is managed externally
+    # AUTHENTICATION_APIKEY_ALLOWED_KEYS: ""
     AUTHENTICATION_APIKEY_USERS: "hello@dify.ai"
     AUTHORIZATION_ADMINLIST_ENABLED: "true"
     AUTHORIZATION_ADMINLIST_USERS: "hello@dify.ai"
-
-
   envSecrets:
     # create a Kubernetes secret with AUTHENTICATION_APIKEY_ALLOWED_KEYS key and its respective value
     # AUTHENTICATION_APIKEY_ALLOWED_KEYS: name-of-the-k8s-secret-containing-the-comma-separated-api-keys
-
-  # Configure offload providers
-  offload:
-    s3:
-      enabled: false
-      # If one is using AWS EKS and has already configured K8s Service Account
-      # that holds the AWS credentials one can pass a name of that service account
-      # here using this setting.
-      # NOTE: the root `serviceAccountName` config has priority over this one, and
-      # if the root one is set this one will NOT overwrite it. This one is here for
-      # backwards compatibility.
-      serviceAccountName:
-
-      envconfig:
-        # Configure bucket where data should be saved, this setting is mandatory
-        OFFLOAD_S3_BUCKET: weaviate-offload
-
-        # Optional setting. Defaults to AWS S3 (s3.amazonaws.com).
-        # Set this option if you have a MinIO storage configured in your environment
-        # and want to use it instead of the AWS S3.
-        # OFFLOAD_S3_ENDPOINT: custom.minio.endpoint.address
-
-        # Optional setting. Defaults to true.
-        # Set this option if you don't want to use SSL.
-        # OFFLOAD_S3_USE_SSL: true
-
-        # Optional setting. Defaults to false.
-        # Set this option if you wan't Weaviate to create
-        # the bucket used for offloading tenants. Otherwise,
-        # if set to false Weaviate expects the bucket to be
-        # already created with the OFFLOAD_S3_BUCKET name
-        # OFFLOAD_S3_BUCKET_AUTO_CREATE: true
-
-        # You can pass environment AWS settings here:
-        # Define the region
-        # AWS_REGION: eu-west-1
-
-      # For Weaviate to be able to create bucket objects it needs a user credentials to authenticate to AWS.
-      # The User must have permissions to read/create/delete bucket objects.
-      # You can pass the User credentials (access-key id and access-secret-key) in 2 ways:
-      # 1. by setting the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY plain values in the `secrets` section below
-      #     this chart will create a kubernetes secret for you with these key-values pairs
-      # 2. create Kubernetes secret/s with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY  keys and their respective values
-      #     Set the Key and the secret where it is set in `envSecrets` section below
-      secrets: {}
-      #   AWS_ACCESS_KEY_ID: access-key-id (plain text)
-      #   AWS_SECRET_ACCESS_KEY: secret-access-key (plain text)
-
-      # If one has already defined secrets with AWS credentials one can pass them using
-      # this setting:
-      envSecrets: {}
-      #   AWS_ACCESS_KEY_ID: name-of-the-k8s-secret-containing-the-key-id
-      #   AWS_SECRET_ACCESS_KEY: name-of-the-k8s-secret-containing-the-key
 
   # Configure backup providers
   backups:
@@ -1455,44 +1115,8 @@ service:
   type: ClusterIP
   port: 80
 
-ingress:
+postgresql:
   enabled: false
-  className: ""
-  annotations:
-    {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-    # nginx.ingress.kubernetes.io/backend-protocol: HTTP
-    # nginx.ingress.kubernetes.io/proxy-body-size: 15m
-    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
-  hosts:
-    - host: dify-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-    # - host: dify-example2.local
-    #   paths:
-    #     - path: /
-    #       pathType: Prefix
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - dify-example.local
-
-# Global node selector
-# If set, this will apply to all dify components
-# Individual components can be set to a different node selector
-nodeSelector: {}
-
-# Global tolerations
-# If set, this will apply to all dify components
-# Individual components can be set to a different tolerations
-tolerations: []
-
-# Global affinity
-# If set, this will apply to all dify components
-# Individual components can be set to a different affinity
-affinity: {}
 
 redis:
   enabled: true
@@ -1611,7 +1235,7 @@ redis:
 
   ## @param architecture Redis&reg; architecture. Allowed values: `standalone` or `replication`
   ##
-  architecture: replication
+  architecture: standalone
   ## Redis&reg; Authentication parameters
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/redis#setting-the-server-password-on-first-run
   ##
@@ -1625,11 +1249,11 @@ redis:
     ## @param auth.password Redis&reg; password
     ## Defaults to a random 10-character alphanumeric string if not set
     ##
-    password: "difyai123456"
+    password:
     ## @param auth.existingSecret The name of an existing secret with Redis&reg; credentials
     ## NOTE: When it's set, the previous `auth.password` parameter is ignored
     ##
-    existingSecret: ""
+    existingSecret: "redis-secret"
     ## @param auth.existingSecretPasswordKey Password key to be retrieved from existing secret
     ## NOTE: ignored unless `auth.existingSecret` parameter is set
     ##
@@ -2619,263 +2243,33 @@ redis:
     ##
     dhParamsFilename: ""
 
-## @Section External service
-##
-
-## @section External PostgreSQL configuration
-##
+  ## @section useExternalDNS Parameters
+  ##
+  ## @param useExternalDNS.enabled Enable various syntax that would enable external-dns to work.  Note this requires a working installation of `external-dns` to be usable.
+  ## @param useExternalDNS.additionalAnnotations Extra annotations to be utilized when `external-dns` is enabled.
+  ## @param useExternalDNS.annotationKey The annotation key utilized when `external-dns` is enabled. Setting this to `false` will disable annotations.
+  ## @param useExternalDNS.suffix The DNS suffix utilized when `external-dns` is enabled.  Note that we prepend the suffix with the full name of the release.
+  ##
+  useExternalDNS:
+    enabled: false
+    suffix: ""
+    annotationKey: external-dns.alpha.kubernetes.io/
+    additionalAnnotations: {}
 
 ###################################
 # External postgres
 # - these configs are only used when `externalPostgres.enabled` is true
 ###################################
 externalPostgres:
-  enabled: false
-  username: "postgres"
-  password: "difyai123456"
-  address: localhost
+  enabled: true
+  # Note: When using ExternalSecret, these values are managed externally
+  username: ""
+  password: ""
+  address: pg1.uat.internal.dify.ai
   port: 5432
   database:
     api: "dify"
     pluginDaemon: "dify_plugin"
-
-## @section External Redis
-##
-
-###################################
-# External Redis
-# - these configs are only used when `externalRedis.enabled` is true
-###################################
-externalRedis:
-  enabled: false
-  host: "redis.example"
-  port: 6379
-  username: ""
-  password: "difyai123456"
-  db:
-    app: 0
-    celery: 1
-  useSSL: false
-  sentinel:
-    enabled: false
-    masterSet: "mymaster"
-    sentinels:
-      - "sentinel1.example:26379"
-      - "sentinel2.example:26379"
-      - "sentinel3.example:26379"
-    password: ""
-
-
-## @Section Extenral storage backend
-##
-
-###################################
-# External S3
-# - these configs are only used when `externalS3.enabled` is true
-###################################
-externalS3:
-  enabled: false
-  endpoint: "https://xxx.r2.cloudflarestorage.com"
-  pathStyle: false
-  accessKey: "ak-difyai"
-  secretKey: "sk-difyai"
-  bucketName:
-    # Shared storage for `api` and `worker`
-    api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalS3.enabled` is set to `true`).
-    pluginDaemon:
-  useIAM: false
-  region: "us-east-1"
-
-###################################
-# External Azure Blob Storage
-# - these configs are only used when `externalS3.enabled` is false and `externalAzureBlobStorage.enabled` is true
-###################################
-externalAzureBlobStorage:
-  enabled: false
-  url: "https://<your_account_name>.blob.core.windows.net"
-  account: "difyai"
-  key: "difyai"
-  container: "difyai-container"
-
-###################################
-# External OSS
-# - these configs are only used when both `externalS3.enabled` and `externalAzureBlobStorage.enabled` are false and `externalOSS.enabled` is true
-###################################
-externalOSS:
-  enabled: false
-  endpoint: "https://oss-ap-southeast-1-internal.aliyuncs.com"
-  accessKey: "ak-difyai"
-  secretKey: "sk-difyai"
-  region: "ap-southeast-1"
-  bucketName:
-    api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOSS.enabled` is set to `true`).
-    pluginDaemon:
-  authVersion: v4
-  path: "your-path"
-
-###################################
-# External Google Cloud Storage
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` are false and `externalGCS.enabled` is true
-###################################
-externalGCS:
-  enabled: false
-  bucketName:
-    api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalGCS.enabled` is set to `true`).
-    pluginDaemon:
-  serviceAccountJsonBase64: ""
-
-###################################
-# External TENCENT COS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` are false and `externalCOS.enabled` is true
-###################################
-externalCOS:
-  enabled: false
-  secretKey: "your-secret-key"
-  secretId: "your-secret-id"
-  region: "your-region"
-  bucketName:
-    api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalCOS.enabled` is set to `true`).
-    pluginDaemon:
-  scheme: "your-scheme"
-
-###################################
-# External HUAWEI OBS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` are false and `externalOBS.enabled` is true
-###################################
-externalOBS:
-  enabled: false
-  endpoint: "https://your-endpoint"
-  accessKey: "your-secret-id"
-  secretKey: "your-secret-key"
-  bucketName:
-    api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOBS.enabled` is set to `true`).
-    pluginDaemon:
-
-###################################
-# External Tinder Object Storage (TOS) from volcengine
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` and `externalOBS.enabled` are false and `externalTOS.enabled` is true
-###################################
-externalTOS:
-  enabled: false
-  endpoint: "https://tos-cn-beijing.volces.com"
-  accessKey: "your-access-key"
-  secretKey: "your-secret-key"
-  bucketName:
-    # Shared storage for `api` and `worker`
-    api: "your-bucket-name"
-    # If specified, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalTOS.enabled` is set to `true`).
-    pluginDaemon:
-  region: "cn-beijing"
-
-## @section External Vector Database
-##
-
-###################################
-# External Weaviate
-# - these configs take effect when `externalWeaviate.enabled` is true
-###################################
-externalWeaviate:
-  enabled: false
-  endpoint:
-    http: "http://weaviate:8080"
-    grpc: "grpc://weaviate:50051"
-  apiKey: "WVF5YThaHlkYwhGUSmCRgsX3tD5ngdN8pkih"
-
-###################################
-# External Qdrant
-# - these configs take effect only if `externalWeaviate.enabled` is `false` and `externalQdrant.enabled` is `true`
-###################################
-externalQdrant:
-  enabled: false
-  endpoint: "https://your-qdrant-cluster-url.qdrant.tech/"
-  apiKey: "ak-difyai"
-  timeout: 20
-  grpc:
-    enabled: false
-    port: 6334
-
-###################################
-# External Milvus
-# - these configs take effect only if both `externalWeaviate.enabled` and `externalQdrant.enabled` are set as `false` and `externalMilvus.enabled` is `true`
-###################################
-externalMilvus:
-  enabled: false
-  uri: "http://your-milvus.domain:19530"
-  database: "default"
-  token: ""
-  user: ""
-  password: ""
-
-###################################
-# External Pgvector
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` are set as `false` and `externalPgvector.enabled` is `true`
-###################################
-externalPgvector:
-  enabled: false
-  username: "postgres"
-  password: "difyai123456"
-  address: "pgvector"
-  port: 5432
-  dbName: dify
-
-###################################
-# External Tencent Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` are set as `false` and `externalTencentVectorDB.enabled` is `true`
-###################################
-externalTencentVectorDB:
-  enabled: false
-  url: "your-tencent-vector-db-url"
-  apiKey: "your-tencent-vector-db-api-key"
-  timeout: 30
-  username: "root"
-  database: "dify"
-  shard: 1
-  replicas: 2
-
-###################################
-# External MyScaleDB Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` are set as `false` and `externalMyScaleDB.enabled` is `true`
-###################################
-externalMyScaleDB:
-  enabled: false
-  host: "myscale"
-  port: 8123
-  username: "default"
-  password: ""
-  database: "dify"
-  ftsParams: ""
-
-###################################
-# External TableStore Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` and `externalMyScaleDB.enabled` are set as `false` and `externalTableStore.enabled` is `true`
-###################################
-externalTableStore:
-  enabled: false
-  endpoint: "endpoint"
-  instanceName: "instance-name"
-  accessKeyId: "your-secret-id"
-  accessKeySecret: "your-secret-key"
-
-###################################
-# External Elasticsearch
-# - these configs take effect only if all other vector databases are disabled and `externalElasticsearch.enabled` is `true`
-###################################
-externalElasticsearch:
-  enabled: false
-  host: "elasticsearch.example.com"
-  port: 9200
-  # Note: When using ExternalSecret, these values are managed externally
-  username: ""
-  password: ""
-
-
-## @section (Experimental): External Secret Operator
-##
 
 ###################################
 # External Secret (External Secrets Operator)
@@ -2883,25 +2277,21 @@ externalElasticsearch:
 # - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
 ###################################
 externalSecret:
-  enabled: false
+  enabled: true
 
   # External secret store backend provider (e.g., vault, aws, azure, gcp, etc.)
   secretStore:
+    # SecretStore or ClusterSecretStore name to reference
     name: "default-secret-store"
-    kind: "SecretStore"
-
-  # Global refresh interval for all ExternalSecrets
-  refreshInterval: "15m"
-
-  # Global ExternalSecret configuration options
-  # Default decoding strategy for secret data
-  # Options: Auto, Base64, Base64URL, None
-  decodingStrategy: "None"
+    # kind: SecretStore or ClusterSecretStore
+    kind: "ClusterSecretStore"
 
   # Configuration for api secret
   api:
     # Whether to create ExternalSecret for api
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
     # Remote references for external secret store
     # Only specify the fields you want to include - all possible fields are defined in the template
     remoteRefs:
@@ -2938,16 +2328,15 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
-      OTLP_API_KEY:
-        key: "dify/otel"
-        property: "api_key"
     data:
-      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-external-pg-redis-master:6379/1"
 
   # Configuration for worker secret
   worker:
     # Whether to create ExternalSecret for worker
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       SECRET_KEY:
@@ -2980,15 +2369,16 @@ externalSecret:
       S3_SECRET_KEY:
         key: "dify/s3"
         property: "secret_key"
-      OTLP_API_KEY:
-        key: "dify/otel"
-        property: "api_key"
     data:
-      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@redis:6379/1"
+      CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@dify-test-eso-external-pg-redis-master:6379/1"
 
   # Configuration for sandbox secret
   sandbox:
+    # Whether to create ExternalSecret for sandbox
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
+    # Remote references for external secret store
     remoteRefs:
       API_KEY:
         key: "dify/sandbox"
@@ -2998,6 +2388,8 @@ externalSecret:
   pluginDaemon:
     # Whether to create ExternalSecret for plugin daemon
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       DB_USERNAME:
@@ -3020,6 +2412,8 @@ externalSecret:
   postgresql:
     # Whether to create ExternalSecret for built-in PostgreSQL
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       postgres-password:
@@ -3033,25 +2427,10 @@ externalSecret:
   redis:
     # Whether to create ExternalSecret for built-in Redis
     enabled: true
+    # Refresh interval for the ExternalSecret
+    refreshInterval: "15m"
     # Remote references for external secret store
     remoteRefs:
       redis-password:
         key: "dify/redis"
         property: "redis_password"
-
-  # Configuration for Elasticsearch secret (for external Elasticsearch with ExternalSecret)
-  elasticsearch:
-    # Whether to create ExternalSecret for external Elasticsearch
-    enabled: false
-    # Refresh interval for the ExternalSecret
-    refreshInterval: "15m"
-    # Remote references for external secret store
-    # Only sensitive data (username/password) are fetched from external store
-    # Static values (host/port) are taken from values.yaml
-    remoteRefs:
-      ELASTICSEARCH_USERNAME:
-        key: "dify/elasticsearch"
-        property: "username"
-      ELASTICSEARCH_PASSWORD:
-        key: "dify/elasticsearch"
-        property: "password"

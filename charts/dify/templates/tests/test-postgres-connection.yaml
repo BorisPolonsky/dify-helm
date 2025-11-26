@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ include "dify.fullname" . }}-test-postgres-connection"
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    component: "postgres"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: check-postgres
+          image: "{{ .Values.postgresql.image.registry }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          command:
+            - sh
+            - -c
+            - |
+              until PGPASSWORD=$DB_PASSWORD pg_isready -h $DB_HOST -U $DB_USERNAME -d $DB_DATABASE ; do
+                echo "Waiting for PostgreSQL sequence to be available..."
+                sleep 1
+              done
+              echo "PostgreSQL is ready."
+          envFrom:
+          - configMapRef:
+              name: {{ template "dify.api.fullname" . }}
+          - secretRef:
+              name: {{ template "dify.api.fullname" . }}

@@ -1,5 +1,5 @@
-{{- if and .Values.worker.enabled}}
-{{- $usePvc := not (or .Values.externalS3.enabled .Values.externalAzureBlobStorage.enabled .Values.externalOSS.enabled .Values.externalGCS.enabled .Values.externalCOS.enabled .Values.externalOBS.enabled) -}}
+{{- if and .Values.worker.enabled }}
+{{- $usePvc := not (or .Values.externalS3.enabled .Values.externalAzureBlobStorage.enabled .Values.externalOSS.enabled .Values.externalGCS.enabled .Values.externalCOS.enabled .Values.externalOBS.enabled .Values.externalTOS.enabled) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -43,6 +43,9 @@ spec:
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
       serviceAccountName: {{ include "dify.worker.serviceAccountName" . }}
+      {{- if .Values.worker.priorityClassName }}
+      priorityClassName: {{ .Values.worker.priorityClassName | quote }}
+      {{- end }}
       {{- if .Values.image.api.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.api.pullSecrets }}
@@ -52,6 +55,26 @@ spec:
       {{- if .Values.worker.podSecurityContext }}
       securityContext:
 {{ toYaml .Values.worker.podSecurityContext | indent 8 }}
+      {{- end }}
+      {{- if .Values.api.migration }}
+      initContainers:
+      - name: check-api
+        image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
+        command:
+          - sh
+          - -c
+          - |
+            until curl http://{{ template "dify.api.fullname" . }}:{{ .Values.api.service.port }}/health; do
+              echo "Waiting for API service to be available..."
+              sleep 1
+            done
+        envFrom:
+        - configMapRef:
+            name: {{ template "dify.worker.fullname" . }}
+        - secretRef:
+            name: {{ template "dify.worker.fullname" . }}
+        resources:
+          {{- toYaml .Values.worker.resources | nindent 12 }}
       {{- end }}
       containers:
       - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
@@ -71,6 +94,11 @@ spec:
 {{ toYaml .Values.worker.containerSecurityContext | indent 10 }}
         {{- end }}
         env:
+        - name: MODE
+          value: "worker"
+        # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+        - name: LOG_LEVEL
+          value: {{ .Values.worker.logLevel | quote }}
         {{- if .Values.worker.extraEnv }}
           {{- toYaml .Values.worker.extraEnv | nindent 8 }}
         {{- end }}

@@ -1,5 +1,17 @@
 {{- if and .Values.pluginDaemon.enabled}}
-{{- $usePvc := not (or (and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon)) -}}
+{{- $usePvc :=
+  or
+    .Values.pluginDaemon.persistence.persistentVolumeClaim.existingClaim
+    (not (or
+      (and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon)
+      (and .Values.externalAzureBlobStorage.enabled)
+      (and .Values.externalOSS.enabled .Values.externalOSS.bucketName.pluginDaemon)
+      (and .Values.externalGCS.enabled .Values.externalGCS.bucketName.pluginDaemon)
+      (and .Values.externalCOS.enabled .Values.externalCOS.bucketName.pluginDaemon)
+      (and .Values.externalOBS.enabled .Values.externalOBS.bucketName.pluginDaemon)
+      (and .Values.externalTOS.enabled .Values.externalTOS.bucketName.pluginDaemon)
+    ))
+}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -43,6 +55,9 @@ spec:
 {{ include "dify.ud.labels" . | indent 8 }}
     spec:
       serviceAccountName: {{ include "dify.pluginDaemon.serviceAccountName" . }}
+      {{- if .Values.pluginDaemon.priorityClassName }}
+      priorityClassName: {{ .Values.pluginDaemon.priorityClassName | quote }}
+      {{- end }}
       {{- if .Values.image.pluginDaemon.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.pluginDaemon.pullSecrets }}
