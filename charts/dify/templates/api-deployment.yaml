@@ -59,9 +59,8 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
-      {{- if .Values.api.podSecurityContext }}
-      securityContext:
-{{ toYaml .Values.api.podSecurityContext | indent 8 }}
+      {{- if .Values.api.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.api.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       containers:
       - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
@@ -90,9 +89,9 @@ spec:
           tcpSocket:
             port: api
         {{- end }}
-        {{- if .Values.api.containerSecurityContext }}
-        securityContext:
-{{ toYaml .Values.api.containerSecurityContext | indent 10 }}
+        # We don't require a privileged container in this case
+        {{- if .Values.api.containerSecurityContext.enabled }}
+        securityContext: {{- omit .Values.api.containerSecurityContext "enabled" | toYaml | nindent 10 }}
         {{- end }}
         env:
         {{- if .Values.sandbox.enabled }}

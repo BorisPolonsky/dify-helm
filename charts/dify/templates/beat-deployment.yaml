@@ -49,9 +49,8 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
-      {{- if .Values.beat.podSecurityContext }}
-      securityContext:
-{{ toYaml .Values.beat.podSecurityContext | indent 8 }}
+      {{- if .Values.beat.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.beat.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       containers:
       - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
@@ -66,9 +65,9 @@ spec:
         {{- if .Values.beat.customStartupProbe }}
         startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.beat.customStartupProbe "context" $) | nindent 10 }}
         {{- end }}
-        {{- if .Values.beat.containerSecurityContext }}
-        securityContext:
-{{ toYaml .Values.beat.containerSecurityContext | indent 10 }}
+        # We don't require a privileged container in this case
+        {{- if .Values.beat.containerSecurityContext.enabled }}
+        securityContext: {{- omit .Values.beat.containerSecurityContext "enabled" | toYaml | nindent 10 }}
         {{- end }}
         env:
         - name: MODE
