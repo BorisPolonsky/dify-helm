@@ -693,9 +693,15 @@ cache_store_log none
 
 {{- define "dify.pluginDaemon.db.config" -}}
 {{- if .Values.externalPostgres.enabled }}
+DB_TYPE: postgresql
 DB_HOST: {{ .Values.externalPostgres.address | quote }}
 DB_PORT: {{ .Values.externalPostgres.port | toString | quote }}
 DB_DATABASE: {{ .Values.externalPostgres.database.pluginDaemon | quote }}
+{{- else if .Values.externalMysql.enabled }}
+DB_TYPE: mysql
+DB_HOST: {{ .Values.externalMysql.address | quote }}
+DB_PORT: {{ .Values.externalMysql.port | toString | quote }}
+DB_DATABASE: {{ .Values.externalMysql.database.pluginDaemon | quote }}
 {{- else if .Values.postgresql.enabled }}
 # N.B.: `pluginDaemon` will the very same `PostgresSQL` database as `api`, `worker`,
 # which is NOT recommended for production and subject to possible confliction in the future releases of `dify`
