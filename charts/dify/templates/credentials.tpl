@@ -53,6 +53,9 @@ OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
 {{- if .Values.externalPostgres.enabled }}
 DB_USERNAME: {{ .Values.externalPostgres.username | b64enc | quote }}
 DB_PASSWORD: {{ .Values.externalPostgres.password | b64enc | quote }}
+{{- else if .Values.externalMysql.enabled }}
+DB_USERNAME: {{ .Values.externalMysql.username | b64enc | quote }}
+DB_PASSWORD: {{ .Values.externalMysql.password | b64enc | quote }}
 {{- else if .Values.postgresql.enabled }}
   {{ with .Values.postgresql.global.postgresql.auth }}
   {{- if empty .username }}

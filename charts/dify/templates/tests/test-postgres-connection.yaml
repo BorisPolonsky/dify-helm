@@ -1,3 +1,8 @@
+{{- if or .Values.externalPostgres.enabled 
+  (and
+    (not .Values.externalMysql.enabled)
+    .Values.postgresql.enabled
+)}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -28,3 +33,4 @@ spec:
               name: {{ template "dify.api.fullname" . }}
           - secretRef:
               name: {{ template "dify.api.fullname" . }}
+{{- end }}
