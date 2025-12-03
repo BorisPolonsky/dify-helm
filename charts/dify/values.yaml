@@ -2675,6 +2675,23 @@ externalPostgres:
     api: "dify"
     pluginDaemon: "dify_plugin"
 
+## @section External MySQL configuration
+##
+
+###################################
+# External MySQL
+# - these configs are only used when `externalMysql.enabled` is true and `externalPostgres.enabled` is false
+###################################
+externalMysql:
+  enabled: false
+  username: "root"
+  password: "difyai123456"
+  address: localhost
+  port: 3306
+  database:
+    api: "dify"
+    pluginDaemon: "dify_plugin"
+
 ## @section External Redis
 ##
 
