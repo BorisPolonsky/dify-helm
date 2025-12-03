@@ -118,7 +118,7 @@ graph TB
 
     %% External Dependencies
     subgraph ExternalServices [🌐 External Services]
-        ExternalDB[(🔧 External PostgreSQL)]
+        ExternalDB[(🔧 External PostgreSQL/MySQL)]
         ExternalRedis[(🔴 External Redis)]
         ExternalVector[(🧮 External Vector DB)]
         ExternalStorage[(💾 External Object Storage)]
