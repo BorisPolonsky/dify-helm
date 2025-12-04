@@ -1404,7 +1404,7 @@ redis:
 
 ###################################
 # External Redis
-# - these configs are only used when `externalRedis.enabled` is true
+# - these configs applies only if `externalRedis.enabled` is true
 ###################################
 externalRedis:
   enabled: true

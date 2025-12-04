@@ -2601,7 +2601,7 @@ redis:
 
 ###################################
 # External postgres
-# - these configs are only used when `externalPostgres.enabled` is true
+# - these configs applies only if `externalPostgres.enabled` is true
 ###################################
 externalPostgres:
   enabled: false
@@ -2613,12 +2613,29 @@ externalPostgres:
     api: "dify"
     pluginDaemon: "dify_plugin"
 
+## @section External MySQL configuration
+##
+
+###################################
+# External MySQL
+# - these configs applies only if `externalMysql.enabled` is true and `externalPostgres.enabled` is false
+###################################
+externalMysql:
+  enabled: false
+  username: "root"
+  password: "difyai123456"
+  address: localhost
+  port: 3306
+  database:
+    api: "dify"
+    pluginDaemon: "dify_plugin"
+
 ## @section External Redis
 ##
 
 ###################################
 # External Redis
-# - these configs are only used when `externalRedis.enabled` is true
+# - these configs applies only if `externalRedis.enabled` is true
 ###################################
 externalRedis:
   enabled: false
@@ -2626,6 +2643,9 @@ externalRedis:
   port: 6379
   username: ""
   password: "difyai123456"
+  db:
+    app: 0
+    celery: 1
   useSSL: false
   sentinel:
     enabled: false
@@ -2642,7 +2662,7 @@ externalRedis:
 
 ###################################
 # External S3
-# - these configs are only used when `externalS3.enabled` is true
+# - these configs applies only if `externalS3.enabled` is true
 ###################################
 externalS3:
   enabled: false
@@ -2653,14 +2673,14 @@ externalS3:
   bucketName:
     # Shared storage for `api` and `worker`
     api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalS3.enabled` is set to `true`).
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence.
     pluginDaemon:
   useIAM: false
   region: "us-east-1"
 
 ###################################
 # External Azure Blob Storage
-# - these configs are only used when `externalS3.enabled` is false and `externalAzureBlobStorage.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalAzureBlobStorage.enabled` is true
 ###################################
 externalAzureBlobStorage:
   enabled: false
@@ -2671,7 +2691,7 @@ externalAzureBlobStorage:
 
 ###################################
 # External OSS
-# - these configs are only used when both `externalS3.enabled` and `externalAzureBlobStorage.enabled` are false and `externalOSS.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalOSS.enabled` is true
 ###################################
 externalOSS:
   enabled: false
@@ -2681,26 +2701,26 @@ externalOSS:
   region: "ap-southeast-1"
   bucketName:
     api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOSS.enabled` is set to `true`).
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence.
     pluginDaemon:
   authVersion: v4
   path: "your-path"
 
 ###################################
 # External Google Cloud Storage
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` are false and `externalGCS.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalGCS.enabled` is true
 ###################################
 externalGCS:
   enabled: false
   bucketName:
     api: "difyai"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalGCS.enabled` is set to `true`).
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence.
     pluginDaemon:
   serviceAccountJsonBase64: ""
 
 ###################################
 # External TENCENT COS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` are false and `externalCOS.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalCOS.enabled` is true
 ###################################
 externalCOS:
   enabled: false
@@ -2709,13 +2729,13 @@ externalCOS:
   region: "your-region"
   bucketName:
     api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalCOS.enabled` is set to `true`).
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence.
     pluginDaemon:
   scheme: "your-scheme"
 
 ###################################
 # External HUAWEI OBS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` are false and `externalOBS.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalOBS.enabled` is true
 ###################################
 externalOBS:
   enabled: false
@@ -2724,12 +2744,12 @@ externalOBS:
   secretKey: "your-secret-key"
   bucketName:
     api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalOBS.enabled` is set to `true`).
+    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence.
     pluginDaemon:
 
 ###################################
 # External Tinder Object Storage (TOS) from volcengine
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` and `externalOBS.enabled` are false and `externalTOS.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalTOS.enabled` is true
 ###################################
 externalTOS:
   enabled: false
@@ -2739,7 +2759,7 @@ externalTOS:
   bucketName:
     # Shared storage for `api` and `worker`
     api: "your-bucket-name"
-    # If specifed, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence (only used when `externalTOS.enabled` is set to `true`).
+    # If specified, `pluginDaemon` will use this bucket instead of binding `PersistentVolume` for data persistence.
     pluginDaemon:
   region: "cn-beijing"
 
@@ -2748,7 +2768,7 @@ externalTOS:
 
 ###################################
 # External Weaviate
-# - these configs take effect when `externalWeaviate.enabled` is true
+# - these configs applies only if `externalWeaviate.enabled` is true
 ###################################
 externalWeaviate:
   enabled: false
@@ -2759,7 +2779,7 @@ externalWeaviate:
 
 ###################################
 # External Qdrant
-# - these configs take effect only if `externalWeaviate.enabled` is `false` and `externalQdrant.enabled` is `true`
+# - these configs applies only if all vector databases above are disabled and `externalQdrant.enabled` is true
 ###################################
 externalQdrant:
   enabled: false
@@ -2772,7 +2792,7 @@ externalQdrant:
 
 ###################################
 # External Milvus
-# - these configs take effect only if both `externalWeaviate.enabled` and `externalQdrant.enabled` are set as `false` and `externalMilvus.enabled` is `true`
+# - these configs applies only if both `externalWeaviate.enabled` and `externalQdrant.enabled` are false and `externalMilvus.enabled` is true
 ###################################
 externalMilvus:
   enabled: false
@@ -2784,7 +2804,7 @@ externalMilvus:
 
 ###################################
 # External Pgvector
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` are set as `false` and `externalPgvector.enabled` is `true`
+# - these configs applies only if all vector databases above are disabled and `externalPgvector.enabled` is true
 ###################################
 externalPgvector:
   enabled: false
@@ -2796,7 +2816,7 @@ externalPgvector:
 
 ###################################
 # External Tencent Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` are set as `false` and `externalTencentVectorDB.enabled` is `true`
+# - these configs applies only if all vector databases above are disabled and `externalTencentVectorDB.enabled` is true
 ###################################
 externalTencentVectorDB:
   enabled: false
@@ -2810,7 +2830,7 @@ externalTencentVectorDB:
 
 ###################################
 # External MyScaleDB Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` are set as `false` and `externalMyScaleDB.enabled` is `true`
+# - these configs applies only if all vector databases above are disabled and `externalMyScaleDB.enabled` is true
 ###################################
 externalMyScaleDB:
   enabled: false
@@ -2823,7 +2843,7 @@ externalMyScaleDB:
 
 ###################################
 # External TableStore Vector DB
-# - these configs take effect only if both `externalWeaviate.enabled`, `externalQdrant.enabled` and `externalMilvus.enabled` and `externalPgvector.enabled` and `externalTencentVectorDB.enabled` and `externalMyScaleDB.enabled` are set as `false` and `externalTableStore.enabled` is `true`
+# - these configs applies only if all vector databases above are disabled and `externalTableStore.enabled` is true
 ###################################
 externalTableStore:
   enabled: false
@@ -2834,7 +2854,7 @@ externalTableStore:
 
 ###################################
 # External Elasticsearch
-# - these configs take effect only if all other vector databases are disabled and `externalElasticsearch.enabled` is `true`
+# - these configs applies only if all vector databases above are disabled and `externalElasticsearch.enabled` is true
 ###################################
 externalElasticsearch:
   enabled: false
@@ -2850,7 +2870,7 @@ externalElasticsearch:
 
 ###################################
 # External Secret (External Secrets Operator)
-# - these configs are used when `externalSecret.enabled` is true
+# - these configs applies only if `externalSecret.enabled` is true
 # - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
 ###################################
 externalSecret:

@@ -2422,7 +2422,7 @@ redis:
 
 ###################################
 # External postgres
-# - these configs are only used when `externalPostgres.enabled` is true
+# - these configs applies only if `externalPostgres.enabled` is true
 ###################################
 externalPostgres:
   enabled: false
@@ -2436,7 +2436,7 @@ externalPostgres:
 
 ###################################
 # External S3
-# - these configs are only used when `externalS3.enabled` is true
+# - these configs applies only if `externalS3.enabled` is true
 ###################################
 externalS3:
   enabled: false
@@ -2455,7 +2455,7 @@ externalS3:
 
 ###################################
 # External Azure Blob Storage
-# - these configs are only used when `externalS3.enabled` is false and `externalAzureBlobStorage.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalAzureBlobStorage.enabled` is true
 ###################################
 externalAzureBlobStorage:
   enabled: false
@@ -2466,7 +2466,7 @@ externalAzureBlobStorage:
 
 ###################################
 # External OSS
-# - these configs are only used when both `externalS3.enabled` and `externalAzureBlobStorage.enabled` are false and `externalOSS.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalOSS.enabled` is true
 ###################################
 externalOSS:
   enabled: false
@@ -2483,7 +2483,7 @@ externalOSS:
 
 ###################################
 # External Google Cloud Storage
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` are false and `externalGCS.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalGCS.enabled` is true
 ###################################
 externalGCS:
   enabled: false
@@ -2495,7 +2495,7 @@ externalGCS:
 
 ###################################
 # External TENCENT COS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` are false and `externalCOS.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalCOS.enabled` is true
 ###################################
 externalCOS:
   enabled: false
@@ -2510,7 +2510,7 @@ externalCOS:
 
 ###################################
 # External HUAWEI OBS
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` are false and `externalOBS.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalOBS.enabled` is true
 ###################################
 externalOBS:
   enabled: false
@@ -2524,7 +2524,7 @@ externalOBS:
 
 ###################################
 # External Tinder Object Storage (TOS) from volcengine
-# - these configs are only used when `externalS3.enabled` and `externalAzureBlobStorage.enabled` and `externalOSS.enabled` and `externalGCS.enabled` and `externalCOS.enabled` and `externalOBS.enabled` are false and `externalTOS.enabled` is true
+# - these configs applies only if all external storage backends above are disabled and `externalTOS.enabled` is true
 ###################################
 externalTOS:
   enabled: false
@@ -2645,7 +2645,7 @@ externalElasticsearch:
 
 ###################################
 # External Secret (External Secrets Operator)
-# - these configs are used when `externalSecret.enabled` is true
+# - these configs applies only if `externalSecret.enabled` is true
 # - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
 ###################################
 externalSecret:

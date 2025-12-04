@@ -2282,7 +2282,7 @@ redis:
 
 ###################################
 # External postgres
-# - these configs are only used when `externalPostgres.enabled` is true
+# - these configs applies only if `externalPostgres.enabled` is true
 ###################################
 externalPostgres:
   enabled: true
@@ -2297,7 +2297,7 @@ externalPostgres:
 
 ###################################
 # External Secret (External Secrets Operator)
-# - these configs are used when `externalSecret.enabled` is true
+# - these configs applies only if `externalSecret.enabled` is true
 # - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
 ###################################
 externalSecret:
