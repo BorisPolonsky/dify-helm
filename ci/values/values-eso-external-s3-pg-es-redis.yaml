@@ -301,7 +301,7 @@ redis:
 
 ###################################
 # External postgres
-# - these configs are only used when `externalPostgres.enabled` is true
+# - these configs applies only if `externalPostgres.enabled` is true
 ###################################
 externalPostgres:
   enabled: true
@@ -316,7 +316,7 @@ externalPostgres:
 
 ###################################
 # External Redis
-# - these configs are only used when `externalRedis.enabled` is true
+# - these configs applies only if `externalRedis.enabled` is true
 ###################################
 externalRedis:
   enabled: true
@@ -328,7 +328,7 @@ externalRedis:
 
 ###################################
 # External S3
-# - these configs are only used when `externalS3.enabled` is true
+# - these configs applies only if `externalS3.enabled` is true
 ###################################
 externalS3:
   enabled: true
@@ -360,7 +360,7 @@ externalElasticsearch:
 
 ###################################
 # External Secret (External Secrets Operator)
-# - these configs are used when `externalSecret.enabled` is true
+# - these configs applies only if `externalSecret.enabled` is true
 # - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
 ###################################
 externalSecret:

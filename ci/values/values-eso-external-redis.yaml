@@ -1174,7 +1174,7 @@ redis:
 
 ###################################
 # External Redis
-# - these configs are only used when `externalRedis.enabled` is true
+# - these configs applies only if `externalRedis.enabled` is true
 ###################################
 externalRedis:
   enabled: true
@@ -1186,7 +1186,7 @@ externalRedis:
 
 ###################################
 # External Secret (External Secrets Operator)
-# - these configs are used when `externalSecret.enabled` is true
+# - these configs applies only if `externalSecret.enabled` is true
 # - when enabled, the built-in Secret resources will be replaced by ExternalSecret resources
 ###################################
 externalSecret:
