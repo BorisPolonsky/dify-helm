@@ -174,7 +174,9 @@ The Nginx proxy handles traffic routing with the following rules:
 
 ### Supported External Components
 - [x] Redis (Standalone and Sentinel)
-- [x] PostgreSQL
+- External Database
+  - [x] PostgreSQL
+  - [x] MySQL
 - [x] Object Storage:
   - [x] Amazon S3
   - [x] Microsoft Azure Blob Storage
