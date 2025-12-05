@@ -174,7 +174,7 @@ The Nginx proxy handles traffic routing with the following rules:
 
 ### Supported External Components
 - [x] Redis (Standalone and Sentinel)
-- External Database
+- [x] External Database
   - [x] PostgreSQL
   - [x] MySQL
 - [x] Object Storage:
@@ -185,7 +185,7 @@ The Nginx proxy handles traffic routing with the following rules:
   - [x] Tencent Cloud COS
   - [x] Huawei Cloud OBS
   - [x] Volcengine TOS
-- External Vector DB:
+- [x] External Vector DB:
   - [x] Weaviate
   - [x] Qdrant
   - [x] Milvus
