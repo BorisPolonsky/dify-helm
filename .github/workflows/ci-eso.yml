@@ -19,6 +19,7 @@ on:
         options:
           - "legacy: using built-in components (baseline)"
           - "legacy: using external services (Redis, PostgreSQL, S3)"
+          - "legacy: using external services (Redis, MySQL, S3)"
           - "external-secrets: using built-in components"
           - "external-secrets: using external services (S3, PostgreSQL, Elasticsearch, Redis)"
           - "external-secrets + OTEL: using external services (OpenTelemetry)"
@@ -141,6 +142,7 @@ jobs:
             use_external_pg: false
             use_external_s3: false
             use_external_es: false
+            use_external_mysql: false
 
           # Test all external components together (legacy) - Redis, PostgreSQL, S3
           - config_name: "legacy: using external services (Redis, PostgreSQL, S3)"
@@ -150,6 +152,17 @@ jobs:
             use_external_pg: true
             use_external_s3: true
             use_external_es: false
+            use_external_mysql: false
+
+          # Test all external components together (legacy) - Redis, MySQL, S3
+          - config_name: "legacy: using external services (Redis, MySQL, S3)"
+            values_file: "values-legacy-external-mysql-all.yaml"
+            use_eso: false
+            use_external_redis: true
+            use_external_pg: false
+            use_external_s3: true
+            use_external_es: false
+            use_external_mysql: true
 
           # Test ESO mechanism with built-in components (validates ESO integration)
           - config_name: "external-secrets: using built-in components"
@@ -159,6 +172,7 @@ jobs:
             use_external_pg: false
             use_external_s3: false
             use_external_es: false
+            use_external_mysql: false
 
           # Test ESO with all external components (most complex scenario, validates ESO with external services)
           - config_name: "external-secrets: using external services (S3, PostgreSQL, Elasticsearch, Redis)"
@@ -168,6 +182,7 @@ jobs:
             use_external_pg: true
             use_external_s3: true
             use_external_es: true
+            use_external_mysql: false
 
           # Test OTEL integration with ESO (modern stack)
           - config_name: "external-secrets + OTEL: using external services (OpenTelemetry)"
@@ -177,6 +192,7 @@ jobs:
             use_external_pg: false
             use_external_s3: false
             use_external_es: false
+            use_external_mysql: false
             use_otel_collector: true
 
     name: ${{ matrix.config_name }}
@@ -317,6 +333,26 @@ jobs:
           chmod +x ci/scripts/setup-external-postgres-dns.sh
           ci/scripts/setup-external-postgres-dns.sh
 
+      - name: Install external MySQL
+        if: matrix.use_external_mysql
+        run: |
+          echo "Installing external MySQL..."
+          helm install external-mysql bitnami/mysql \
+            --version 10.3.0 \
+            --set image.repository="bitnamilegacy/mysql" \
+            --set auth.rootPassword="difyai123456" \
+            --set auth.database="dify" \
+            --set primary.service.type="ClusterIP" \
+            --set primary.service.ports.mysql=3306 \
+            --wait \
+            --timeout 300s
+
+      - name: Setup external MySQL DNS
+        if: matrix.use_external_mysql
+        run: |
+          chmod +x ci/scripts/setup-external-mysql-dns.sh
+          ci/scripts/setup-external-mysql-dns.sh
+
       - name: Install MinIO
         if: matrix.use_external_s3
         run: |
@@ -445,6 +481,7 @@ jobs:
           echo "Tested Configurations:"
           echo "- Legacy: Built-in (PostgreSQL, Redis) - baseline"
           echo "- Legacy: External services (Redis, PostgreSQL, S3) - merged external components"
+          echo "- Legacy: External services (Redis, MySQL, S3) - merged external components with MySQL"
           echo "- ESO: Built-in (PostgreSQL, Redis) - validates ESO mechanism"
           echo "- ESO: External services (S3, PostgreSQL, Elasticsearch, Redis) - most complex scenario"
           echo "- ESO + OTEL: External services (OpenTelemetry) - modern stack"
