@@ -337,13 +337,13 @@ jobs:
         if: matrix.use_external_mysql
         run: |
           echo "Installing external MySQL..."
-          helm install external-mysql bitnamilegacy/mysql \
+          helm install external-mysql bitnami/mysql \
             --version 10.3.0 \
+            --set image.repository="bitnamilegacy/mysql" \
             --set auth.rootPassword="difyai123456" \
             --set auth.database="dify" \
             --set primary.service.type="ClusterIP" \
             --set primary.service.ports.mysql=3306 \
-            --set primary.persistence.enabled=false \
             --wait \
             --timeout 300s
 
