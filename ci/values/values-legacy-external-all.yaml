@@ -1387,7 +1387,7 @@ tolerations: []
 affinity: {}
 
 redis:
-  enabled: true
+  enabled: false
   ## @section Global parameters
   ## Global Docker image parameters
   ## Please, note that this will override the image parameters, including dependencies, configured to use the global value
@@ -2539,8 +2539,8 @@ externalPostgres:
 # - these configs applies only if `externalRedis.enabled` is true
 ###################################
 externalRedis:
-  enabled: false
-  host: "redis.example"
+  enabled: true
+  host: "redis-master"
   port: 6379
   username: ""
   password: "difyai123456"
@@ -2563,11 +2563,11 @@ externalRedis:
 # - these configs applies only if `externalS3.enabled` is true
 ###################################
 externalS3:
-  enabled: false
-  endpoint: "https://xxx.r2.cloudflarestorage.com"
-  pathStyle: false
-  accessKey: "ak-difyai"
-  secretKey: "sk-difyai"
+  enabled: true
+  endpoint: "http://minio:9000"
+  pathStyle: true
+  accessKey: "minio-root"
+  secretKey: "minio123456"
   bucketName:
     # Shared storage for `api` and `worker`
     api: "difyai"
