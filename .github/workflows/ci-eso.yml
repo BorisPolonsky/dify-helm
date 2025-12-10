@@ -17,19 +17,11 @@ on:
         required: false
         type: choice
         options:
-          - "legacy: using built-in PostgreSQL and built-in Redis"
-          - "legacy: using external redis and built-in(PostgreSQL)"
-          - "legacy: using external PostgreSQL and built-in Redis"
-          - "legacy: using external S3 and built-in PostgreSQL and Redis"
-          - "legacy: using external Elasticsearch"
-          - "legacy + OTEL: using built-in (pg, redis)"
-          - "external-secrets: using built-in (pg, redis)"
-          - "external-secrets: using external (pg)"
-          - "external-secrets: using external (s3)"
-          - "external-secrets: using external (redis)"
-          - "external-secrets: using external (es)"
-          - "external-secrets: using external (s3, pg, es, redis)"
-          - "external-secrets + OTEL: using built-in (pg, redis)"
+          - "legacy: using built-in components (baseline)"
+          - "legacy: using external services (Redis, PostgreSQL, S3)"
+          - "external-secrets: using built-in components"
+          - "external-secrets: using external services (S3, PostgreSQL, Elasticsearch, Redis)"
+          - "external-secrets + OTEL: using external services (OpenTelemetry)"
 
   pull_request:
     branches:
@@ -141,7 +133,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - config_name: "legacy: using built-in PostgreSQL and built-in Redis"
+          # Baseline: All built-in components (legacy)
+          - config_name: "legacy: using built-in components (baseline)"
             values_file: "values-legacy.yaml"
             use_eso: false
             use_external_redis: false
@@ -149,48 +142,17 @@ jobs:
             use_external_s3: false
             use_external_es: false
 
-          - config_name: "legacy: using external redis and built-in(PostgreSQL)"
-            values_file: "values-legacy-external-redis.yaml"
+          # Test all external components together (legacy) - Redis, PostgreSQL, S3
+          - config_name: "legacy: using external services (Redis, PostgreSQL, S3)"
+            values_file: "values-legacy-external-all.yaml"
             use_eso: false
             use_external_redis: true
-            use_external_pg: false
-            use_external_s3: false
-            use_external_es: false
-
-          - config_name: "legacy: using external PostgreSQL and built-in Redis"
-            values_file: "values-legacy-external-pg.yaml"
-            use_eso: false
-            use_external_redis: false
             use_external_pg: true
-            use_external_s3: false
-            use_external_es: false
-
-          - config_name: "legacy: using external S3 and built-in PostgreSQL and Redis"
-            values_file: "values-legacy-external-s3.yaml"
-            use_eso: false
-            use_external_redis: false
-            use_external_pg: false
             use_external_s3: true
             use_external_es: false
 
-          - config_name: "legacy: using external Elasticsearch"
-            values_file: "values-legacy-external-es.yaml"
-            use_eso: false
-            use_external_redis: false
-            use_external_pg: false
-            use_external_s3: false
-            use_external_es: true
-
-          - config_name: "legacy + OTEL: using built-in (pg, redis)"
-            values_file: "values-legacy-otel.yaml"
-            use_eso: false
-            use_external_redis: false
-            use_external_pg: false
-            use_external_s3: false
-            use_external_es: false
-            use_otel_collector: true
-
-          - config_name: "external-secrets: using built-in (pg, redis)"
+          # Test ESO mechanism with built-in components (validates ESO integration)
+          - config_name: "external-secrets: using built-in components"
             values_file: "values-eso.yaml"
             use_eso: true
             use_external_redis: false
@@ -198,39 +160,8 @@ jobs:
             use_external_s3: false
             use_external_es: false
 
-          - config_name: "external-secrets: using external (pg)"
-            values_file: "values-eso-external-pg.yaml"
-            use_eso: true
-            use_external_redis: false
-            use_external_pg: true
-            use_external_s3: false
-            use_external_es: false
-
-          - config_name: "external-secrets: using external (s3)"
-            values_file: "values-eso-external-s3.yaml"
-            use_eso: true
-            use_external_redis: false
-            use_external_pg: false
-            use_external_s3: true
-            use_external_es: false
-
-          - config_name: "external-secrets: using external (redis)"
-            values_file: "values-eso-external-redis.yaml"
-            use_eso: true
-            use_external_redis: true
-            use_external_pg: false
-            use_external_s3: false
-            use_external_es: false
-
-          - config_name: "external-secrets: using external (es)"
-            values_file: "values-eso-external-es.yaml"
-            use_eso: true
-            use_external_redis: false
-            use_external_pg: false
-            use_external_s3: false
-            use_external_es: true
-
-          - config_name: "external-secrets: using external (s3, pg, es, redis)"
+          # Test ESO with all external components (most complex scenario, validates ESO with external services)
+          - config_name: "external-secrets: using external services (S3, PostgreSQL, Elasticsearch, Redis)"
             values_file: "values-eso-external-s3-pg-es-redis.yaml"
             use_eso: true
             use_external_redis: true
@@ -238,7 +169,8 @@ jobs:
             use_external_s3: true
             use_external_es: true
 
-          - config_name: "external-secrets + OTEL: using built-in (pg, redis)"
+          # Test OTEL integration with ESO (modern stack)
+          - config_name: "external-secrets + OTEL: using external services (OpenTelemetry)"
             values_file: "values-eso-otel.yaml"
             use_eso: true
             use_external_redis: false
@@ -511,12 +443,10 @@ jobs:
           fi
           echo ""
           echo "Tested Configurations:"
-          echo "- ESO + Built-in PostgreSQL"
-          echo "- ESO + External PostgreSQL"
-          echo "- ESO + External S3 bucket"
-          echo "- ESO + External S3 + External PostgreSQL"
-          echo "- Legacy + Built-in PostgreSQL"
-          echo "- Legacy + External PostgreSQL"
-          echo "- Legacy + External S3"
+          echo "- Legacy: Built-in (PostgreSQL, Redis) - baseline"
+          echo "- Legacy: External services (Redis, PostgreSQL, S3) - merged external components"
+          echo "- ESO: Built-in (PostgreSQL, Redis) - validates ESO mechanism"
+          echo "- ESO: External services (S3, PostgreSQL, Elasticsearch, Redis) - most complex scenario"
+          echo "- ESO + OTEL: External services (OpenTelemetry) - modern stack"
           echo ""
           echo "CI Pipeline completed successfully!"
