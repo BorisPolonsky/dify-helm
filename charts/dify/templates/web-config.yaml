@@ -4,6 +4,6 @@ metadata:
   name: {{ template "dify.web.fullname" . }}
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    app.kubernetes.io/component: web
+    component: web
 data:
   {{- include "dify.web.config" . | nindent 2 }}

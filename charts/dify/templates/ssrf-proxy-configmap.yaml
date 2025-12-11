@@ -5,7 +5,7 @@ metadata:
   name: {{ template "dify.ssrfProxy.fullname" . }}
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    app.kubernetes.io/component: ssrf-proxy
+    component: ssrf-proxy
 data:
   squid.conf: |-
     {{- include "dify.ssrfProxy.config.squid" . | indent 4 }}

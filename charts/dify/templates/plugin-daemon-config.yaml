@@ -4,6 +4,6 @@ metadata:
   name: {{ template "dify.pluginDaemon.fullname" . }}
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    app.kubernetes.io/component: plugin-daemon
+    component: plugin-daemon
 data:
   {{- include "dify.pluginDaemon.config" . | nindent 2 }}

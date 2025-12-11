@@ -4,6 +4,6 @@ metadata:
   name: {{ template "dify.sandbox.fullname" . }}
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    app.kubernetes.io/component: sandbox
+    component: sandbox
 data:
   {{- include "dify.sandbox.config" . | nindent 2 }}

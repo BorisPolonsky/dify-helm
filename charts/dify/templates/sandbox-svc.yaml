@@ -8,7 +8,7 @@ metadata:
 {{- if .Values.sandbox.service.labels }}
 {{ toYaml .Values.sandbox.service.labels | indent 4 }}
 {{- end }}
-    app.kubernetes.io/component: "sandbox"
+    component: "sandbox"
 {{- with .Values.sandbox.service.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
@@ -25,5 +25,5 @@ spec:
       targetPort: sandbox
   selector:
 {{ include "dify.selectorLabels" . | indent 4 }}
-    app.kubernetes.io/component: "sandbox"
+    component: "sandbox"
 {{- end }}

@@ -20,7 +20,7 @@ metadata:
     descriptions: plugin-daemon
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    app.kubernetes.io/component: plugin-daemon
+    component: plugin-daemon
     # app: {{ template "dify.pluginDaemon.fullname" . }}
 {{ include "dify.ud.labels" . | indent 4 }}
   name: {{ template "dify.pluginDaemon.fullname" . }}
@@ -29,7 +29,7 @@ spec:
   selector:
     matchLabels:
 {{- include "dify.selectorLabels" . | nindent 6 }}
-      app.kubernetes.io/component: plugin-daemon
+      component: plugin-daemon
       {{/*
       # Required labels for istio
       # app: {{ template "dify.pluginDaemon.fullname" . }}
@@ -46,7 +46,7 @@ spec:
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
-        app.kubernetes.io/component: plugin-daemon
+        component: plugin-daemon
         {{/*
         # Required labels for istio
         # app: {{ template "dify.pluginDaemon.fullname" . }}

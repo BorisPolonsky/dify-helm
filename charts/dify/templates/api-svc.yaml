@@ -8,7 +8,7 @@ metadata:
 {{- if .Values.api.service.labels }}
 {{ toYaml .Values.api.service.labels | indent 4 }}
 {{- end }}
-    app.kubernetes.io/component: "api"
+    component: "api"
 {{- with .Values.api.service.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
@@ -25,5 +25,5 @@ spec:
       targetPort: api
   selector:
 {{ include "dify.selectorLabels" . | indent 4 }}
-    app.kubernetes.io/component: "api"
+    component: "api"
 {{- end }}

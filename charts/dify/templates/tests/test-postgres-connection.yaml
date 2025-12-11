@@ -9,7 +9,7 @@ metadata:
   name: "{{ include "dify.fullname" . }}-test-postgres-connection"
   labels:
     {{- include "dify.labels" . | nindent 4 }}
-    app.kubernetes.io/component: "test-postgres"
+    component: "postgres"
   annotations:
     "helm.sh/hook": test
 spec:
