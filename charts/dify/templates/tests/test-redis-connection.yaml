@@ -4,7 +4,7 @@ metadata:
   name: "{{ include "dify.fullname" . }}-test-redis-connection"
   labels:
     {{- include "dify.labels" . | nindent 4 }}
-    component: "redis"
+    component: "redis-conn-test"
   annotations:
     "helm.sh/hook": test
 spec:
