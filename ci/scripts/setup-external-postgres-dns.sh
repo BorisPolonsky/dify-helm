@@ -9,7 +9,7 @@ kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=postgresql --ti
 
 # Test database connection
 echo "INFO: Testing database connection..."
-kubectl run postgres-test --rm --image=postgres:15 --restart=Never -- \
+kubectl run postgres-test --rm --image=bitnamilegacy/postgresql:15.3.0-debian-11-r7 --restart=Never -- \
   psql -h external-postgres-postgresql -U postgres -d dify -c "\l" || echo "Connection test completed"
 
 # Get the PostgreSQL service cluster IP
