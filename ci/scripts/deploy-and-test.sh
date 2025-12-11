@@ -610,6 +610,18 @@ check_secrets_and_configs() {
     else
         # For traditional deployments, use Helm labels
         secrets=$(kubectl get secrets -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || echo "")
+
+        # TODO: Remove this workaround once chart secrets include app.kubernetes.io/instance label
+        # Also check for specific expected secrets by name (chart secrets may not have app.kubernetes.io/instance label)
+        # This is needed when using external services (no built-in Redis/PostgreSQL) where chart secrets don't get the label
+        local expected_secrets="${RELEASE_NAME}-api ${RELEASE_NAME}-worker ${RELEASE_NAME}-sandbox ${RELEASE_NAME}-plugin-daemon"
+        for expected in $expected_secrets; do
+            if kubectl get secret "$expected" -n "$NAMESPACE" >/dev/null 2>&1; then
+                if [[ ! "$secrets" =~ $expected ]]; then
+                    secrets="$secrets $expected"
+                fi
+            fi
+        done
     fi
 
     if [[ -z "$secrets" ]]; then
@@ -630,6 +642,18 @@ check_secrets_and_configs() {
 
     # Check configmaps
     local configmaps=$(kubectl get configmaps -n "$NAMESPACE" -l app.kubernetes.io/instance="$RELEASE_NAME" -o jsonpath='{.items[*].metadata.name}' 2>/dev/null || echo "")
+
+    # TODO: Remove this workaround once chart ConfigMaps include app.kubernetes.io/instance label
+    # Also check for specific expected ConfigMaps by name (chart ConfigMaps may not have app.kubernetes.io/instance label)
+    local expected_configmaps="${RELEASE_NAME}-api ${RELEASE_NAME}-worker ${RELEASE_NAME}-sandbox ${RELEASE_NAME}-plugin-daemon ${RELEASE_NAME}-proxy ${RELEASE_NAME}-ssrf-proxy"
+    for expected in $expected_configmaps; do
+        if kubectl get configmap "$expected" -n "$NAMESPACE" >/dev/null 2>&1; then
+            if [[ ! "$configmaps" =~ $expected ]]; then
+                configmaps="$configmaps $expected"
+            fi
+        fi
+    done
+    
     if [[ -n "$configmaps" ]]; then
         echo "INFO: Found configmaps: $configmaps"
         for cm in $configmaps; do
