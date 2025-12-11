@@ -9,11 +9,11 @@ kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=mysql --timeout
 
 # Test database connection
 echo "INFO: Testing database connection..."
-kubectl run mysql-test --rm --image=mysql:8.0 --restart=Never -- \
-  mysql -h external-mysql-mysql -u root -pdifyai123456 -e "SHOW DATABASES;" || echo "Connection test completed"
+kubectl run mysql-test --image=bitnamilegacy/mysql:8.0.37-debian-12-r2 --restart=Never --rm -i -- \
+  mysql -h external-mysql -u root -pdifyai123456 -e "SHOW DATABASES;" || echo "Connection test completed"
 
 # Get the MySQL service cluster IP
-MYSQL_IP=$(kubectl get service external-mysql-mysql -o jsonpath='{.spec.clusterIP}')
+MYSQL_IP=$(kubectl get service external-mysql -o jsonpath='{.spec.clusterIP}')
 echo "INFO: MySQL service IP: $MYSQL_IP"
 
 # Update CoreDNS to simulate external hostname resolution
@@ -31,5 +31,5 @@ kubectl run dns-test --rm --image=busybox --restart=Never -- nslookup mysql1.uat
 
 echo "SUCCESS: External MySQL DNS setup completed"
 echo "INFO: MySQL available at: mysql1.uat.internal.dify.ai:3306"
-echo "INFO: Internal service: external-mysql-mysql:3306"
+echo "INFO: Internal service: external-mysql:3306"
 
