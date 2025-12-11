@@ -4,7 +4,7 @@ metadata:
   name: "{{ include "dify.fullname" . }}-test-redis-connection"
   labels:
     {{- include "dify.labels" . | nindent 4 }}
-    component: "redis"
+    app.kubernetes.io/component: "test-redis"
   annotations:
     "helm.sh/hook": test
 spec:

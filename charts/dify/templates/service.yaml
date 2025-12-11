@@ -9,7 +9,7 @@ metadata:
 {{ toYaml .Values.service.labels | indent 4 }}
 {{- end }}
 {{- if .Values.proxy.enabled }}
-    component: "proxy"
+    app.kubernetes.io/component: "proxy"
 {{- end }}
 {{- with .Values.service.annotations }}
   annotations:
@@ -44,6 +44,6 @@ spec:
   selector:
 {{ include "dify.selectorLabels" . | indent 4 }}
 {{- if and .Values.proxy.enabled }}
-    component: "proxy"
+    app.kubernetes.io/component: "proxy"
 {{- end }}
 {{- end }}

@@ -8,7 +8,7 @@ metadata:
 {{- if .Values.pluginDaemon.service.labels }}
 {{ toYaml .Values.pluginDaemon.service.labels | indent 4 }}
 {{- end }}
-    component: "plugin-daemon"
+    app.kubernetes.io/component: "plugin-daemon"
 {{- with .Values.pluginDaemon.service.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
@@ -31,5 +31,5 @@ spec:
     {{- end }}
   selector:
 {{ include "dify.selectorLabels" . | indent 4 }}
-    component: "plugin-daemon"
+    app.kubernetes.io/component: "plugin-daemon"
 {{- end }}

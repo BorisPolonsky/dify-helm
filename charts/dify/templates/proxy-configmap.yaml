@@ -4,7 +4,7 @@ metadata:
   name: {{ template "dify.nginx.fullname" . }}
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    component: proxy
+    app.kubernetes.io/component: proxy
 data:
   proxy.conf: |-
     {{- include "dify.nginx.config.proxy" . | indent 4 }}

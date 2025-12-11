@@ -8,7 +8,7 @@ metadata:
     descriptions: worker
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    component: worker
+    app.kubernetes.io/component: worker
     # app: {{ template "dify.worker.fullname" . }}
 {{ include "dify.ud.labels" . | indent 4 }}
   name: {{ template "dify.worker.fullname" . }}
@@ -17,7 +17,7 @@ spec:
   selector:
     matchLabels:
 {{- include "dify.selectorLabels" . | nindent 6 }}
-      component: worker
+      app.kubernetes.io/component: worker
       {{/*
       # Required labels for istio
       # app: {{ template "dify.worker.fullname" . }}
@@ -34,7 +34,7 @@ spec:
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
-        component: worker
+        app.kubernetes.io/component: worker
         {{/*
         # Required labels for istio
         # app: {{ template "dify.worker.fullname" . }}

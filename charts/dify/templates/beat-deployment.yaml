@@ -7,7 +7,7 @@ metadata:
     descriptions: beat
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    component: beat
+    app.kubernetes.io/component: beat
     # app: {{ template "dify.beat.fullname" . }}
 {{ include "dify.ud.labels" . | indent 4 }}
   name: {{ template "dify.beat.fullname" . }}
@@ -16,7 +16,7 @@ spec:
   selector:
     matchLabels:
 {{- include "dify.selectorLabels" . | nindent 6 }}
-      component: beat
+      app.kubernetes.io/component: beat
       {{/*
       # Required labels for istio
       # app: {{ template "dify.beat.fullname" . }}
@@ -31,7 +31,7 @@ spec:
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
-        component: beat
+        app.kubernetes.io/component: beat
         {{/*
         # Required labels for istio
         # app: {{ template "dify.beat.fullname" . }}

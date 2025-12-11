@@ -7,7 +7,7 @@ metadata:
     descriptions: web server
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    component: web
+    app.kubernetes.io/component: web
     # app: {{ template "dify.web.fullname" . }}
 {{ include "dify.ud.labels" . | indent 4 }}
   name: {{ template "dify.web.fullname" . }}
@@ -16,7 +16,7 @@ spec:
   selector:
     matchLabels:
 {{- include "dify.selectorLabels" . | nindent 6 }}
-      component: web
+      app.kubernetes.io/component: web
       {{/*
       # Required labels for istio
       # app: {{ template "dify.web.fullname" . }}
@@ -32,7 +32,7 @@ spec:
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
-        component: web
+        app.kubernetes.io/component: web
         {{/*
         # Required labels for istio
         # app: {{ template "dify.web.fullname" . }}

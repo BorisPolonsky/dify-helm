@@ -7,7 +7,7 @@ metadata:
     descriptions: 'SSRF Proxy'
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    component: ssrf-proxy
+    app.kubernetes.io/component: ssrf-proxy
     # app: {{ template "dify.ssrfProxy.fullname" . }}
 {{ include "dify.ud.labels" . | indent 4 }}
   name: {{ template "dify.ssrfProxy.fullname" . }}
@@ -16,7 +16,7 @@ spec:
   selector:
     matchLabels:
 {{- include "dify.selectorLabels" . | nindent 6 }}
-      component: ssrf-proxy
+      app.kubernetes.io/component: ssrf-proxy
       {{/*
       # Required labels for istio
       # app: {{ template "dify.ssrfProxy.fullname" . }}
@@ -32,7 +32,7 @@ spec:
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
-        component: ssrf-proxy
+        app.kubernetes.io/component: ssrf-proxy
         {{/*
         # Required labels for istio
         # app: {{ template "dify.ssrfProxy.fullname" . }}

@@ -8,7 +8,7 @@ metadata:
 {{- if .Values.web.service.labels }}
 {{ toYaml .Values.web.service.labels | indent 4 }}
 {{- end }}
-    component: "web"
+    app.kubernetes.io/component: "web"
 {{- with .Values.web.service.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
@@ -25,5 +25,5 @@ spec:
       targetPort: web
   selector:
 {{ include "dify.selectorLabels" . | indent 4 }}
-    component: "web"
+    app.kubernetes.io/component: "web"
 {{- end }}

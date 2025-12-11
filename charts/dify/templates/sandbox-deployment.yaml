@@ -7,7 +7,7 @@ metadata:
     descriptions: sandbox
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    component: sandbox
+    app.kubernetes.io/component: sandbox
     # app: {{ template "dify.sandbox.fullname" . }}
 {{ include "dify.ud.labels" . | indent 4 }}
   name: {{ template "dify.sandbox.fullname" . }}
@@ -16,7 +16,7 @@ spec:
   selector:
     matchLabels:
 {{- include "dify.selectorLabels" . | nindent 6 }}
-      component: sandbox
+      app.kubernetes.io/component: sandbox
       {{/*
       # Required labels for istio
       # app: {{ template "dify.sandbox.fullname" . }}
@@ -33,7 +33,7 @@ spec:
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
-        component: sandbox
+        app.kubernetes.io/component: sandbox
         {{/*
         # Required labels for istio
         # app: {{ template "dify.sandbox.fullname" . }}

@@ -7,7 +7,7 @@ metadata:
     descriptions: nginx proxy
   labels:
 {{- include "dify.labels" . | nindent 4 }}
-    component: proxy
+    app.kubernetes.io/component: proxy
     # app: {{ template "dify.nginx.fullname" . }}
 {{ include "dify.ud.labels" . | indent 4 }}
   name: {{ template "dify.nginx.fullname" . }}
@@ -16,7 +16,7 @@ spec:
   selector:
     matchLabels:
 {{- include "dify.selectorLabels" . | nindent 6 }}
-      component: proxy
+      app.kubernetes.io/component: proxy
       {{/*
       # Required labels for istio
       # app: {{ template "dify.nginx.fullname" . }}
@@ -32,7 +32,7 @@ spec:
 {{ include "dify.ud.annotations" . | indent 8 }}
       labels:
 {{- include "dify.selectorLabels" . | nindent 8 }}
-        component: proxy
+        app.kubernetes.io/component: proxy
         {{/*
         # Required labels for istio
         # app: {{ template "dify.nginx.fullname" . }}
