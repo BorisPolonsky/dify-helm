@@ -77,7 +77,7 @@ spec:
         {{- end }}
         ports:
           - name: dify
-            containerPort: 80
+            containerPort: {{ .Values.proxy.port | default 80 }}
             protocol: TCP
         resources:
           {{- toYaml .Values.proxy.resources | nindent 12 }}
