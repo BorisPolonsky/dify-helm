@@ -256,9 +256,18 @@ api:
   ## Ignored if `.Values.externalS3.enabled` is true
   ##
   persistence:
+    ## @param api.persistence.enabled Use volumes to persist data
+    ## (This controls the generic extra volumes/volumeMounts below; the default app-data PVC logic is controlled by external storage flags)
+    enabled: false
     mountPath: "/app/api/storage"
     annotations:
       helm.sh/resource-policy: keep
+    ## @param api.persistence.volumes Optionally specify extra list of additional volumes for the API pod(s)
+    ##
+    volumes: []
+    ## @param api.persistence.volumeMounts Optionally specify extra list of additional volumeMounts for the API container(s)
+    ##
+    volumeMounts: []
     persistentVolumeClaim:
       existingClaim: ""
       ## Dify App Data Persistent Volume Storage Class
@@ -345,6 +354,16 @@ worker:
   #        key: DB_PASSWORD
 
   logLevel: INFO
+  ## @param worker.persistence.enabled Use volumes to persist data
+  ##
+  persistence:
+    enabled: false
+    ## @param worker.persistence.volumes Optionally specify extra list of additional volumes for the worker pod(s)
+    ##
+    volumes: []
+    ## @param worker.persistence.volumeMounts Optionally specify extra list of additional volumeMounts for the worker container(s)
+    ##
+    volumeMounts: []
   ## Dify Worker ServiceAccount configuration
   ##
   serviceAccount:
@@ -403,6 +422,16 @@ beat:
   # - name: ENABLE_CLEAN_EMBEDDING_CACHE_TASK
   #   value: "false"
   logLevel: INFO
+  ## @param beat.persistence.enabled Use volumes to persist data
+  ##
+  persistence:
+    enabled: false
+    ## @param beat.persistence.volumes Optionally specify extra list of additional volumes for the beat pod(s)
+    ##
+    volumes: []
+    ## @param beat.persistence.volumeMounts Optionally specify extra list of additional volumeMounts for the beat container(s)
+    ##
+    volumeMounts: []
   ## celery beat ServiceAccount configuration
   ##
   serviceAccount:
@@ -471,6 +500,16 @@ proxy:
         accessModes: ReadWriteMany
         size: 1Gi
         subPath: ""
+  ## @param proxy.persistence.enabled Use volumes to persist data
+  ##
+  persistence:
+    enabled: false
+    ## @param proxy.persistence.volumes Optionally specify extra list of additional volumes for the proxy pod(s)
+    ##
+    volumes: []
+    ## @param proxy.persistence.volumeMounts Optionally specify extra list of additional volumeMounts for the proxy container(s)
+    ##
+    volumeMounts: []
   ## Proxy ServiceAccount configuration
   ##
   serviceAccount:
@@ -569,6 +608,16 @@ web:
   ## @param web.enableServiceLinks Disable this feature if additional environment variables would lead to `E2BIG` errors in case frontend were managed by `pm2`
   ##
   enableServiceLinks: false
+  ## @param web.persistence.enabled Use volumes to persist data
+  ##
+  persistence:
+    enabled: false
+    ## @param web.persistence.volumes Optionally specify extra list of additional volumes for the web pod(s)
+    ##
+    volumes: []
+    ## @param web.persistence.volumeMounts Optionally specify extra list of additional volumeMounts for the web container(s)
+    ##
+    volumeMounts: []
 
 sandbox:
   enabled: true
@@ -713,6 +762,16 @@ ssrfProxy:
         accessModes: ReadWriteMany
         size: 1Gi
         subPath: ""
+  ## @param ssrfProxy.persistence.enabled Use volumes to persist data
+  ##
+  persistence:
+    enabled: false
+    ## @param ssrfProxy.persistence.volumes Optionally specify extra list of additional volumes for the ssrfProxy pod(s)
+    ##
+    volumes: []
+    ## @param ssrfProxy.persistence.volumeMounts Optionally specify extra list of additional volumeMounts for the ssrfProxy container(s)
+    ##
+    volumeMounts: []
   service:
     port: 3128
     annotations: {}
@@ -779,9 +838,18 @@ pluginDaemon:
   ## Ignored if external object storage were configured via `.Values.externalS3` sections.
   ##
   persistence:
+    ## @param pluginDaemon.persistence.enabled Use volumes to persist data
+    ##
+    enabled: false
     mountPath: "/app/storage"
     annotations:
       helm.sh/resource-policy: keep
+    ## @param pluginDaemon.persistence.volumes Optionally specify extra list of additional volumes for the pluginDaemon pod(s)
+    ##
+    volumes: []
+    ## @param pluginDaemon.persistence.volumeMounts Optionally specify extra list of additional volumeMounts for the pluginDaemon container(s)
+    ##
+    volumeMounts: []
     persistentVolumeClaim:
       existingClaim: ""
       ## Dify Plugin Daemon Persistent Volume Storage Class

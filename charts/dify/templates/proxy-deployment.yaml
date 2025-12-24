@@ -99,6 +99,9 @@ spec:
           mountPath: {{ .Values.proxy.log.persistence.mountPath | quote }}
           subPath: {{ .Values.proxy.log.persistence.persistentVolumeClaim.subPath | default "" }}
         {{- end }}
+        {{- if and .Values.proxy.persistence.enabled .Values.proxy.persistence.volumeMounts }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.proxy.persistence.volumeMounts "context" $) | nindent 8 }}
+        {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.proxy.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
@@ -132,5 +135,8 @@ spec:
       - name: nginx-logs-disk
         persistentVolumeClaim:
           claimName: {{ .Values.proxy.log.persistence.persistentVolumeClaim.existingClaim | default (printf "%s-logs" (include "dify.nginx.fullname" . | trunc 58)) }}
+      {{- end }}
+      {{- if and .Values.proxy.persistence.enabled .Values.proxy.persistence.volumes }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.proxy.persistence.volumes "context" $) | nindent 6 }}
       {{- end }}
 {{- end }}

@@ -109,6 +109,9 @@ spec:
           mountPath: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
           subPath: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.subPath | default "" }}
         {{- end }}
+        {{- if and .Values.pluginDaemon.persistence.enabled .Values.pluginDaemon.persistence.volumeMounts }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.persistence.volumeMounts "context" $) | nindent 8 }}
+        {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.pluginDaemon.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
@@ -138,5 +141,8 @@ spec:
       - name: app-data
         persistentVolumeClaim:
           claimName: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.pluginDaemon.fullname" . | trunc 58)) }}
+      {{- end }}
+      {{- if and .Values.pluginDaemon.persistence.enabled .Values.pluginDaemon.persistence.volumes }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.persistence.volumes "context" $) | nindent 6 }}
       {{- end }}
 {{- end }}
