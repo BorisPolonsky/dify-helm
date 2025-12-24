@@ -449,6 +449,9 @@ proxy:
   # Apply your own Environment Variables if necessary
   # - name: LANG
   #   value: "C.UTF-8"
+
+  ## @param proxy.useDefaultUser Use default user for nginx
+  useDefaultUser: false
   log:
     persistence:
       ## If true, create/use a Persistent Volume Claim for log

@@ -531,7 +531,9 @@ proxy_send_timeout 3600s;
 {{- end }}
 
 {{- define "dify.nginx.config.nginx" }}
+{{- if not .Values.proxy.useDefaultUser }}
 user  nginx;
+{{- end }}
 worker_processes  auto;
 {{- if .Values.proxy.log.persistence.enabled }}
 error_log  {{ .Values.proxy.log.persistence.mountPath }}/error.log notice;
