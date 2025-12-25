@@ -531,12 +531,18 @@ proxy_send_timeout 3600s;
 {{- end }}
 
 {{- define "dify.nginx.config.nginx" }}
+{{- if or (not .Values.proxy.containerSecurityContext.enabled) (and .Values.proxy.containerSecurityContext.enabled (eq (int (default 0 .Values.proxy.containerSecurityContext.runAsUser)) 0)) }}
 user  nginx;
+{{- end }}
 worker_processes  auto;
 {{- if .Values.proxy.log.persistence.enabled }}
 error_log  {{ .Values.proxy.log.persistence.mountPath }}/error.log notice;
 {{- end }}
+{{- if and .Values.proxy.containerSecurityContext.enabled (ne (int (default 0 .Values.proxy.containerSecurityContext.runAsUser)) 0) }}
+pid        /tmp/nginx.pid;
+{{- else }}
 pid        /var/run/nginx.pid;
+{{- end }}
 
 
 events {

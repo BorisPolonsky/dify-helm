@@ -441,10 +441,26 @@ proxy:
   ## @param proxy.updateStrategy Update strategy type and configuration parameters
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
-  # Configure Pods Security Context
-  podSecurityContext: {}
-  # Configure Container Security Context
-  containerSecurityContext: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param proxy.podSecurityContext.enabled Enabled Dify proxy pod's Security Context
+  ## @param proxy.podSecurityContext.fsGroup Set Dify proxy pod's Security Context fsGroup
+  ## NOTE: Disabled by default to maintain backward compatibility with existing PVCs created as root.
+  ## Enable this when deploying fresh or after ensuring PVC permissions are correct for non-root user.
+  ##
+  podSecurityContext:
+    enabled: false
+    fsGroup: 101
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param proxy.containerSecurityContext.enabled Dify proxy containers' Security Context
+  ## @param proxy.containerSecurityContext.runAsUser Set Dify proxy containers' Security Context runAsUser
+  ## NOTE: Disabled by default to maintain backward compatibility with existing PVCs created as root.
+  ## Enable this when deploying fresh or after ensuring PVC permissions are correct for non-root user (UID 101).
+  ##
+  containerSecurityContext:
+    enabled: false
+    runAsUser: 101
   extraEnv:
   # Apply your own Environment Variables if necessary
   # - name: LANG
