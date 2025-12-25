@@ -539,7 +539,7 @@ worker_processes  auto;
 error_log  {{ .Values.proxy.log.persistence.mountPath }}/error.log notice;
 {{- end }}
 {{- if and .Values.proxy.containerSecurityContext.enabled (ne (int (default 0 .Values.proxy.containerSecurityContext.runAsUser)) 0) }}
-pid        /tmp/nginx.pid;
+pid        /var/run/nginx/nginx.pid;
 {{- else }}
 pid        /var/run/nginx.pid;
 {{- end }}

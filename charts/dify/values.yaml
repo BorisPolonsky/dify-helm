@@ -451,6 +451,7 @@ proxy:
   podSecurityContext:
     enabled: false
     fsGroup: 101
+    fsGroupChangePolicy: "Always"
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param proxy.containerSecurityContext.enabled Dify proxy containers' Security Context

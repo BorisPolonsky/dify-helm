@@ -100,6 +100,8 @@ spec:
         {{- if and .Values.proxy.containerSecurityContext.enabled (ne (int (default 0 .Values.proxy.containerSecurityContext.runAsUser)) 0) }}
         - name: nginx-cache
           mountPath: /var/cache/nginx
+        - name: nginx-run
+          mountPath: /var/run/nginx
         {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.proxy.nodeSelector) }}
       nodeSelector:
@@ -137,6 +139,8 @@ spec:
       {{- end }}
       {{- if and .Values.proxy.containerSecurityContext.enabled (ne (int (default 0 .Values.proxy.containerSecurityContext.runAsUser)) 0) }}
       - name: nginx-cache
+        emptyDir: {}
+      - name: nginx-run
         emptyDir: {}
       {{- end }}
 {{- end }}
