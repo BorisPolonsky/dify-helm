@@ -89,6 +89,9 @@ spec:
           mountPath: {{ .Values.ssrfProxy.log.persistence.mountPath | quote }}
           subPath: {{ .Values.ssrfProxy.log.persistence.persistentVolumeClaim.subPath | default "" }}
         {{- end }}
+        {{- if and .Values.ssrfProxy.persistence.enabled .Values.ssrfProxy.persistence.volumeMounts }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.persistence.volumeMounts "context" $) | nindent 8 }}
+        {{- end }}
         resources:
           {{- toYaml .Values.ssrfProxy.resources | nindent 12 }}
     {{- if and (.Values.nodeSelector) (not .Values.ssrfProxy.nodeSelector) }}
@@ -124,5 +127,8 @@ spec:
       - name: squid-log
         persistentVolumeClaim:
           claimName: {{ .Values.ssrfProxy.log.persistence.persistentVolumeClaim.existingClaim | default (printf "%s-logs" (include "dify.ssrfProxy.fullname" . | trunc 58)) }}
+      {{- end }}
+      {{- if and .Values.ssrfProxy.persistence.enabled .Values.ssrfProxy.persistence.volumes }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.persistence.volumes "context" $) | nindent 6 }}
       {{- end }}
 {{- end }}
