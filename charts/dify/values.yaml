@@ -445,22 +445,18 @@ proxy:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param proxy.podSecurityContext.enabled Enabled Dify proxy pod's Security Context
   ## @param proxy.podSecurityContext.fsGroup Set Dify proxy pod's Security Context fsGroup
-  ## NOTE: Disabled by default to maintain backward compatibility with existing PVCs created as root.
-  ## Enable this when deploying fresh or after ensuring PVC permissions are correct for non-root user.
   ##
   podSecurityContext:
-    enabled: false
+    enabled: true
     fsGroup: 101
     fsGroupChangePolicy: "Always"
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param proxy.containerSecurityContext.enabled Dify proxy containers' Security Context
   ## @param proxy.containerSecurityContext.runAsUser Set Dify proxy containers' Security Context runAsUser
-  ## NOTE: Disabled by default to maintain backward compatibility with existing PVCs created as root.
-  ## Enable this when deploying fresh or after ensuring PVC permissions are correct for non-root user (UID 101).
   ##
   containerSecurityContext:
-    enabled: false
+    enabled: true
     runAsUser: 101
   extraEnv:
   # Apply your own Environment Variables if necessary
