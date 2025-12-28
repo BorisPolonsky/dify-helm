@@ -570,7 +570,7 @@ http {
 
 {{- define "dify.nginx.config.default" }}
 server {
-    listen {{ .Values.proxy.port | default 80 }};
+    listen 8080;
     server_name _;
 
     location /console/api {

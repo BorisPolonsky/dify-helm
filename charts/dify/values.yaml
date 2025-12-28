@@ -427,9 +427,6 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
-  priorityClassName: ""
-  ## @param proxy.port Custom port that overrides the default one
-  port: 80
   ## Configure extra options for proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param proxy.customLivenessProbe Custom livenessProbe that overrides the default one
