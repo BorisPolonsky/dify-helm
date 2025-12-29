@@ -456,6 +456,8 @@ proxy:
   customStartupProbe: {}
   ## @param proxy.clientMaxBodySize Custom client_max_body_size param nginx default: 15m
   clientMaxBodySize: ""
+  ## @param proxy.workerProcesses Number of worker processes for nginx. Set to 'auto' (string) to automatically detect the number of available CPUs, or specify an integer (e.g., 4) for a fixed number of worker processes.
+  workerProcesses: "auto"
   ## @param proxy.updateStrategy Update strategy type and configuration parameters
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
