@@ -101,13 +101,13 @@ spec:
             protocol: TCP
         resources:
           {{- toYaml .Values.sandbox.resources | nindent 12 }}
-        {{- if and .Values.sandbox.persistence.enabled .Values.sandbox.persistence.volumeMounts }}
+        {{- if .Values.sandbox.extraVolumeMounts }}
         volumeMounts:
-        {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.persistence.volumeMounts "context" $) | nindent 8 }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.extraVolumeMounts "context" $) | nindent 8 }}
         {{- end }}
-      {{- if and .Values.sandbox.persistence.enabled .Values.sandbox.persistence.volumes }}
+      {{- if .Values.sandbox.extraVolumes }}
       volumes:
-      {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.persistence.volumes "context" $) | nindent 6 }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.extraVolumes "context" $) | nindent 6 }}
       {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.sandbox.nodeSelector) }}
       nodeSelector:

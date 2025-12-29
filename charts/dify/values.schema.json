@@ -205,6 +205,8 @@
             }
           }
         },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
         "serviceAccount": {
           "type": "object",
           "properties": {
@@ -243,18 +245,8 @@
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
         "logLevel": { "type": "string" },
-        "persistence": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean" },
-            "volumes": { 
-              "type": "array"
-            },
-            "volumeMounts": { 
-              "type": "array"
-            }
-          }
-        },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
         "serviceAccount": {
           "type": "object",
           "properties": {
@@ -288,18 +280,8 @@
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
         "logLevel": { "type": "string" },
-        "persistence": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean" },
-            "volumes": { 
-              "type": "array"
-            },
-            "volumeMounts": { 
-              "type": "array"
-            }
-          }
-        },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
         "serviceAccount": {
           "type": "object",
           "properties": {
@@ -329,18 +311,8 @@
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
-        "persistence": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean" },
-            "volumes": { 
-              "type": "array"
-            },
-            "volumeMounts": { 
-              "type": "array"
-            }
-          }
-        },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
         "log": {
           "type": "object",
           "properties": {
@@ -434,18 +406,8 @@
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": "array" },
-        "persistence": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean" },
-            "volumes": { 
-              "type": "array"
-            },
-            "volumeMounts": { 
-              "type": "array"
-            }
-          }
-        },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
         "service": {
           "type": "object",
           "properties": {
@@ -526,6 +488,8 @@
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": "array" },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
         "service": {
           "type": "object",
           "properties": {
@@ -539,18 +503,6 @@
           "type": "object",
           "properties": {
             "apiKey": { "type": "string" }
-          }
-        },
-        "persistence": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean" },
-            "volumes": { 
-              "type": "array"
-            },
-            "volumeMounts": { 
-              "type": "array"
-            }
           }
         },
         "serviceAccount": {
@@ -581,18 +533,8 @@
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
-        "persistence": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean" },
-            "volumes": { 
-              "type": "array"
-            },
-            "volumeMounts": { 
-              "type": "array"
-            }
-          }
-        },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
         "log": {
           "type": "object",
           "properties": {
@@ -653,6 +595,8 @@
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
         "service": {
           "type": "object",
           "properties": {

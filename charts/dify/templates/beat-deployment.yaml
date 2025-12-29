@@ -85,9 +85,9 @@ spec:
             name: {{ template "dify.worker.fullname" . }}
         resources:
           {{- toYaml .Values.beat.resources | nindent 12 }}
-    {{- if and .Values.beat.persistence.enabled .Values.beat.persistence.volumeMounts }}
+    {{- if .Values.beat.extraVolumeMounts }}
     volumeMounts:
-    {{- include "common.tplvalues.render" (dict "value" .Values.beat.persistence.volumeMounts "context" $) | nindent 8 }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.beat.extraVolumeMounts "context" $) | nindent 8 }}
     {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.beat.nodeSelector) }}
       nodeSelector:
@@ -113,8 +113,8 @@ spec:
       tolerations:
 {{ toYaml .Values.beat.tolerations | indent 8 }}
     {{- end }}
-    {{- if and .Values.beat.persistence.enabled .Values.beat.persistence.volumes }}
+    {{- if .Values.beat.extraVolumes }}
       volumes:
-      {{- include "common.tplvalues.render" (dict "value" .Values.beat.persistence.volumes "context" $) | nindent 6 }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.beat.extraVolumes "context" $) | nindent 6 }}
     {{- end }}
 {{- end }}

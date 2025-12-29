@@ -105,9 +105,9 @@ spec:
             protocol: TCP
         resources:
           {{- toYaml .Values.web.resources | nindent 12 }}
-        {{- if and .Values.web.persistence.enabled .Values.web.persistence.volumeMounts }}
+        {{- if .Values.web.extraVolumeMounts }}
         volumeMounts:
-        {{- include "common.tplvalues.render" (dict "value" .Values.web.persistence.volumeMounts "context" $) | nindent 8 }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.web.extraVolumeMounts "context" $) | nindent 8 }}
         {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.web.nodeSelector) }}
       nodeSelector:
@@ -133,8 +133,8 @@ spec:
       tolerations:
 {{ toYaml .Values.web.tolerations | indent 8 }}
     {{- end }}
-    {{- if and .Values.web.persistence.enabled .Values.web.persistence.volumes }}
+    {{- if .Values.web.extraVolumes }}
       volumes:
-      {{- include "common.tplvalues.render" (dict "value" .Values.web.persistence.volumes "context" $) | nindent 6 }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.web.extraVolumes "context" $) | nindent 6 }}
     {{- end }}
 {{- end }}
