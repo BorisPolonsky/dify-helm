@@ -534,7 +534,7 @@ proxy_send_timeout 3600s;
 {{- if or (not .Values.proxy.containerSecurityContext.enabled) (and .Values.proxy.containerSecurityContext.enabled (eq (int (default 0 .Values.proxy.containerSecurityContext.runAsUser)) 0)) }}
 user  nginx;
 {{- end }}
-worker_processes  auto;
+worker_processes  {{ .Values.proxy.workerProcesses | default "auto" }};
 {{- if .Values.proxy.log.persistence.enabled }}
 error_log  {{ .Values.proxy.log.persistence.mountPath }}/error.log notice;
 {{- end }}

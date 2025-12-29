@@ -307,6 +307,7 @@
         "customReadinessProbe": { "type": "object" },
         "customStartupProbe": { "type": "object" },
         "clientMaxBodySize": { "type": "string" },
+        "workerProcesses": { "type": ["string", "integer"] },
         "updateStrategy": { "type": "object" },
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
