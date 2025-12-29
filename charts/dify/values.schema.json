@@ -243,6 +243,18 @@
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
         "logLevel": { "type": "string" },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "volumes": { 
+              "type": "array"
+            },
+            "volumeMounts": { 
+              "type": "array"
+            }
+          }
+        },
         "serviceAccount": {
           "type": "object",
           "properties": {
@@ -276,6 +288,18 @@
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
         "logLevel": { "type": "string" },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "volumes": { 
+              "type": "array"
+            },
+            "volumeMounts": { 
+              "type": "array"
+            }
+          }
+        },
         "serviceAccount": {
           "type": "object",
           "properties": {
@@ -305,6 +329,18 @@
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "volumes": { 
+              "type": "array"
+            },
+            "volumeMounts": { 
+              "type": "array"
+            }
+          }
+        },
         "log": {
           "type": "object",
           "properties": {
@@ -398,6 +434,18 @@
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": "array" },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "volumes": { 
+              "type": "array"
+            },
+            "volumeMounts": { 
+              "type": "array"
+            }
+          }
+        },
         "service": {
           "type": "object",
           "properties": {
@@ -533,6 +581,18 @@
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "volumes": { 
+              "type": "array"
+            },
+            "volumeMounts": { 
+              "type": "array"
+            }
+          }
+        },
         "log": {
           "type": "object",
           "properties": {

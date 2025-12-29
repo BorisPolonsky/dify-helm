@@ -103,6 +103,9 @@ spec:
         - name: nginx-run
           mountPath: /var/run/nginx
         {{- end }}
+        {{- if and .Values.proxy.persistence.enabled .Values.proxy.persistence.volumeMounts }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.proxy.persistence.volumeMounts "context" $) | nindent 8 }}
+        {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.proxy.nodeSelector) }}
       nodeSelector:
 {{ toYaml .Values.nodeSelector | indent 8 }}
@@ -142,5 +145,8 @@ spec:
         emptyDir: {}
       - name: nginx-run
         emptyDir: {}
+      {{- end }}
+      {{- if and .Values.proxy.persistence.enabled .Values.proxy.persistence.volumes }}
+      {{- include "common.tplvalues.render" (dict "value" .Values.proxy.persistence.volumes "context" $) | nindent 6 }}
       {{- end }}
 {{- end }}
