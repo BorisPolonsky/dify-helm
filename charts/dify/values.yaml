@@ -34,7 +34,7 @@ image:
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## ref: https://kubernetes.io/docs/tasks/-pod-container/pull-image-private-registry/
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
@@ -45,7 +45,7 @@ image:
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## ref: https://kubernetes.io/docs/tasks/-pod-container/pull-image-private-registry/
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
@@ -56,7 +56,7 @@ image:
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## ref: https://kubernetes.io/docs/tasks/-pod-container/pull-image-private-registry/
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
@@ -67,7 +67,7 @@ image:
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ## ref: https://kubernetes.io/docs/tasks/-pod-container/pull-image-private-registry/
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
@@ -89,8 +89,8 @@ api:
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
-  ## Configure extra options for API containers' liveness, readiness, and startup probes
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ##  extra options for API containers' liveness, readiness, and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/-pod-container/-liveness-readiness-startup-probes/#-probes
   ## @param api.livenessProbe.enabled Enable livenessProbe on API nodes
   livenessProbe:
     enabled: true
@@ -124,16 +124,16 @@ api:
   customReadinessProbe: {}
   ## @param api.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
-  ## Configure Pods Security Context
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ##  Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param api.podSecurityContext.enabled Enabled Dify api pod's Security Context
   ## @param api.podSecurityContext.fsGroup Set Dify api pod's Security Context fsGroup
   ##
   podSecurityContext:
     enabled: true
     fsGroup: 1001
-  ## Configure Container Security Context
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ##  Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param api.containerSecurityContext.enabled Dify api containers' Security Context
   ## @param api.containerSecurityContext.runAsUser Set Dify api containers' Security Context runAsUser
   ##
@@ -303,8 +303,8 @@ worker:
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
-  ## Configure extra options for worker containers' liveness, readiness, and startup probes
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ##  extra options for worker containers' liveness, readiness, and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param worker.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
   ## @param worker.customReadinessProbe Custom readinessProbe that overrides the default one
@@ -427,6 +427,7 @@ proxy:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  priorityClassName: ""
   ## Configure extra options for proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param proxy.customLivenessProbe Custom livenessProbe that overrides the default one
