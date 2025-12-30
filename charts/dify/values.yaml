@@ -7,10 +7,9 @@ global:
   edition: "SELF_HOSTED"
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
   appSecretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
-  # A global secret key for inter-component API calls (e.g. `api`, `sandbox` and `pluginDaemon`). You can generate a strong key using `openssl rand -base64 42`.
-  # Used as fallback for component-specific inter-component API keys (e.g., pluginDaemon.auth.serverKey, pluginDaemon.auth.difyApiKey).
-  # Component-specific values take precedence over this global value. If component-specific value is empty, this global value is used.
-  innerApiKey: ""
+  # A global secret key for all inter-component API calls among Dify containers (e.g. `api`, `sandbox` and `pluginDaemon`). You can generate a strong key using `openssl rand -base64 42`.
+  # Takes no effect when left empty. Can be overridden by component-specific values.
+  internalApiKey: ""
   # The backend domain of the console API, used to concatenate the authorization callback.
   # If empty, it is the same domain. Example: console.dify.ai
   consoleApiDomain: ""
@@ -713,7 +712,7 @@ sandbox:
     clusterIP: ""
   auth:
     # API key for sandbox code execution service. You can generate a strong key using `openssl rand -base64 42`.
-    # If not set, uses global.innerApiKey
+    # If not set, uses global.internalApiKey
     apiKey: ""
 
   ## Sandbox ServiceAccount configuration
