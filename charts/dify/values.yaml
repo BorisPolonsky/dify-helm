@@ -32,6 +32,10 @@ global:
     enabled: true
     url: "https://marketplace.dify.ai"
     apiUrl: "https://marketplace.dify.ai"
+    # Takes effect only if built-in `nginx` were enabled
+    # If enabled, route marketplace api call to built-in `nginx` and strip headers for tracking.
+    # https://github.com/BorisPolonsky/dify-helm/pull/131
+    apiProxyEnabled: false
 
 ## @section Dify image parameters
 ##
@@ -876,7 +880,9 @@ pluginDaemon:
   ##
   extraVolumeMounts: []
   marketplace:
+    # DEPRECATED: Use global.marketplace.enabled instead.
     enabled: true
+    # DEPRECATED: Use global.marketplace.apiProxyEnabled instead.
     # Takes effect only if built-in `nginx` were enabled
     # If enabled, route marketplace api call to built-in `nginx` and strip headers for tracking.
     # https://github.com/BorisPolonsky/dify-helm/pull/131

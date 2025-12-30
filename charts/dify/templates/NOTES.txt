@@ -1,4 +1,4 @@
-{{- if or .Values.api.url.consoleApi .Values.api.url.consoleWeb .Values.api.url.serviceApi .Values.api.url.appApi .Values.api.url.appWeb .Values.api.url.files .Values.api.url.marketplaceApi .Values.api.url.marketplace .Values.api.secretKey }}
+{{- if or .Values.api.url.consoleApi .Values.api.url.consoleWeb .Values.api.url.serviceApi .Values.api.url.appApi .Values.api.url.appWeb .Values.api.url.files .Values.api.url.marketplaceApi .Values.api.url.marketplace .Values.api.secretKey .Values.pluginDaemon.marketplace.enabled .Values.pluginDaemon.marketplace.apiProxyEnabled }}
 WARNING: Deprecated values detected:
 {{- /* api.url.* deprecated values */ -}}
 {{- if .Values.api.url.consoleApi }}
@@ -27,6 +27,12 @@ WARNING: Deprecated values detected:
 {{- end }}
 {{- if .Values.api.secretKey }}
   - `api.secretKey` is deprecated and will be removed in future versions. Use `global.appSecretKey` instead.
+{{- end }}
+{{- if .Values.pluginDaemon.marketplace.enabled }}
+  - `pluginDaemon.marketplace.enabled` is deprecated and will be removed in future versions. Use `global.marketplace.enabled` instead.
+{{- end }}
+{{- if .Values.pluginDaemon.marketplace.apiProxyEnabled }}
+  - `pluginDaemon.marketplace.apiProxyEnabled` is deprecated and will be removed in future versions. Use `global.marketplace.apiProxyEnabled` instead.
 {{- end }}
 
 {{- end }}

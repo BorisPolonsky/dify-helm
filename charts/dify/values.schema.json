@@ -72,7 +72,8 @@
           "properties": {
             "enabled": { "type": "boolean" },
             "url": { "type": "string" },
-            "apiUrl": { "type": "string" }
+            "apiUrl": { "type": "string" },
+            "apiProxyEnabled": { "type": "boolean" }
           }
         }
       }

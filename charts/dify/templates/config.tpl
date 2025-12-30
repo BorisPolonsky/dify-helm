@@ -171,7 +171,7 @@ CONSOLE_API_URL: {{ .Values.api.url.consoleApi | default .Values.global.consoleA
 # example: http://udify.app
 APP_API_URL: {{ .Values.api.url.appApi | default .Values.global.appApiDomain | quote }}
 # The DSN for Sentry
-{{- if and .Values.pluginDaemon.enabled .Values.pluginDaemon.marketplace.enabled .Values.pluginDaemon.marketplace.apiProxyEnabled }}
+{{- if and .Values.pluginDaemon.enabled (.Values.pluginDaemon.marketplace.enabled | default .Values.global.marketplace.enabled) (.Values.pluginDaemon.marketplace.apiProxyEnabled | default .Values.global.marketplace.apiProxyEnabled) }}
 MARKETPLACE_ENABLED: "true"
 MARKETPLACE_API_URL: "/marketplace"
 {{- else }}
@@ -612,7 +612,7 @@ server {
       include proxy.conf;
     }
 
-    {{- if and .Values.pluginDaemon.enabled .Values.pluginDaemon.marketplace.enabled .Values.pluginDaemon.marketplace.apiProxyEnabled }}
+    {{- if and .Values.pluginDaemon.enabled (.Values.pluginDaemon.marketplace.enabled | default .Values.global.marketplace.enabled) (.Values.pluginDaemon.marketplace.apiProxyEnabled | default .Values.global.marketplace.apiProxyEnabled) }}
     location /marketplace {
       rewrite ^/marketplace/(.*)$ /$1 break;
       proxy_ssl_server_name on;
@@ -732,7 +732,7 @@ DIFY_INNER_API_URL: "http://{{ template "dify.api.fullname" . }}:{{ .Values.api.
 {{- end }}
 
 {{- define "dify.marketplace.config" }}
-{{- if .Values.pluginDaemon.marketplace.enabled }}
+{{- if .Values.pluginDaemon.marketplace.enabled | default .Values.global.marketplace.enabled }}
 MARKETPLACE_ENABLED: "true"
 MARKETPLACE_API_URL: {{ .Values.api.url.marketplaceApi | default .Values.global.marketplace.apiUrl | quote }}
 {{- else }}
