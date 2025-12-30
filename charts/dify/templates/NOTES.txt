@@ -1,3 +1,41 @@
+{{- if or .Values.api.url.consoleApi .Values.api.url.consoleWeb .Values.api.url.serviceApi .Values.api.url.appApi .Values.api.url.appWeb .Values.api.url.files .Values.api.url.marketplaceApi .Values.api.url.marketplace .Values.api.secretKey .Values.pluginDaemon.marketplace.enabled .Values.pluginDaemon.marketplace.apiProxyEnabled }}
+WARNING: Deprecated values detected:
+{{- /* api.url.* deprecated values */ -}}
+{{- if .Values.api.url.consoleApi }}
+  - `api.url.consoleApi` is deprecated and will be removed in future versions. Use `global.consoleApiDomain` instead.
+{{- end }}
+{{- if .Values.api.url.consoleWeb }}
+  - `api.url.consoleWeb` is deprecated and will be removed in future versions. Use `global.consoleWebDomain` instead.
+{{- end }}
+{{- if .Values.api.url.serviceApi }}
+  - `api.url.serviceApi` is deprecated and will be removed in future versions. Use `global.serviceApiDomain` instead.
+{{- end }}
+{{- if .Values.api.url.appApi }}
+  - `api.url.appApi` is deprecated and will be removed in future versions. Use `global.appApiDomain` instead.
+{{- end }}
+{{- if .Values.api.url.appWeb }}
+  - `api.url.appWeb` is deprecated and will be removed in future versions. Use `global.appWebDomain` instead.
+{{- end }}
+{{- if .Values.api.url.files }}
+  - `api.url.files` is deprecated and will be removed in future versions. Use `global.filesDomain` instead.
+{{- end }}
+{{- if .Values.api.url.marketplaceApi }}
+  - `api.url.marketplaceApi` is deprecated and will be removed in future versions. Use `global.marketplace.apiUrl` instead.
+{{- end }}
+{{- if .Values.api.url.marketplace }}
+  - `api.url.marketplace` is deprecated and will be removed in future versions. Use `global.marketplace.url` instead.
+{{- end }}
+{{- if .Values.api.secretKey }}
+  - `api.secretKey` is deprecated and will be removed in future versions. Use `global.appSecretKey` instead.
+{{- end }}
+{{- if .Values.pluginDaemon.marketplace.enabled }}
+  - `pluginDaemon.marketplace.enabled` is deprecated and will be removed in future versions. Use `global.marketplace.enabled` instead.
+{{- end }}
+{{- if .Values.pluginDaemon.marketplace.apiProxyEnabled }}
+  - `pluginDaemon.marketplace.apiProxyEnabled` is deprecated and will be removed in future versions. Use `global.marketplace.apiProxyEnabled` instead.
+{{- end }}
+
+{{- end }}
 1. Get the application URL by running these commands:
 {{- if .Values.ingress.enabled }}
 {{- range $host := .Values.ingress.hosts }}
