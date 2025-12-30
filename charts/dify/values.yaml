@@ -7,11 +7,10 @@ global:
   edition: "SELF_HOSTED"
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
   appSecretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
-  # secret key for inner api calls. You can generate a strong key using `openssl rand -base64 42`.
-  innerApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
-  # Secret key for plugin daemon server authentication. You can generate a strong key using `openssl rand -base64 42`.
-  # Used as fallback for pluginDaemon.auth.serverKey if not set
-  pluginDaemonKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
+  # A global secret key for inter-component API calls (e.g. `api`, `sandbox` and `pluginDaemon`). You can generate a strong key using `openssl rand -base64 42`.
+  # Used as fallback for component-specific inter-component API keys (e.g., pluginDaemon.auth.serverKey, pluginDaemon.auth.difyApiKey).
+  # Component-specific values take precedence over this global value. If component-specific value is empty, this global value is used.
+  innerApiKey: ""
   # The backend domain of the console API, used to concatenate the authorization callback.
   # If empty, it is the same domain. Example: console.dify.ai
   consoleApiDomain: ""
@@ -279,8 +278,7 @@ api:
         optimistic: false
   # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
   migration: true
-  # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-  # If not set, uses global.appSecretKey
+  # DEPRECATED: Use global.appSecretKey instead.
   secretKey: ""
   ## Storage for `api` and `worker`
   ## Ignored if `.Values.externalS3.enabled` is true
@@ -847,10 +845,9 @@ pluginDaemon:
     labels: {}
     clusterIP: ""
   auth:
-    # DEPRECATED: Use global.pluginDaemonKey instead.
-    serverKey: ""
-    # DEPRECATED: Use global.innerApiKey instead.
-    difyApiKey: ""
+    serverKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
+    # A separate key for interactions between `api`(`worker`) and `pluginDaemon`
+    difyApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
   ## Storage for `pluginDaemon`
   ## Ignored if external object storage were configured via `.Values.externalS3` sections.
   ##

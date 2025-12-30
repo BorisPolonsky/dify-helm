@@ -1,6 +1,5 @@
-{{- if or .Values.api.url.consoleApi .Values.api.url.consoleWeb .Values.api.url.serviceApi .Values.api.url.appApi .Values.api.url.appWeb .Values.api.url.files .Values.api.url.marketplaceApi .Values.api.url.marketplace .Values.pluginDaemon.auth.difyApiKey .Values.pluginDaemon.auth.serverKey }}
+{{- if or .Values.api.url.consoleApi .Values.api.url.consoleWeb .Values.api.url.serviceApi .Values.api.url.appApi .Values.api.url.appWeb .Values.api.url.files .Values.api.url.marketplaceApi .Values.api.url.marketplace .Values.api.secretKey }}
 WARNING: Deprecated values detected:
-{{- if or .Values.api.url.consoleApi .Values.api.url.consoleWeb .Values.api.url.serviceApi .Values.api.url.appApi .Values.api.url.appWeb .Values.api.url.files .Values.api.url.marketplaceApi .Values.api.url.marketplace }}
 {{- /* api.url.* deprecated values */ -}}
 {{- if .Values.api.url.consoleApi }}
   - `api.url.consoleApi` is deprecated and will be removed in future versions. Use `global.consoleApiDomain` instead.
@@ -26,15 +25,8 @@ WARNING: Deprecated values detected:
 {{- if .Values.api.url.marketplace }}
   - `api.url.marketplace` is deprecated and will be removed in future versions. Use `global.marketplace.url` instead.
 {{- end }}
-{{- end }}
-{{- if or .Values.pluginDaemon.auth.difyApiKey .Values.pluginDaemon.auth.serverKey }}
-{{- /* pluginDaemon.auth.* deprecated values */ -}}
-{{- if .Values.pluginDaemon.auth.difyApiKey }}
-  - `pluginDaemon.auth.difyApiKey` is deprecated and will be removed in future versions. Use `global.innerApiKey` instead.
-{{- end }}
-{{- if .Values.pluginDaemon.auth.serverKey }}
-  - `pluginDaemon.auth.serverKey` is deprecated and will be removed in future versions. Use `global.pluginDaemonKey` instead.
-{{- end }}
+{{- if .Values.api.secretKey }}
+  - `api.secretKey` is deprecated and will be removed in future versions. Use `global.appSecretKey` instead.
 {{- end }}
 
 {{- end }}

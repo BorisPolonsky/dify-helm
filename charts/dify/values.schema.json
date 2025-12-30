@@ -61,7 +61,6 @@
         "edition": { "type": "string" },
         "appSecretKey": { "type": "string" },
         "innerApiKey": { "type": "string" },
-        "pluginDaemonKey": { "type": "string" },
         "consoleApiDomain": { "type": "string" },
         "consoleWebDomain": { "type": "string" },
         "serviceApiDomain": { "type": "string" },

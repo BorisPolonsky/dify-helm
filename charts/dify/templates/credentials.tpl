@@ -14,7 +14,7 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
-PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.pluginDaemonKey | b64enc | quote }}
+PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.innerApiKey | b64enc | quote }}
 INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.innerApiKey | b64enc | quote }}
 {{- end }}
 {{- if and .Values.api.otel.enabled (not .Values.externalSecret.enabled) }}
@@ -38,7 +38,7 @@ SECRET_KEY: {{ .Values.api.secretKey | default .Values.global.appSecretKey | b64
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
-PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.pluginDaemonKey | b64enc | quote }}
+PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.innerApiKey | b64enc | quote }}
 INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.innerApiKey | b64enc | quote }}
 {{- end }}
 {{- if and .Values.api.otel.enabled (not .Values.externalSecret.enabled) }}
@@ -220,7 +220,7 @@ API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{ include "dify.db.credentials" . }}
 {{ include "dify.redis.credentials" . }}
 {{ include "dify.pluginDaemon.storage.credentials" . }}
-SERVER_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.pluginDaemonKey | b64enc | quote }}
+SERVER_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.innerApiKey | b64enc | quote }}
 DIFY_INNER_API_KEY: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.innerApiKey | b64enc | quote }}
 {{- end }}
 
