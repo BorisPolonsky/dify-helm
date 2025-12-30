@@ -712,7 +712,9 @@ sandbox:
     labels: {}
     clusterIP: ""
   auth:
-    apiKey: "dify-sandbox"
+    # API key for sandbox code execution service. You can generate a strong key using `openssl rand -base64 42`.
+    # If not set, uses global.innerApiKey
+    apiKey: ""
 
   ## Sandbox ServiceAccount configuration
   ##

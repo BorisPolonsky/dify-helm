@@ -2,7 +2,7 @@
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 SECRET_KEY: {{ .Values.api.secretKey | default .Values.global.appSecretKey | b64enc | quote }}
 {{- if .Values.sandbox.enabled }}
-CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
+CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | default .Values.global.innerApiKey | b64enc | quote }}
 {{- end }}
 {{- include "dify.db.credentials" . }}
 # The configurations of redis connection.
@@ -213,7 +213,7 @@ SMTP_PASSWORD: {{ .Values.api.mail.smtp.password | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.sandbox.credentials" -}}
-API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
+API_KEY: {{ .Values.sandbox.auth.apiKey | default .Values.global.innerApiKey | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.pluginDaemon.credentials" -}}
