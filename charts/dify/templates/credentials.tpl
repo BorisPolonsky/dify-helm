@@ -1,6 +1,6 @@
 {{- define "dify.api.credentials" -}}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-SECRET_KEY: {{ .Values.api.secretKey | b64enc | quote }}
+SECRET_KEY: {{ .Values.api.secretKey | default .Values.global.appSecretKey | b64enc | quote }}
 {{- if .Values.sandbox.enabled }}
 CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{- end }}
@@ -14,8 +14,8 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
-PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | b64enc | quote }}
-INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
+PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.pluginDaemonKey | b64enc | quote }}
+INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.innerApiKey | b64enc | quote }}
 {{- end }}
 {{- if and .Values.api.otel.enabled (not .Values.externalSecret.enabled) }}
 OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
@@ -23,7 +23,7 @@ OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.worker.credentials" -}}
-SECRET_KEY: {{ .Values.api.secretKey | b64enc | quote }}
+SECRET_KEY: {{ .Values.api.secretKey | default .Values.global.appSecretKey | b64enc | quote }}
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
 {{ include "dify.db.credentials" . }}
@@ -38,8 +38,8 @@ SECRET_KEY: {{ .Values.api.secretKey | b64enc | quote }}
 {{ include "dify.vectordb.credentials" . }}
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
-PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | b64enc | quote }}
-INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
+PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.pluginDaemonKey | b64enc | quote }}
+INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.innerApiKey | b64enc | quote }}
 {{- end }}
 {{- if and .Values.api.otel.enabled (not .Values.externalSecret.enabled) }}
 OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
@@ -220,8 +220,8 @@ API_KEY: {{ .Values.sandbox.auth.apiKey | b64enc | quote }}
 {{ include "dify.db.credentials" . }}
 {{ include "dify.redis.credentials" . }}
 {{ include "dify.pluginDaemon.storage.credentials" . }}
-SERVER_KEY: {{ .Values.pluginDaemon.auth.serverKey | b64enc | quote }}
-DIFY_INNER_API_KEY: {{ .Values.pluginDaemon.auth.difyApiKey | b64enc | quote }}
+SERVER_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.pluginDaemonKey | b64enc | quote }}
+DIFY_INNER_API_KEY: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.innerApiKey | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.pluginDaemon.storage.credentials" -}}

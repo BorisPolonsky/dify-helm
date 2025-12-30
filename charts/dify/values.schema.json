@@ -55,6 +55,29 @@
         }
       }
     },
+    "global": {
+      "type": "object",
+      "properties": {
+        "edition": { "type": "string" },
+        "appSecretKey": { "type": "string" },
+        "innerApiKey": { "type": "string" },
+        "pluginDaemonKey": { "type": "string" },
+        "consoleApiDomain": { "type": "string" },
+        "consoleWebDomain": { "type": "string" },
+        "serviceApiDomain": { "type": "string" },
+        "appApiDomain": { "type": "string" },
+        "appWebDomain": { "type": "string" },
+        "filesDomain": { "type": "string" },
+        "marketplace": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "url": { "type": "string" },
+            "apiUrl": { "type": "string" }
+          }
+        }
+      }
+    },
     "api": {
       "type": "object",
       "properties": {

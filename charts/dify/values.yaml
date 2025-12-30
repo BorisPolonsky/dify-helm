@@ -2,6 +2,39 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+global:
+  # The edition of the application, SELF_HOSTED or CLOUD
+  edition: "SELF_HOSTED"
+  # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
+  appSecretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
+  # secret key for inner api calls. You can generate a strong key using `openssl rand -base64 42`.
+  innerApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
+  # Secret key for plugin daemon server authentication. You can generate a strong key using `openssl rand -base64 42`.
+  # Used as fallback for pluginDaemon.auth.serverKey if not set
+  pluginDaemonKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
+  # The backend domain of the console API, used to concatenate the authorization callback.
+  # If empty, it is the same domain. Example: console.dify.ai
+  consoleApiDomain: ""
+  # The front-end domain of the console web, used to concatenate some front-end addresses and for CORS configuration use.
+  # If empty, it is the same domain. Example: console.dify.ai
+  consoleWebDomain: ""
+  # Service API domain, used to display Service API Base Url to the front-end.
+  # If empty, it is the same domain. Example: api.dify.ai
+  serviceApiDomain: ""
+  # WebApp API backend domain, used to declare the back-end URL for the front-end API.
+  # If empty, it is the same domain. Example: app.dify.ai
+  appApiDomain: ""
+  # WebApp domain, used to display WebAPP API Base Url to the front-end. If empty, it is the same domain. Example: app.dify.ai
+  appWebDomain: ""
+  # File preview or download domain, used to display the file preview
+  # or download URL to the front-end or as a multi-modal model input;
+  # In order to prevent others from forging, the image preview URL is signed and has a 5-minute expiration time.
+  filesDomain: ""
+  marketplace:
+    enabled: true
+    url: "https://marketplace.dify.ai"
+    apiUrl: "https://marketplace.dify.ai"
+
 ## @section Dify image parameters
 ##
 
@@ -209,25 +242,21 @@ api:
   # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
   logLevel: INFO
   url:
-    # The backend URL of the console API, used to concatenate the authorization callback.
-    # If empty, it is the same domain. Example: https://api.console.dify.ai
+    # DEPRECATED: Use global.consoleApiDomain instead.
     consoleApi: ""
-    # The front-end URL of the console web, used to concatenate some front-end addresses and for CORS configuration use.
-    # If empty, it is the same domain. Example: https://console.dify.ai
+    # DEPRECATED: Use global.consoleWebDomain instead.
     consoleWeb: ""
-    # Service API URL, used to display Service API Base URL to the front-end.
-    # If empty, it is the same domain. Example: https://api.dify.ai
+    # DEPRECATED: Use global.serviceApiDomain instead.
     serviceApi: ""
-    # WebApp API backend URL, used to declare the back-end URL for the front-end API.
-    # If empty, it is the same domain. Example: https://app.dify.ai
+    # DEPRECATED: Use global.appApiDomain instead.
     appApi: ""
-    # WebApp URL, used to display WebAPP API Base URL to the front-end. If empty, it is the same domain. Example: https://api.app.dify.ai
+    # DEPRECATED: Use global.appWebDomain instead.
     appWeb: ""
-    # File preview or download URL prefix, used to display the file preview
-    # or download URL to the front-end or as a multi-modal model input;
-    # In order to prevent others from forging, the image preview URL is signed and has a 5-minute expiration time.
+    # DEPRECATED: Use global.filesDomain instead.
     files: ""
+    # DEPRECATED: Use global.marketplace.apiUrl instead.
     marketplaceApi: "https://marketplace.dify.ai"
+    # DEPRECATED: Use global.marketplace.url instead.
     marketplace: "https://marketplace.dify.ai"
   mail:
     # default email sender from email address, if not given a specific address
@@ -251,7 +280,8 @@ api:
   # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
   migration: true
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-  secretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
+  # If not set, uses global.appSecretKey
+  secretKey: ""
   ## Storage for `api` and `worker`
   ## Ignored if `.Values.externalS3.enabled` is true
   ##
@@ -580,10 +610,8 @@ web:
   podSecurityContext: {}
   # Configure Container Security Context
   containerSecurityContext: {}
-  extraEnv:
   # Apply your own Environment Variables if necessary
-  - name: EDITION
-    value: "SELF_HOSTED"
+  extraEnv: []
   service:
     port: 3000
     annotations: {}
@@ -819,9 +847,10 @@ pluginDaemon:
     labels: {}
     clusterIP: ""
   auth:
-    serverKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
-    # A separate key for interactions between `api`(`worker`) and `pluginDaemon`
-    difyApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
+    # DEPRECATED: Use global.pluginDaemonKey instead.
+    serverKey: ""
+    # DEPRECATED: Use global.innerApiKey instead.
+    difyApiKey: ""
   ## Storage for `pluginDaemon`
   ## Ignored if external object storage were configured via `.Values.externalS3` sections.
   ##
