@@ -717,7 +717,7 @@ sandbox:
   auth:
     # API key for sandbox code execution service. You can generate a strong key using `openssl rand -base64 42`.
     # If not set, uses global.internalApiKey
-    apiKey: ""
+    apiKey: "dify-sandbox"
 
   ## Sandbox ServiceAccount configuration
   ##
