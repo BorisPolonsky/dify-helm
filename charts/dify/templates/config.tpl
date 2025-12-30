@@ -160,8 +160,10 @@ OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.api.otel.metricExportTimeout | toString |
 {{- end }}
 
 {{- define "dify.web.config" -}}
+{{- if .Values.global.edition }}
 # The edition of the application, SELF_HOSTED or CLOUD
-EDITION: {{ .Values.global.edition | default "SELF_HOSTED" | quote }}
+EDITION: {{ .Values.global.edition | quote }}
+{{- end }}
 # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
