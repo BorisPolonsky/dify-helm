@@ -73,49 +73,49 @@ spec:
         {{- toYaml .Values.pluginDaemon.podSecurityContext | nindent 8 }}
       {{- end }}
       containers:
-      - image: "{{ .Values.image.pluginDaemon.repository }}:{{ default .Chart.AppVersion .Values.image.pluginDaemon.tag }}"
-        imagePullPolicy: "{{ .Values.image.pluginDaemon.pullPolicy }}"
-        name: plugin-daemon
-        {{- if .Values.pluginDaemon.customLivenessProbe }}
-        livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.customLivenessProbe "context" $) | nindent 10 }}
-        {{- end }}
-        {{- if .Values.pluginDaemon.customReadinessProbe }}
-        readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.customReadinessProbe "context" $) | nindent 10 }}
-        {{- end }}
-        {{- if .Values.pluginDaemon.customStartupProbe }}
-        startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.customStartupProbe "context" $) | nindent 10 }}
-        {{- end }}
-        {{- if .Values.pluginDaemon.containerSecurityContext }}
-        securityContext:
-          {{- toYaml .Values.pluginDaemon.containerSecurityContext | nindent 10 }}
-        {{- end }}
-        env:
-        {{- if .Values.pluginDaemon.extraEnv }}
-          {{- toYaml .Values.pluginDaemon.extraEnv | nindent 8 }}
-        {{- end }}
-        envFrom:
-        - configMapRef:
-            name: {{ template "dify.pluginDaemon.fullname" . }}
-        - secretRef:
-            name: {{ template "dify.pluginDaemon.fullname" . }}
-        ports:
-        - name: daemon
-          containerPort: 5002
-          protocol: TCP
-        - name: plugin-install
-          containerPort: 5003
-          protocol: TCP
-        resources:
-          {{- toYaml .Values.pluginDaemon.resources | nindent 12 }}
-        volumeMounts:
-          {{- if $usePvc }}
-          - name: app-data
-            mountPath: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
-            subPath: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.subPath | default "" }}
+        - image: "{{ .Values.image.pluginDaemon.repository }}:{{ default .Chart.AppVersion .Values.image.pluginDaemon.tag }}"
+          imagePullPolicy: "{{ .Values.image.pluginDaemon.pullPolicy }}"
+          name: plugin-daemon
+          {{- if .Values.pluginDaemon.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.customLivenessProbe "context" $) | nindent 12 }}
           {{- end }}
-          {{- if .Values.pluginDaemon.extraVolumeMounts }}
-          {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.extraVolumeMounts "context" $) | nindent 10 }}
+          {{- if .Values.pluginDaemon.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.customReadinessProbe "context" $) | nindent 12 }}
           {{- end }}
+          {{- if .Values.pluginDaemon.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.customStartupProbe "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.pluginDaemon.containerSecurityContext }}
+          securityContext:
+            {{- toYaml .Values.pluginDaemon.containerSecurityContext | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.pluginDaemon.extraEnv }}
+              {{- toYaml .Values.pluginDaemon.extraEnv | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "dify.pluginDaemon.fullname" . }}
+            - secretRef:
+                name: {{ template "dify.pluginDaemon.fullname" . }}
+          ports:
+            - name: daemon
+              containerPort: 5002
+              protocol: TCP
+            - name: plugin-install
+              containerPort: 5003
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.pluginDaemon.resources | nindent 14 }}
+          volumeMounts:
+            {{- if $usePvc }}
+            - name: app-data
+              mountPath: {{ .Values.pluginDaemon.persistence.mountPath | quote }}
+              subPath: {{ .Values.pluginDaemon.persistence.persistentVolumeClaim.subPath | default "" }}
+            {{- end }}
+            {{- if .Values.pluginDaemon.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.pluginDaemon.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.pluginDaemon.nodeSelector) }}
       nodeSelector:
         {{- toYaml .Values.nodeSelector | nindent 8 }}

@@ -60,59 +60,59 @@ spec:
         {{- toYaml .Values.web.podSecurityContext | nindent 8 }}
       {{- end }}
       containers:
-      - image: "{{ .Values.image.web.repository }}:{{ default .Chart.AppVersion .Values.image.web.tag }}"
-        imagePullPolicy: "{{ .Values.image.web.pullPolicy }}"
-        name: web
-        {{- if .Values.web.customLivenessProbe }}
-        livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customLivenessProbe "context" $) | nindent 10 }}
-        {{- else if .Values.web.livenessProbe.enabled }}
-        livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.livenessProbe "enabled") "context" $) | nindent 10 }}
-          httpGet:
-            path: /apps
-            port: web
-            httpHeaders:
-            - name: accept-language
-              value: en
-        {{- end }}
-        {{- if .Values.web.customReadinessProbe }}
-        readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customReadinessProbe "context" $) | nindent 10 }}
-        {{- else if .Values.web.readinessProbe.enabled }}
-        readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.readinessProbe "enabled") "context" $) | nindent 10 }}
-          httpGet:
-            path: /apps
-            port: web
-            httpHeaders:
-            - name: accept-language
-              value: en
-        {{- end }}
-        {{- if .Values.web.customStartupProbe }}
-        startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customStartupProbe "context" $) | nindent 10 }}
-        {{- else if .Values.web.startupProbe.enabled }}
-        startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.startupProbe "enabled") "context" $) | nindent 10 }}
-          tcpSocket:
-            port: web
-        {{- end }}
-        {{- if .Values.web.containerSecurityContext }}
-        securityContext:
-          {{- toYaml .Values.web.containerSecurityContext | nindent 10 }}
-        {{- end }}
-        env:
-        {{- if .Values.web.extraEnv }}
-          {{- toYaml .Values.web.extraEnv | nindent 8 }}
-        {{- end }}
-        envFrom:
-        - configMapRef:
-            name: {{ template "dify.web.fullname" . }}
-        ports:
-          - name: web
-            containerPort: 3000
-            protocol: TCP
-        resources:
-          {{- toYaml .Values.web.resources | nindent 12 }}
-        {{- if .Values.web.extraVolumeMounts }}
-        volumeMounts:
-        {{- include "common.tplvalues.render" (dict "value" .Values.web.extraVolumeMounts "context" $) | nindent 8 }}
-        {{- end }}
+        - image: "{{ .Values.image.web.repository }}:{{ default .Chart.AppVersion .Values.image.web.tag }}"
+          imagePullPolicy: "{{ .Values.image.web.pullPolicy }}"
+          name: web
+          {{- if .Values.web.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.web.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /apps
+              port: web
+              httpHeaders:
+                - name: accept-language
+                  value: en
+          {{- end }}
+          {{- if .Values.web.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.web.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /apps
+              port: web
+              httpHeaders:
+                - name: accept-language
+                  value: en
+          {{- end }}
+          {{- if .Values.web.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.web.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: web
+          {{- end }}
+          {{- if .Values.web.containerSecurityContext }}
+          securityContext:
+            {{- toYaml .Values.web.containerSecurityContext | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.web.extraEnv }}
+              {{- toYaml .Values.web.extraEnv | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "dify.web.fullname" . }}
+          ports:
+            - name: web
+              containerPort: 3000
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.web.resources | nindent 14 }}
+          {{- if .Values.web.extraVolumeMounts }}
+          volumeMounts:
+            {{- include "common.tplvalues.render" (dict "value" .Values.web.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.web.nodeSelector) }}
       nodeSelector:
         {{- toYaml .Values.nodeSelector | nindent 8 }}

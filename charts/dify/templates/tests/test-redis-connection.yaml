@@ -115,7 +115,7 @@ spec:
               echo "Redis is ready."
               {{- end }}
           envFrom:
-          - configMapRef:
-              name: {{ template "dify.api.fullname" . }}
-          - secretRef:
-              name: {{ template "dify.api.fullname" . }}
+            - configMapRef:
+                name: {{ template "dify.api.fullname" . }}
+            - secretRef:
+                name: {{ template "dify.api.fullname" . }}

@@ -67,67 +67,67 @@ spec:
       securityContext: {{- omit .Values.api.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       containers:
-      - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
-        imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
-        name: api
-        {{- if .Values.api.customLivenessProbe }}
-        livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.api.customLivenessProbe "context" $) | nindent 10 }}
-        {{- else if .Values.api.livenessProbe.enabled }}
-        livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.api.livenessProbe "enabled") "context" $) | nindent 10 }}
-          httpGet:
-            path: /health
-            port: api
-        {{- end }}
-        {{- if .Values.api.customReadinessProbe }}
-        readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.api.customReadinessProbe "context" $) | nindent 10 }}
-        {{- else if .Values.api.readinessProbe.enabled }}
-        readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.api.readinessProbe "enabled") "context" $) | nindent 10 }}
-          httpGet:
-            path: /health
-            port: api
-        {{- end }}
-        {{- if .Values.api.customStartupProbe }}
-        startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.api.customStartupProbe "context" $) | nindent 10 }}
-        {{- else if .Values.api.startupProbe.enabled }}
-        startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.api.startupProbe "enabled") "context" $) | nindent 10 }}
-          tcpSocket:
-            port: api
-        {{- end }}
-        # We don't require a privileged container in this case
-        {{- if .Values.api.containerSecurityContext.enabled }}
-        securityContext: {{- omit .Values.api.containerSecurityContext "enabled" | toYaml | nindent 10 }}
-        {{- end }}
-        env:
-        {{- if .Values.sandbox.enabled }}
-        - name: CODE_EXECUTION_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ template "dify.sandbox.fullname" . }}
-              key: "API_KEY"
-        {{- end }}
-        {{- if .Values.api.extraEnv }}
-          {{- toYaml .Values.api.extraEnv | nindent 8 }}
-        {{- end }}
-        envFrom:
-        - configMapRef:
-            name: {{ template "dify.api.fullname" . }}
-        - secretRef:
-            name: {{ template "dify.api.fullname" . }}
-        ports:
-          - name: api
-            containerPort: 5001
-            protocol: TCP
-        resources:
-          {{- toYaml .Values.api.resources | nindent 12 }}
-        volumeMounts:
-          {{- if $usePvc }}
-          - name: app-data
-            mountPath: {{ .Values.api.persistence.mountPath | quote }}
-            subPath: {{ .Values.api.persistence.persistentVolumeClaim.subPath | default "" }}
+        - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
+          imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
+          name: api
+          {{- if .Values.api.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.api.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.api.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.api.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: api
           {{- end }}
-          {{- if .Values.api.extraVolumeMounts }}
-          {{- include "common.tplvalues.render" (dict "value" .Values.api.extraVolumeMounts "context" $) | nindent 10 }}
+          {{- if .Values.api.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.api.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.api.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.api.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: api
           {{- end }}
+          {{- if .Values.api.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.api.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.api.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.api.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: api
+          {{- end }}
+          # We don't require a privileged container in this case
+          {{- if .Values.api.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.api.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.sandbox.enabled }}
+            - name: CODE_EXECUTION_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ template "dify.sandbox.fullname" . }}
+                  key: "API_KEY"
+            {{- end }}
+            {{- if .Values.api.extraEnv }}
+              {{- toYaml .Values.api.extraEnv | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "dify.api.fullname" . }}
+            - secretRef:
+                name: {{ template "dify.api.fullname" . }}
+          ports:
+            - name: api
+              containerPort: 5001
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.api.resources | nindent 14 }}
+          volumeMounts:
+            {{- if $usePvc }}
+            - name: app-data
+              mountPath: {{ .Values.api.persistence.mountPath | quote }}
+              subPath: {{ .Values.api.persistence.persistentVolumeClaim.subPath | default "" }}
+            {{- end }}
+            {{- if .Values.api.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.api.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.api.nodeSelector) }}
       nodeSelector:
         {{- toYaml .Values.nodeSelector | nindent 8 }}
