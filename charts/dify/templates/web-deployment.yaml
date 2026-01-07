@@ -38,7 +38,7 @@ spec:
         # app: {{ template "dify.web.fullname" . }}
         # version: {{ .Values.istioServiceMesh.version | quote }}
         */}}
-{{ include "dify.ud.labels" . | indent 8 }}
+        {{- include "dify.ud.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "dify.web.serviceAccountName" . }}
       {{- if .Values.web.priorityClassName }}
@@ -57,7 +57,7 @@ spec:
       {{- end }}
       {{- if .Values.web.podSecurityContext }}
       securityContext:
-{{ toYaml .Values.web.podSecurityContext | indent 8 }}
+        {{- toYaml .Values.web.podSecurityContext | nindent 8 }}
       {{- end }}
       containers:
       - image: "{{ .Values.image.web.repository }}:{{ default .Chart.AppVersion .Values.image.web.tag }}"
@@ -94,7 +94,7 @@ spec:
         {{- end }}
         {{- if .Values.web.containerSecurityContext }}
         securityContext:
-{{ toYaml .Values.web.containerSecurityContext | indent 10 }}
+          {{- toYaml .Values.web.containerSecurityContext | nindent 10 }}
         {{- end }}
         env:
         {{- if .Values.web.extraEnv }}
@@ -115,27 +115,27 @@ spec:
         {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.web.nodeSelector) }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if .Values.web.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.web.nodeSelector | indent 8 }}
+        {{- toYaml .Values.web.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if and (.Values.affinity) (not .Values.web.affinity) }}
       affinity:
-{{ toYaml .Values.affinity | indent 8 }}
+        {{- toYaml .Values.affinity | nindent 8 }}
     {{- end }}
     {{- if .Values.web.affinity }}
       affinity:
-{{ toYaml .Values.web.affinity | indent 8 }}
+        {{- toYaml .Values.web.affinity | nindent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.web.tolerations) }}
       tolerations:
-{{ toYaml .Values.tolerations | indent 8 }}
+        {{- toYaml .Values.tolerations | nindent 8 }}
     {{- end }}
     {{- if .Values.web.tolerations }}
       tolerations:
-{{ toYaml .Values.web.tolerations | indent 8 }}
+        {{- toYaml .Values.web.tolerations | nindent 8 }}
     {{- end }}
     {{- if .Values.web.extraVolumes }}
       volumes:
