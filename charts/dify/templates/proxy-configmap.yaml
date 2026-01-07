@@ -3,16 +3,16 @@ kind: ConfigMap
 metadata:
   name: {{ template "dify.nginx.fullname" . }}
   labels:
-{{- include "dify.labels" . | nindent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
     component: proxy
 data:
   proxy.conf: |-
-    {{- include "dify.nginx.config.proxy" . | indent 4 }}
+    {{- include "dify.nginx.config.proxy" . | nindent 4 }}
   nginx.conf: |-
-    {{- include "dify.nginx.config.nginx" . | indent 4 }}
+    {{- include "dify.nginx.config.nginx" . | nindent 4 }}
   default.conf: |-
-    {{- include "dify.nginx.config.default" . | indent 4 }}
+    {{- include "dify.nginx.config.default" . | nindent 4 }}
 {{- range $key, $value := .Values.extraConfigFiles }}
   {{ $key }}: |-
-{{ $value | indent 4 }}
+    {{- $value | indent 0 }}
 {{- end }}

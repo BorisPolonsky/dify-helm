@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "dify.worker.fullname" . }}
   labels:
-{{- include "dify.labels" . | nindent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
     component: worker
 data:
   {{- include "dify.worker.config" . | nindent 2 }}

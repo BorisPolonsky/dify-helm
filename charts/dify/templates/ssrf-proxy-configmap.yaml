@@ -4,9 +4,9 @@ kind: ConfigMap
 metadata:
   name: {{ template "dify.ssrfProxy.fullname" . }}
   labels:
-{{- include "dify.labels" . | nindent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
     component: ssrf-proxy
 data:
   squid.conf: |-
-    {{- include "dify.ssrfProxy.config.squid" . | indent 4 }}
+    {{- include "dify.ssrfProxy.config.squid" . | nindent 4 }}
 {{- end }}
