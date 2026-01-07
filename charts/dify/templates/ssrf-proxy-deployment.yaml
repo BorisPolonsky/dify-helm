@@ -52,7 +52,7 @@ spec:
       {{- end }}
       {{- if .Values.ssrfProxy.hostAliases }}
       hostAliases:
-      {{- toYaml .Values.ssrfProxy.hostAliases | nindent 8 }}
+        {{- toYaml .Values.ssrfProxy.hostAliases | nindent 8 }}
       {{- end }}
       {{- if .Values.ssrfProxy.podSecurityContext }}
       securityContext:

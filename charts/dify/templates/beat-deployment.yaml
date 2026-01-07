@@ -51,7 +51,7 @@ spec:
       {{- end }}
       {{- if .Values.beat.hostAliases }}
       hostAliases:
-      {{- toYaml .Values.beat.hostAliases | nindent 8 }}
+        {{- toYaml .Values.beat.hostAliases | nindent 8 }}
       {{- end }}
       {{- if .Values.beat.podSecurityContext.enabled }}
       securityContext: {{- omit .Values.beat.podSecurityContext "enabled" | toYaml | nindent 8 }}

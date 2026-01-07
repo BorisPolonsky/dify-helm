@@ -53,7 +53,7 @@ spec:
       {{- end }}
       {{- if .Values.web.hostAliases }}
       hostAliases:
-      {{- toYaml .Values.web.hostAliases | nindent 8 }}
+        {{- toYaml .Values.web.hostAliases | nindent 8 }}
       {{- end }}
       {{- if .Values.web.podSecurityContext }}
       securityContext:

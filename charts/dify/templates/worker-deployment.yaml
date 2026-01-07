@@ -54,7 +54,7 @@ spec:
       {{- end }}
       {{- if .Values.worker.hostAliases }}
       hostAliases:
-      {{- toYaml .Values.worker.hostAliases | nindent 8 }}
+        {{- toYaml .Values.worker.hostAliases | nindent 8 }}
       {{- end }}
       {{- if .Values.worker.podSecurityContext.enabled }}
       securityContext: {{- omit .Values.worker.podSecurityContext "enabled" | toYaml | nindent 8 }}
