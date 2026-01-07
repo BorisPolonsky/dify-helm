@@ -107,9 +107,9 @@ spec:
             - name: nginx-run
               mountPath: /var/run/nginx
             {{- end }}
-          {{- if .Values.proxy.extraVolumeMounts }}
-          {{- include "common.tplvalues.render" (dict "value" .Values.proxy.extraVolumeMounts "context" $) | nindent 10 }}
-          {{- end }}
+            {{- if .Values.proxy.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.proxy.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.proxy.nodeSelector) }}
       nodeSelector:
         {{- toYaml .Values.nodeSelector | nindent 8 }}
