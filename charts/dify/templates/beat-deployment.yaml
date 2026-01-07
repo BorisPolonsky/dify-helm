@@ -3,19 +3,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-{{ include "dify.ud.annotations" . | indent 4 }}
+    {{- include "dify.ud.annotations" . | nindent 4 }}
     descriptions: beat
   labels:
-{{- include "dify.labels" . | nindent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
     component: beat
     # app: {{ template "dify.beat.fullname" . }}
-{{ include "dify.ud.labels" . | indent 4 }}
+    {{- include "dify.ud.labels" . | nindent 4 }}
   name: {{ template "dify.beat.fullname" . }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-{{- include "dify.selectorLabels" . | nindent 6 }}
+      {{- include "dify.selectorLabels" . | nindent 6 }}
       component: beat
       {{/*
       # Required labels for istio
@@ -28,16 +28,16 @@ spec:
   template:
     metadata:
       annotations:
-{{ include "dify.ud.annotations" . | indent 8 }}
+        {{- include "dify.ud.annotations" . | nindent 8 }}
       labels:
-{{- include "dify.selectorLabels" . | nindent 8 }}
+        {{- include "dify.selectorLabels" . | nindent 8 }}
         component: beat
         {{/*
         # Required labels for istio
         # app: {{ template "dify.beat.fullname" . }}
         # version: {{ .Values.istioServiceMesh.version | quote }}
         */}}
-{{ include "dify.ud.labels" . | indent 8 }}
+        {{- include "dify.ud.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "dify.beat.serviceAccountName" . }}
       {{- if .Values.beat.priorityClassName }}
@@ -95,27 +95,27 @@ spec:
     {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.beat.nodeSelector) }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if .Values.beat.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.beat.nodeSelector | indent 8 }}
+        {{- toYaml .Values.beat.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if and (.Values.affinity) (not .Values.beat.affinity) }}
       affinity:
-{{ toYaml .Values.affinity | indent 8 }}
+        {{- toYaml .Values.affinity | nindent 8 }}
     {{- end }}
     {{- if .Values.beat.affinity }}
       affinity:
-{{ toYaml .Values.beat.affinity | indent 8 }}
+        {{- toYaml .Values.beat.affinity | nindent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.beat.tolerations) }}
       tolerations:
-{{ toYaml .Values.tolerations | indent 8 }}
+        {{- toYaml .Values.tolerations | nindent 8 }}
     {{- end }}
     {{- if .Values.beat.tolerations }}
       tolerations:
-{{ toYaml .Values.beat.tolerations | indent 8 }}
+        {{- toYaml .Values.beat.tolerations | nindent 8 }}
     {{- end }}
     {{- if .Values.beat.extraVolumes }}
       volumes:

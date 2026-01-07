@@ -3,19 +3,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-{{ include "dify.ud.annotations" . | indent 4 }}
+    {{- include "dify.ud.annotations" . | nindent 4 }}
     descriptions: 'SSRF Proxy'
   labels:
-{{- include "dify.labels" . | nindent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
     component: ssrf-proxy
     # app: {{ template "dify.ssrfProxy.fullname" . }}
-{{ include "dify.ud.labels" . | indent 4 }}
+    {{- include "dify.ud.labels" . | nindent 4 }}
   name: {{ template "dify.ssrfProxy.fullname" . }}
 spec:
   replicas: {{ .Values.ssrfProxy.replicas }}
   selector:
     matchLabels:
-{{- include "dify.selectorLabels" . | nindent 6 }}
+      {{- include "dify.selectorLabels" . | nindent 6 }}
       component: ssrf-proxy
       {{/*
       # Required labels for istio
@@ -29,16 +29,16 @@ spec:
     metadata:
       annotations:
         checksum/ssrf-proxy-config: {{ include (print $.Template.BasePath "/ssrf-proxy-configmap.yaml") . | sha256sum }}
-{{ include "dify.ud.annotations" . | indent 8 }}
+        {{- include "dify.ud.annotations" . | nindent 8 }}
       labels:
-{{- include "dify.selectorLabels" . | nindent 8 }}
+        {{- include "dify.selectorLabels" . | nindent 8 }}
         component: ssrf-proxy
         {{/*
         # Required labels for istio
         # app: {{ template "dify.ssrfProxy.fullname" . }}
         # version: {{ .Values.istioServiceMesh.version | quote }}
         */}}
-{{ include "dify.ud.labels" . | indent 8 }}
+        {{- include "dify.ud.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "dify.ssrfProxy.serviceAccountName" . }}
       {{- if .Values.ssrfProxy.priorityClassName }}
@@ -56,7 +56,7 @@ spec:
       {{- end }}
       {{- if .Values.ssrfProxy.podSecurityContext }}
       securityContext:
-{{ toYaml .Values.ssrfProxy.podSecurityContext | indent 8 }}
+        {{- toYaml .Values.ssrfProxy.podSecurityContext | nindent 8 }}
       {{- end }}
       containers:
       - image: "{{ .Values.image.ssrfProxy.repository }}:{{ .Values.image.ssrfProxy.tag }}"
@@ -73,7 +73,7 @@ spec:
         {{- end }}
         {{- if .Values.ssrfProxy.containerSecurityContext }}
         securityContext:
-{{ toYaml .Values.ssrfProxy.containerSecurityContext | indent 10 }}
+          {{- toYaml .Values.ssrfProxy.containerSecurityContext | nindent 10 }}
         {{- end }}
         env:
         {{- if .Values.ssrfProxy.extraEnv }}
@@ -100,27 +100,27 @@ spec:
           {{- toYaml .Values.ssrfProxy.resources | nindent 12 }}
     {{- if and (.Values.nodeSelector) (not .Values.ssrfProxy.nodeSelector) }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if .Values.ssrfProxy.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.ssrfProxy.nodeSelector | indent 8 }}
+        {{- toYaml .Values.ssrfProxy.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if and (.Values.affinity) (not .Values.ssrfProxy.affinity) }}
       affinity:
-{{ toYaml .Values.affinity | indent 8 }}
+        {{- toYaml .Values.affinity | nindent 8 }}
     {{- end }}
     {{- if .Values.ssrfProxy.affinity }}
       affinity:
-{{ toYaml .Values.ssrfProxy.affinity | indent 8 }}
+        {{- toYaml .Values.ssrfProxy.affinity | nindent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.ssrfProxy.tolerations) }}
       tolerations:
-{{ toYaml .Values.tolerations | indent 8 }}
+        {{- toYaml .Values.tolerations | nindent 8 }}
     {{- end }}
     {{- if .Values.ssrfProxy.tolerations }}
       tolerations:
-{{ toYaml .Values.ssrfProxy.tolerations | indent 8 }}
+        {{- toYaml .Values.ssrfProxy.tolerations | nindent 8 }}
     {{- end }}
       volumes:
       - name: squid-conf

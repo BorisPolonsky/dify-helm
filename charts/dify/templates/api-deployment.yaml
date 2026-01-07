@@ -4,19 +4,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-{{ include "dify.ud.annotations" . | indent 4 }}
+    {{- include "dify.ud.annotations" . | nindent 4 }}
     descriptions: api
   labels:
-{{- include "dify.labels" . | nindent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
     component: api
     # app: {{ template "dify.api.fullname" . }}
-{{ include "dify.ud.labels" . | indent 4 }}
+    {{- include "dify.ud.labels" . | nindent 4 }}
   name: {{ template "dify.api.fullname" . }}
 spec:
   replicas: {{ .Values.api.replicas }}
   selector:
     matchLabels:
-{{- include "dify.selectorLabels" . | nindent 6 }}
+      {{- include "dify.selectorLabels" . | nindent 6 }}
       component: api
       {{/*
       # Required labels for istio
@@ -31,16 +31,16 @@ spec:
       annotations:
         checksum/api-config: {{ include (print $.Template.BasePath "/api-config.yaml") . | sha256sum }}
         checksum/api-secret: {{ include (print $.Template.BasePath "/api-secret.yaml") . | sha256sum }}
-{{ include "dify.ud.annotations" . | indent 8 }}
+        {{- include "dify.ud.annotations" . | nindent 8 }}
       labels:
-{{- include "dify.selectorLabels" . | nindent 8 }}
+        {{- include "dify.selectorLabels" . | nindent 8 }}
         component: api
         {{/*
         # Required labels for istio
         # app: {{ template "dify.api.fullname" . }}
         # version: {{ .Values.istioServiceMesh.version | quote }}
         */}}
-{{ include "dify.ud.labels" . | indent 8 }}
+        {{- include "dify.ud.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "dify.api.serviceAccountName" . }}
       {{- if .Values.api.priorityClassName }}
@@ -130,27 +130,27 @@ spec:
         {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.api.nodeSelector) }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if .Values.api.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.api.nodeSelector | indent 8 }}
+        {{- toYaml .Values.api.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if and (.Values.affinity) (not .Values.api.affinity) }}
       affinity:
-{{ toYaml .Values.affinity | indent 8 }}
+        {{- toYaml .Values.affinity | nindent 8 }}
     {{- end }}
     {{- if .Values.api.affinity }}
       affinity:
-{{ toYaml .Values.api.affinity | indent 8 }}
+        {{- toYaml .Values.api.affinity | nindent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.api.tolerations) }}
       tolerations:
-{{ toYaml .Values.tolerations | indent 8 }}
+        {{- toYaml .Values.tolerations | nindent 8 }}
     {{- end }}
     {{- if .Values.api.tolerations }}
       tolerations:
-{{ toYaml .Values.api.tolerations | indent 8 }}
+        {{- toYaml .Values.api.tolerations | nindent 8 }}
     {{- end }}
       volumes:
       {{- if $usePvc }}

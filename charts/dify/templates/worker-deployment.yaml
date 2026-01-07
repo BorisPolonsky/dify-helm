@@ -4,19 +4,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-{{ include "dify.ud.annotations" . | indent 4 }}
+    {{- include "dify.ud.annotations" . | nindent 4 }}
     descriptions: worker
   labels:
-{{- include "dify.labels" . | nindent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
     component: worker
     # app: {{ template "dify.worker.fullname" . }}
-{{ include "dify.ud.labels" . | indent 4 }}
+    {{- include "dify.ud.labels" . | nindent 4 }}
   name: {{ template "dify.worker.fullname" . }}
 spec:
   replicas: {{ .Values.worker.replicas }}
   selector:
     matchLabels:
-{{- include "dify.selectorLabels" . | nindent 6 }}
+      {{- include "dify.selectorLabels" . | nindent 6 }}
       component: worker
       {{/*
       # Required labels for istio
@@ -31,16 +31,16 @@ spec:
       annotations:
         checksum/worker-config: {{ include (print $.Template.BasePath "/worker-config.yaml") . | sha256sum }}
         checksum/worker-secret: {{ include (print $.Template.BasePath "/worker-secret.yaml") . | sha256sum }}
-{{ include "dify.ud.annotations" . | indent 8 }}
+        {{- include "dify.ud.annotations" . | nindent 8 }}
       labels:
-{{- include "dify.selectorLabels" . | nindent 8 }}
+        {{- include "dify.selectorLabels" . | nindent 8 }}
         component: worker
         {{/*
         # Required labels for istio
         # app: {{ template "dify.worker.fullname" . }}
         # version: {{ .Values.istioServiceMesh.version | quote }}
         */}}
-{{ include "dify.ud.labels" . | indent 8 }}
+        {{- include "dify.ud.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "dify.worker.serviceAccountName" . }}
       {{- if .Values.worker.priorityClassName }}
@@ -127,27 +127,27 @@ spec:
         {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.worker.nodeSelector) }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if .Values.worker.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.worker.nodeSelector | indent 8 }}
+        {{- toYaml .Values.worker.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if and (.Values.affinity) (not .Values.worker.affinity) }}
       affinity:
-{{ toYaml .Values.affinity | indent 8 }}
+        {{- toYaml .Values.affinity | nindent 8 }}
     {{- end }}
     {{- if .Values.worker.affinity }}
       affinity:
-{{ toYaml .Values.worker.affinity | indent 8 }}
+        {{- toYaml .Values.worker.affinity | nindent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.worker.tolerations) }}
       tolerations:
-{{ toYaml .Values.tolerations | indent 8 }}
+        {{- toYaml .Values.tolerations | nindent 8 }}
     {{- end }}
     {{- if .Values.worker.tolerations }}
       tolerations:
-{{ toYaml .Values.worker.tolerations | indent 8 }}
+        {{- toYaml .Values.worker.tolerations | nindent 8 }}
     {{- end }}
       volumes:
       {{- if $usePvc }}
