@@ -131,6 +131,9 @@
           }
         },
         "updateStrategy": { "type": "object" },
+        "customLivenessProbe": { "type": "object" },
+        "customReadinessProbe": { "type": "object" },
+        "customStartupProbe": { "type": "object" },
         "hostAliases": {
           "type": "array",
           "items": {
@@ -145,9 +148,6 @@
             "required": ["ip", "hostnames"]
           }
         },
-        "customLivenessProbe": { "type": "object" },
-        "customReadinessProbe": { "type": "object" },
-        "customStartupProbe": { "type": "object" },
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": "array" },
@@ -480,6 +480,9 @@
           }
         },
         "updateStrategy": { "type": "object" },
+        "customLivenessProbe": { "type": "object" },
+        "customReadinessProbe": { "type": "object" },
+        "customStartupProbe": { "type": "object" },
         "hostAliases": {
           "type": "array",
           "items": {
@@ -494,9 +497,6 @@
             "required": ["ip", "hostnames"]
           }
         },
-        "customLivenessProbe": { "type": "object" },
-        "customReadinessProbe": { "type": "object" },
-        "customStartupProbe": { "type": "object" },
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": "array" },
@@ -576,6 +576,9 @@
           }
         },
         "updateStrategy": { "type": "object" },
+        "customLivenessProbe": { "type": "object" },
+        "customReadinessProbe": { "type": "object" },
+        "customStartupProbe": { "type": "object" },
         "hostAliases": {
           "type": "array",
           "items": {
@@ -590,9 +593,6 @@
             "required": ["ip", "hostnames"]
           }
         },
-        "customLivenessProbe": { "type": "object" },
-        "customReadinessProbe": { "type": "object" },
-        "customStartupProbe": { "type": "object" },
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": "array" },

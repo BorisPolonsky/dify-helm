@@ -153,16 +153,16 @@ api:
   ## @param api.updateStrategy Update strategy type and configuration parameters
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
-  ## @param api.hostAliases Add deployment host aliases
-  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
-  ##
-  hostAliases: []
   ## @param api.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
   ## @param api.customReadinessProbe Custom readinessProbe that overrides the default one
   customReadinessProbe: {}
   ## @param api.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  ## @param api.hostAliases Add deployment host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
   ## Configure Pods Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param api.podSecurityContext.enabled Enabled Dify api pod's Security Context
@@ -617,16 +617,16 @@ web:
   ## @param web.updateStrategy Update strategy type and configuration parameters
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
-  ## @param web.hostAliases Add deployment host aliases
-  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
-  ##
-  hostAliases: []
   ## @param web.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
   ## @param web.customReadinessProbe Custom readinessProbe that overrides the default one
   customReadinessProbe: {}
   ## @param web.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  ## @param web.hostAliases Add deployment host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
   # Configure Pods Security Context
   podSecurityContext: {}
   # Configure Container Security Context
@@ -707,16 +707,16 @@ sandbox:
   ## @param sandbox.updateStrategy Update strategy type and configuration parameters
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
-  ## @param sandbox.hostAliases Add deployment host aliases
-  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
-  ##
-  hostAliases: []
   ## @param sandbox.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
   ## @param sandbox.customReadinessProbe Custom readinessProbe that overrides the default one
   customReadinessProbe: {}
   ## @param sandbox.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  ## @param sandbox.hostAliases Add deployment host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
   # Configure Pods Security Context
   podSecurityContext: {}
   # Configure Container Security Context
