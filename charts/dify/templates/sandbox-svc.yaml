@@ -4,15 +4,15 @@ kind: Service
 metadata:
   name: {{ template "dify.sandbox.fullname" . }}
   labels:
-{{ include "dify.labels" . | indent 4 }}
-{{- if .Values.sandbox.service.labels }}
-{{ toYaml .Values.sandbox.service.labels | indent 4 }}
-{{- end }}
+    {{- include "dify.labels" . | nindent 4 }}
+    {{- if .Values.sandbox.service.labels }}
+    {{- toYaml .Values.sandbox.service.labels | nindent 4 }}
+    {{- end }}
     component: "sandbox"
-{{- with .Values.sandbox.service.annotations }}
+  {{- with .Values.sandbox.service.annotations }}
   annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: ClusterIP
   {{- if .Values.sandbox.service.clusterIP }}
@@ -24,6 +24,6 @@ spec:
       protocol: TCP
       targetPort: sandbox
   selector:
-{{ include "dify.selectorLabels" . | indent 4 }}
+    {{- include "dify.selectorLabels" . | nindent 4 }}
     component: "sandbox"
 {{- end }}

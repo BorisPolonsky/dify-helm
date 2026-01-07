@@ -4,32 +4,32 @@ kind: Service
 metadata:
   name: {{ template "dify.pluginDaemon.fullname" . }}
   labels:
-{{ include "dify.labels" . | indent 4 }}
-{{- if .Values.pluginDaemon.service.labels }}
-{{ toYaml .Values.pluginDaemon.service.labels | indent 4 }}
-{{- end }}
+    {{- include "dify.labels" . | nindent 4 }}
+    {{- if .Values.pluginDaemon.service.labels }}
+    {{- toYaml .Values.pluginDaemon.service.labels | nindent 4 }}
+    {{- end }}
     component: "plugin-daemon"
-{{- with .Values.pluginDaemon.service.annotations }}
+  {{- with .Values.pluginDaemon.service.annotations }}
   annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: ClusterIP
   {{- if .Values.pluginDaemon.service.clusterIP }}
   clusterIP: {{ .Values.pluginDaemon.service.clusterIP }}
   {{- end }}
   ports:
-  - name: http-daemon
-    port: {{ .Values.pluginDaemon.service.ports.daemon }}
-    protocol: TCP
-    targetPort: daemon
-  {{- if .Values.pluginDaemon.service.ports.pluginInstall }}
-  - name: http-plugin-install
-    port: {{ .Values.pluginDaemon.service.ports.pluginInstall }}
-    protocol: TCP
-    targetPort: plugin-install
+    - name: http-daemon
+      port: {{ .Values.pluginDaemon.service.ports.daemon }}
+      protocol: TCP
+      targetPort: daemon
+    {{- if .Values.pluginDaemon.service.ports.pluginInstall }}
+    - name: http-plugin-install
+      port: {{ .Values.pluginDaemon.service.ports.pluginInstall }}
+      protocol: TCP
+      targetPort: plugin-install
     {{- end }}
   selector:
-{{ include "dify.selectorLabels" . | indent 4 }}
+    {{- include "dify.selectorLabels" . | nindent 4 }}
     component: "plugin-daemon"
 {{- end }}
