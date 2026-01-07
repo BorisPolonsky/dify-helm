@@ -131,6 +131,20 @@
           }
         },
         "updateStrategy": { "type": "object" },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
         "customLivenessProbe": { "type": "object" },
         "customReadinessProbe": { "type": "object" },
         "customStartupProbe": { "type": "object" },
@@ -264,6 +278,20 @@
         "customReadinessProbe": { "type": "object" },
         "customStartupProbe": { "type": "object" },
         "updateStrategy": { "type": "object" },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
@@ -299,6 +327,20 @@
             "type": { "type": "string" }
           }
         },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
@@ -332,6 +374,20 @@
         "clientMaxBodySize": { "type": "string" },
         "workerProcesses": { "type": ["string", "integer"] },
         "updateStrategy": { "type": "object" },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
@@ -424,6 +480,20 @@
           }
         },
         "updateStrategy": { "type": "object" },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
         "customLivenessProbe": { "type": "object" },
         "customReadinessProbe": { "type": "object" },
         "customStartupProbe": { "type": "object" },
@@ -506,6 +576,20 @@
           }
         },
         "updateStrategy": { "type": "object" },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
         "customLivenessProbe": { "type": "object" },
         "customReadinessProbe": { "type": "object" },
         "customStartupProbe": { "type": "object" },
@@ -554,6 +638,20 @@
         "customReadinessProbe": { "type": "object" },
         "customStartupProbe": { "type": "object" },
         "updateStrategy": { "type": "object" },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },
@@ -616,6 +714,20 @@
         "customReadinessProbe": { "type": "object" },
         "customStartupProbe": { "type": "object" },
         "updateStrategy": { "type": "object" },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": ["array", "null"] },

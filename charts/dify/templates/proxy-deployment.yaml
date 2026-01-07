@@ -50,6 +50,10 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
+      {{- if .Values.proxy.hostAliases }}
+      hostAliases:
+      {{- toYaml .Values.proxy.hostAliases | nindent 8 }}
+      {{- end }}
       {{- if .Values.proxy.podSecurityContext.enabled }}
       securityContext: {{- omit .Values.proxy.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
