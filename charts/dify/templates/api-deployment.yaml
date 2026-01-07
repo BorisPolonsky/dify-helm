@@ -59,6 +59,10 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
+      {{- if .Values.api.hostAliases }}
+      hostAliases:
+      {{- toYaml .Values.api.hostAliases | nindent 8 }}
+      {{- end }}
       {{- if .Values.api.podSecurityContext.enabled }}
       securityContext: {{- omit .Values.api.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}

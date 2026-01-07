@@ -64,6 +64,10 @@ spec:
         - name: {{ . }}
       {{- end }}
       {{- end }}
+      {{- if .Values.pluginDaemon.hostAliases }}
+      hostAliases:
+      {{- toYaml .Values.pluginDaemon.hostAliases | nindent 8 }}
+      {{- end }}
       {{- if .Values.pluginDaemon.podSecurityContext }}
       securityContext:
 {{ toYaml .Values.pluginDaemon.podSecurityContext | indent 8 }}
