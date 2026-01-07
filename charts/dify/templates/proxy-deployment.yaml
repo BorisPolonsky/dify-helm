@@ -46,9 +46,9 @@ spec:
       {{- end }}
       {{- if .Values.image.proxy.pullSecrets }}
       imagePullSecrets:
-      {{- range .Values.image.proxy.pullSecrets }}
+        {{- range .Values.image.proxy.pullSecrets }}
         - name: {{ . }}
-      {{- end }}
+        {{- end }}
       {{- end }}
       {{- if .Values.proxy.hostAliases }}
       hostAliases:
@@ -84,32 +84,32 @@ spec:
         resources:
           {{- toYaml .Values.proxy.resources | nindent 12 }}
         volumeMounts:
-        - name: nginx
-          mountPath: /etc/nginx/nginx.conf
-          readOnly: true
-          subPath: nginx.conf
-        - name: nginx
-          mountPath: /etc/nginx/proxy.conf
-          readOnly: true
-          subPath: proxy.conf
-        - name: nginx
-          mountPath: /etc/nginx/conf.d/default.conf
-          readOnly: true
-          subPath: default.conf
-        {{- if .Values.proxy.log.persistence.enabled }}
-        - name: nginx-logs-disk
-          mountPath: {{ .Values.proxy.log.persistence.mountPath | quote }}
-          subPath: {{ .Values.proxy.log.persistence.persistentVolumeClaim.subPath | default "" }}
-        {{- end }}
-        {{- if and .Values.proxy.containerSecurityContext.enabled (ne (int (default 0 .Values.proxy.containerSecurityContext.runAsUser)) 0) }}
-        - name: nginx-cache
-          mountPath: /var/cache/nginx
-        - name: nginx-run
-          mountPath: /var/run/nginx
-        {{- end }}
-        {{- if .Values.proxy.extraVolumeMounts }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.proxy.extraVolumeMounts "context" $) | nindent 8 }}
-        {{- end }}
+          - name: nginx
+            mountPath: /etc/nginx/nginx.conf
+            readOnly: true
+            subPath: nginx.conf
+          - name: nginx
+            mountPath: /etc/nginx/proxy.conf
+            readOnly: true
+            subPath: proxy.conf
+          - name: nginx
+            mountPath: /etc/nginx/conf.d/default.conf
+            readOnly: true
+            subPath: default.conf
+          {{- if .Values.proxy.log.persistence.enabled }}
+          - name: nginx-logs-disk
+            mountPath: {{ .Values.proxy.log.persistence.mountPath | quote }}
+            subPath: {{ .Values.proxy.log.persistence.persistentVolumeClaim.subPath | default "" }}
+          {{- end }}
+          {{- if and .Values.proxy.containerSecurityContext.enabled (ne (int (default 0 .Values.proxy.containerSecurityContext.runAsUser)) 0) }}
+          - name: nginx-cache
+            mountPath: /var/cache/nginx
+          - name: nginx-run
+            mountPath: /var/run/nginx
+          {{- end }}
+          {{- if .Values.proxy.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.proxy.extraVolumeMounts "context" $) | nindent 10 }}
+          {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.proxy.nodeSelector) }}
       nodeSelector:
         {{- toYaml .Values.nodeSelector | nindent 8 }}
@@ -135,22 +135,22 @@ spec:
         {{- toYaml .Values.proxy.tolerations | nindent 8 }}
     {{- end }}
       volumes:
-      - name: nginx
-        configMap:
-          defaultMode: 420
-          name: {{ template "dify.nginx.fullname" . }}
-      {{- if .Values.proxy.log.persistence.enabled }}
-      - name: nginx-logs-disk
-        persistentVolumeClaim:
-          claimName: {{ .Values.proxy.log.persistence.persistentVolumeClaim.existingClaim | default (printf "%s-logs" (include "dify.nginx.fullname" . | trunc 58)) }}
-      {{- end }}
-      {{- if and .Values.proxy.containerSecurityContext.enabled (ne (int (default 0 .Values.proxy.containerSecurityContext.runAsUser)) 0) }}
-      - name: nginx-cache
-        emptyDir: {}
-      - name: nginx-run
-        emptyDir: {}
-      {{- end }}
-      {{- if .Values.proxy.extraVolumes }}
-      {{- include "common.tplvalues.render" (dict "value" .Values.proxy.extraVolumes "context" $) | nindent 6 }}
-      {{- end }}
+        - name: nginx
+          configMap:
+            defaultMode: 420
+            name: {{ template "dify.nginx.fullname" . }}
+        {{- if .Values.proxy.log.persistence.enabled }}
+        - name: nginx-logs-disk
+          persistentVolumeClaim:
+            claimName: {{ .Values.proxy.log.persistence.persistentVolumeClaim.existingClaim | default (printf "%s-logs" (include "dify.nginx.fullname" . | trunc 58)) }}
+        {{- end }}
+        {{- if and .Values.proxy.containerSecurityContext.enabled (ne (int (default 0 .Values.proxy.containerSecurityContext.runAsUser)) 0) }}
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.proxy.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.proxy.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
 {{- end }}

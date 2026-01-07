@@ -117,14 +117,14 @@ spec:
         resources:
           {{- toYaml .Values.worker.resources | nindent 12 }}
         volumeMounts:
-        {{- if $usePvc }}
-        - name: app-data
-          mountPath: {{ .Values.api.persistence.mountPath | quote }}
-          subPath: {{ .Values.api.persistence.persistentVolumeClaim.subPath | default "" }}
-        {{- end }}
-        {{- if .Values.worker.extraVolumeMounts }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.worker.extraVolumeMounts "context" $) | nindent 8 }}
-        {{- end }}
+          {{- if $usePvc }}
+          - name: app-data
+            mountPath: {{ .Values.api.persistence.mountPath | quote }}
+            subPath: {{ .Values.api.persistence.persistentVolumeClaim.subPath | default "" }}
+          {{- end }}
+          {{- if .Values.worker.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.worker.extraVolumeMounts "context" $) | nindent 10 }}
+          {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.worker.nodeSelector) }}
       nodeSelector:
         {{- toYaml .Values.nodeSelector | nindent 8 }}
@@ -150,12 +150,12 @@ spec:
         {{- toYaml .Values.worker.tolerations | nindent 8 }}
     {{- end }}
       volumes:
-      {{- if $usePvc }}
-      - name: app-data
-        persistentVolumeClaim:
-          claimName: {{ .Values.api.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.fullname" . | trunc 58)) }}
-      {{- end }}
-      {{- if .Values.worker.extraVolumes }}
-      {{- include "common.tplvalues.render" (dict "value" .Values.worker.extraVolumes "context" $) | nindent 6 }}
-      {{- end }}
+        {{- if $usePvc }}
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.api.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.fullname" . | trunc 58)) }}
+        {{- end }}
+        {{- if .Values.worker.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.worker.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
 {{- end }}

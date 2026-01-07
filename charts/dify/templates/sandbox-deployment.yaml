@@ -47,9 +47,9 @@ spec:
       {{- end }}
       {{- if .Values.image.sandbox.pullSecrets }}
       imagePullSecrets:
-      {{- range .Values.image.sandbox.pullSecrets }}
+        {{- range .Values.image.sandbox.pullSecrets }}
         - name: {{ . }}
-      {{- end }}
+        {{- end }}
       {{- end }}
       {{- if .Values.sandbox.hostAliases }}
       hostAliases:
@@ -107,11 +107,11 @@ spec:
           {{- toYaml .Values.sandbox.resources | nindent 12 }}
         {{- if .Values.sandbox.extraVolumeMounts }}
         volumeMounts:
-        {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.extraVolumeMounts "context" $) | nindent 8 }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.extraVolumeMounts "context" $) | nindent 10 }}
         {{- end }}
       {{- if .Values.sandbox.extraVolumes }}
       volumes:
-      {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.extraVolumes "context" $) | nindent 6 }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.sandbox.extraVolumes "context" $) | nindent 8 }}
       {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.sandbox.nodeSelector) }}
       nodeSelector:

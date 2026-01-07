@@ -46,9 +46,9 @@ spec:
       {{- end }}
       {{- if .Values.image.ssrfProxy.pullSecrets }}
       imagePullSecrets:
-      {{- range .Values.image.ssrfProxy.pullSecrets }}
+        {{- range .Values.image.ssrfProxy.pullSecrets }}
         - name: {{ . }}
-      {{- end }}
+        {{- end }}
       {{- end }}
       {{- if .Values.ssrfProxy.hostAliases }}
       hostAliases:
@@ -84,18 +84,18 @@ spec:
             containerPort: 3128
             protocol: TCP
         volumeMounts:
-        - name: squid-conf
-          mountPath: /etc/squid/squid.conf
-          readOnly: true
-          subPath: squid.conf
-        {{- if .Values.ssrfProxy.log.persistence.enabled }}
-        - name: squid-log
-          mountPath: {{ .Values.ssrfProxy.log.persistence.mountPath | quote }}
-          subPath: {{ .Values.ssrfProxy.log.persistence.persistentVolumeClaim.subPath | default "" }}
-        {{- end }}
-        {{- if .Values.ssrfProxy.extraVolumeMounts }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.extraVolumeMounts "context" $) | nindent 8 }}
-        {{- end }}
+          - name: squid-conf
+            mountPath: /etc/squid/squid.conf
+            readOnly: true
+            subPath: squid.conf
+          {{- if .Values.ssrfProxy.log.persistence.enabled }}
+          - name: squid-log
+            mountPath: {{ .Values.ssrfProxy.log.persistence.mountPath | quote }}
+            subPath: {{ .Values.ssrfProxy.log.persistence.persistentVolumeClaim.subPath | default "" }}
+          {{- end }}
+          {{- if .Values.ssrfProxy.extraVolumeMounts }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.extraVolumeMounts "context" $) | nindent 10 }}
+          {{- end }}
         resources:
           {{- toYaml .Values.ssrfProxy.resources | nindent 12 }}
     {{- if and (.Values.nodeSelector) (not .Values.ssrfProxy.nodeSelector) }}
@@ -123,16 +123,16 @@ spec:
         {{- toYaml .Values.ssrfProxy.tolerations | nindent 8 }}
     {{- end }}
       volumes:
-      - name: squid-conf
-        configMap:
-          defaultMode: 420
-          name: {{ template "dify.ssrfProxy.fullname" . }}
-      {{- if .Values.ssrfProxy.log.persistence.enabled }}
-      - name: squid-log
-        persistentVolumeClaim:
-          claimName: {{ .Values.ssrfProxy.log.persistence.persistentVolumeClaim.existingClaim | default (printf "%s-logs" (include "dify.ssrfProxy.fullname" . | trunc 58)) }}
-      {{- end }}
-      {{- if .Values.ssrfProxy.extraVolumes }}
-      {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.extraVolumes "context" $) | nindent 6 }}
-      {{- end }}
+        - name: squid-conf
+          configMap:
+            defaultMode: 420
+            name: {{ template "dify.ssrfProxy.fullname" . }}
+        {{- if .Values.ssrfProxy.log.persistence.enabled }}
+        - name: squid-log
+          persistentVolumeClaim:
+            claimName: {{ .Values.ssrfProxy.log.persistence.persistentVolumeClaim.existingClaim | default (printf "%s-logs" (include "dify.ssrfProxy.fullname" . | trunc 58)) }}
+        {{- end }}
+        {{- if .Values.ssrfProxy.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.ssrfProxy.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
 {{- end }}

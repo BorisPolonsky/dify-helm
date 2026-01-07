@@ -3,19 +3,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-{{ include "dify.ud.annotations" . | indent 4 }}
+    {{- include "dify.ud.annotations" . | nindent 4 }}
     descriptions: web server
   labels:
-{{- include "dify.labels" . | nindent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
     component: web
     # app: {{ template "dify.web.fullname" . }}
-{{ include "dify.ud.labels" . | indent 4 }}
+    {{- include "dify.ud.labels" . | nindent 4 }}
   name: {{ template "dify.web.fullname" . }}
 spec:
   replicas: {{ .Values.web.replicas }}
   selector:
     matchLabels:
-{{- include "dify.selectorLabels" . | nindent 6 }}
+      {{- include "dify.selectorLabels" . | nindent 6 }}
       component: web
       {{/*
       # Required labels for istio
@@ -29,9 +29,9 @@ spec:
     metadata:
       annotations:
         checksum/web-config: {{ include (print $.Template.BasePath "/web-config.yaml") . | sha256sum }}
-{{ include "dify.ud.annotations" . | indent 8 }}
+        {{- include "dify.ud.annotations" . | nindent 8 }}
       labels:
-{{- include "dify.selectorLabels" . | nindent 8 }}
+        {{- include "dify.selectorLabels" . | nindent 8 }}
         component: web
         {{/*
         # Required labels for istio
