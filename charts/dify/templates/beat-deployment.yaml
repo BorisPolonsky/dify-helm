@@ -89,10 +89,10 @@ spec:
                 name: {{ template "dify.worker.fullname" . }}
           resources:
             {{- toYaml .Values.beat.resources | nindent 14 }}
-        {{- if .Values.beat.extraVolumeMounts }}
-        volumeMounts:
-          {{- include "common.tplvalues.render" (dict "value" .Values.beat.extraVolumeMounts "context" $) | nindent 10 }}
-        {{- end }}
+          {{- if .Values.beat.extraVolumeMounts }}
+          volumeMounts:
+            {{- include "common.tplvalues.render" (dict "value" .Values.beat.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.beat.nodeSelector) }}
       nodeSelector:
         {{- toYaml .Values.nodeSelector | nindent 8 }}
