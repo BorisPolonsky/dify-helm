@@ -4,15 +4,15 @@ kind: Service
 metadata:
   name: {{ template "dify.web.fullname" . }}
   labels:
-{{ include "dify.labels" . | indent 4 }}
-{{- if .Values.web.service.labels }}
-{{ toYaml .Values.web.service.labels | indent 4 }}
-{{- end }}
+    {{- include "dify.labels" . | nindent 4 }}
+    {{- if .Values.web.service.labels }}
+    {{- toYaml .Values.web.service.labels | nindent 4 }}
+    {{- end }}
     component: "web"
-{{- with .Values.web.service.annotations }}
+  {{- with .Values.web.service.annotations }}
   annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: ClusterIP
   {{- if .Values.web.service.clusterIP }}
@@ -24,6 +24,6 @@ spec:
       protocol: TCP
       targetPort: web
   selector:
-{{ include "dify.selectorLabels" . | indent 4 }}
+    {{- include "dify.selectorLabels" . | nindent 4 }}
     component: "web"
 {{- end }}

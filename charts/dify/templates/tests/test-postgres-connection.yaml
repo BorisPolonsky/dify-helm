@@ -29,8 +29,8 @@ spec:
               done
               echo "PostgreSQL is ready."
           envFrom:
-          - configMapRef:
-              name: {{ template "dify.api.fullname" . }}
-          - secretRef:
-              name: {{ template "dify.api.fullname" . }}
+            - configMapRef:
+                name: {{ template "dify.api.fullname" . }}
+            - secretRef:
+                name: {{ template "dify.api.fullname" . }}
 {{- end }}

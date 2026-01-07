@@ -3,19 +3,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-{{ include "dify.ud.annotations" . | indent 4 }}
+    {{- include "dify.ud.annotations" . | nindent 4 }}
     descriptions: web server
   labels:
-{{- include "dify.labels" . | nindent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
     component: web
     # app: {{ template "dify.web.fullname" . }}
-{{ include "dify.ud.labels" . | indent 4 }}
+    {{- include "dify.ud.labels" . | nindent 4 }}
   name: {{ template "dify.web.fullname" . }}
 spec:
   replicas: {{ .Values.web.replicas }}
   selector:
     matchLabels:
-{{- include "dify.selectorLabels" . | nindent 6 }}
+      {{- include "dify.selectorLabels" . | nindent 6 }}
       component: web
       {{/*
       # Required labels for istio
@@ -29,16 +29,16 @@ spec:
     metadata:
       annotations:
         checksum/web-config: {{ include (print $.Template.BasePath "/web-config.yaml") . | sha256sum }}
-{{ include "dify.ud.annotations" . | indent 8 }}
+        {{- include "dify.ud.annotations" . | nindent 8 }}
       labels:
-{{- include "dify.selectorLabels" . | nindent 8 }}
+        {{- include "dify.selectorLabels" . | nindent 8 }}
         component: web
         {{/*
         # Required labels for istio
         # app: {{ template "dify.web.fullname" . }}
         # version: {{ .Values.istioServiceMesh.version | quote }}
         */}}
-{{ include "dify.ud.labels" . | indent 8 }}
+        {{- include "dify.ud.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "dify.web.serviceAccountName" . }}
       {{- if .Values.web.priorityClassName }}
@@ -53,89 +53,89 @@ spec:
       {{- end }}
       {{- if .Values.web.hostAliases }}
       hostAliases:
-      {{- toYaml .Values.web.hostAliases | nindent 8 }}
+        {{- toYaml .Values.web.hostAliases | nindent 8 }}
       {{- end }}
       {{- if .Values.web.podSecurityContext }}
       securityContext:
-{{ toYaml .Values.web.podSecurityContext | indent 8 }}
+        {{- toYaml .Values.web.podSecurityContext | nindent 8 }}
       {{- end }}
       containers:
-      - image: "{{ .Values.image.web.repository }}:{{ default .Chart.AppVersion .Values.image.web.tag }}"
-        imagePullPolicy: "{{ .Values.image.web.pullPolicy }}"
-        name: web
-        {{- if .Values.web.customLivenessProbe }}
-        livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customLivenessProbe "context" $) | nindent 10 }}
-        {{- else if .Values.web.livenessProbe.enabled }}
-        livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.livenessProbe "enabled") "context" $) | nindent 10 }}
-          httpGet:
-            path: /apps
-            port: web
-            httpHeaders:
-            - name: accept-language
-              value: en
-        {{- end }}
-        {{- if .Values.web.customReadinessProbe }}
-        readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customReadinessProbe "context" $) | nindent 10 }}
-        {{- else if .Values.web.readinessProbe.enabled }}
-        readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.readinessProbe "enabled") "context" $) | nindent 10 }}
-          httpGet:
-            path: /apps
-            port: web
-            httpHeaders:
-            - name: accept-language
-              value: en
-        {{- end }}
-        {{- if .Values.web.customStartupProbe }}
-        startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customStartupProbe "context" $) | nindent 10 }}
-        {{- else if .Values.web.startupProbe.enabled }}
-        startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.startupProbe "enabled") "context" $) | nindent 10 }}
-          tcpSocket:
-            port: web
-        {{- end }}
-        {{- if .Values.web.containerSecurityContext }}
-        securityContext:
-{{ toYaml .Values.web.containerSecurityContext | indent 10 }}
-        {{- end }}
-        env:
-        {{- if .Values.web.extraEnv }}
-          {{- toYaml .Values.web.extraEnv | nindent 8 }}
-        {{- end }}
-        envFrom:
-        - configMapRef:
-            name: {{ template "dify.web.fullname" . }}
-        ports:
-          - name: web
-            containerPort: 3000
-            protocol: TCP
-        resources:
-          {{- toYaml .Values.web.resources | nindent 12 }}
-        {{- if .Values.web.extraVolumeMounts }}
-        volumeMounts:
-        {{- include "common.tplvalues.render" (dict "value" .Values.web.extraVolumeMounts "context" $) | nindent 8 }}
-        {{- end }}
+        - image: "{{ .Values.image.web.repository }}:{{ default .Chart.AppVersion .Values.image.web.tag }}"
+          imagePullPolicy: "{{ .Values.image.web.pullPolicy }}"
+          name: web
+          {{- if .Values.web.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.web.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /apps
+              port: web
+              httpHeaders:
+                - name: accept-language
+                  value: en
+          {{- end }}
+          {{- if .Values.web.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.web.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /apps
+              port: web
+              httpHeaders:
+                - name: accept-language
+                  value: en
+          {{- end }}
+          {{- if .Values.web.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.web.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.web.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.web.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: web
+          {{- end }}
+          {{- if .Values.web.containerSecurityContext }}
+          securityContext:
+            {{- toYaml .Values.web.containerSecurityContext | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.web.extraEnv }}
+              {{- toYaml .Values.web.extraEnv | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "dify.web.fullname" . }}
+          ports:
+            - name: web
+              containerPort: 3000
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.web.resources | nindent 14 }}
+          {{- if .Values.web.extraVolumeMounts }}
+          volumeMounts:
+            {{- include "common.tplvalues.render" (dict "value" .Values.web.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.web.nodeSelector) }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if .Values.web.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.web.nodeSelector | indent 8 }}
+        {{- toYaml .Values.web.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if and (.Values.affinity) (not .Values.web.affinity) }}
       affinity:
-{{ toYaml .Values.affinity | indent 8 }}
+        {{- toYaml .Values.affinity | nindent 8 }}
     {{- end }}
     {{- if .Values.web.affinity }}
       affinity:
-{{ toYaml .Values.web.affinity | indent 8 }}
+        {{- toYaml .Values.web.affinity | nindent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.web.tolerations) }}
       tolerations:
-{{ toYaml .Values.tolerations | indent 8 }}
+        {{- toYaml .Values.tolerations | nindent 8 }}
     {{- end }}
     {{- if .Values.web.tolerations }}
       tolerations:
-{{ toYaml .Values.web.tolerations | indent 8 }}
+        {{- toYaml .Values.web.tolerations | nindent 8 }}
     {{- end }}
     {{- if .Values.web.extraVolumes }}
       volumes:

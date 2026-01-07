@@ -15,19 +15,19 @@ metadata:
   name: {{ printf "%s" (include "dify.fullname" . | trunc 58) }}
 {{- with .Values.api.persistence.annotations  }}
   annotations:
-{{ toYaml . | indent 4 }}
+    {{- toYaml . | nindent 4 }}
 {{- end }}
   labels:
-{{ include "dify.labels" . | indent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
 spec:
   accessModes:
   - {{ $pvc.accessModes | quote }}
   {{- if $pvc.storageClass }}
-    {{- if eq "-" $pvc.storageClass }}
+  {{- if eq "-" $pvc.storageClass }}
   storageClassName: ""
-    {{- else }}
+  {{- else }}
   storageClassName: {{ $pvc.storageClass }}
-    {{- end }}
+  {{- end }}
   {{- end }}
   resources:
     requests:
@@ -47,19 +47,19 @@ metadata:
   name: {{ printf "%s-logs" (include "dify.nginx.fullname" . | trunc 58) }}
 {{- with .Values.proxy.log.persistence.annotations  }}
   annotations:
-{{ toYaml . | indent 4 }}
+    {{- toYaml . | nindent 4 }}
 {{- end }}
   labels:
-{{ include "dify.labels" . | indent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
 spec:
   accessModes:
   - {{ $pvc.accessModes | quote }}
   {{- if $pvc.storageClass }}
-    {{- if eq "-" $pvc.storageClass }}
+  {{- if eq "-" $pvc.storageClass }}
   storageClassName: ""
-    {{- else }}
+  {{- else }}
   storageClassName: {{ $pvc.storageClass }}
-    {{- end }}
+  {{- end }}
   {{- end }}
   resources:
     requests:
@@ -78,19 +78,19 @@ metadata:
   name: {{ printf "%s-logs" (include "dify.ssrfProxy.fullname" . | trunc 58) }}
 {{- with .Values.ssrfProxy.log.persistence.annotations  }}
   annotations:
-{{ toYaml . | indent 4 }}
+    {{- toYaml . | nindent 4 }}
 {{- end }}
   labels:
-{{ include "dify.labels" . | indent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
 spec:
   accessModes:
   - {{ $pvc.accessModes | quote }}
   {{- if $pvc.storageClass }}
-    {{- if eq "-" $pvc.storageClass }}
+  {{- if eq "-" $pvc.storageClass }}
   storageClassName: ""
-    {{- else }}
+  {{- else }}
   storageClassName: {{ $pvc.storageClass }}
-    {{- end }}
+  {{- end }}
   {{- end }}
   resources:
     requests:
@@ -118,19 +118,19 @@ metadata:
   name: {{ printf "%s" (include "dify.pluginDaemon.fullname" . | trunc 58) }}
 {{- with .Values.pluginDaemon.persistence.annotations }}
   annotations:
-{{ toYaml . | indent 4 }}
+    {{- toYaml . | nindent 4 }}
 {{- end }}
   labels:
-{{ include "dify.labels" . | indent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
 spec:
   accessModes:
   - {{ $pvc.accessModes | quote }}
   {{- if $pvc.storageClass }}
-    {{- if eq "-" $pvc.storageClass }}
+  {{- if eq "-" $pvc.storageClass }}
   storageClassName: ""
-    {{- else }}
+  {{- else }}
   storageClassName: {{ $pvc.storageClass }}
-    {{- end }}
+  {{- end }}
   {{- end }}
   resources:
     requests:

@@ -18,16 +18,16 @@ spec:
             - sh
             - -c
             - |
-{{- if or (and .Values.externalRedis.enabled .Values.externalRedis.sentinel.enabled) (and .Values.redis.enabled .Values.redis.sentinel.enabled) }}
+              {{- if or (and .Values.externalRedis.enabled .Values.externalRedis.sentinel.enabled) (and .Values.redis.enabled .Values.redis.sentinel.enabled) }}
               # Test connection to Redis with Sentinel enabled
               echo "Testing Redis Sentinel connection..."
-{{- if and .Values.externalRedis.enabled .Values.externalRedis.sentinel.enabled }}
+              {{- if and .Values.externalRedis.enabled .Values.externalRedis.sentinel.enabled }}
               # Parse the sentinels list into an array using POSIX approach
               OLD_IFS=$IFS
               IFS=','
               set -- $REDIS_SENTINELS
               IFS=$OLD_IFS
-{{- else }}
+              {{- else }}
               RELEASE_NAME="{{ .Release.Name }}"
               NAMESPACE="{{ .Release.Namespace }}"
               REPLICAS={{ .Values.redis.replica.replicaCount }}
@@ -39,7 +39,7 @@ spec:
                 set -- "$@" "${RELEASE_NAME}-redis-node-${i}.${RELEASE_NAME}-redis-headless.${NAMESPACE}.svc.cluster.local:26379"
                 i=$((i + 1))
               done
-{{- end }}
+              {{- end }}
               
               # Store the list of sentinels
               SENTINELS_LIST="$@"
@@ -105,7 +105,7 @@ spec:
                 echo "Failed to connect to Redis master at $REDIS_MASTER_HOST:$REDIS_MASTER_PORT"
                 exit 1
               fi
-{{- else }}
+              {{- else }}
               # Test connection under standard Redis setup
               echo "Testing Redis connection at $REDIS_PORT:$REDIS_PORT..."
               until redis-cli -h "$REDIS_HOST" -p "$REDIS_PORT" -a "$REDIS_PASSWORD" ping | grep -q PONG; do
@@ -113,9 +113,9 @@ spec:
                 sleep 1
               done
               echo "Redis is ready."
-{{- end }}
+              {{- end }}
           envFrom:
-          - configMapRef:
-              name: {{ template "dify.api.fullname" . }}
-          - secretRef:
-              name: {{ template "dify.api.fullname" . }}
+            - configMapRef:
+                name: {{ template "dify.api.fullname" . }}
+            - secretRef:
+                name: {{ template "dify.api.fullname" . }}

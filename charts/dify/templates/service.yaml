@@ -4,46 +4,46 @@ kind: Service
 metadata:
   name: {{ template "dify.fullname" . }}
   labels:
-{{ include "dify.labels" . | indent 4 }}
-{{- if .Values.service.labels }}
-{{ toYaml .Values.service.labels | indent 4 }}
-{{- end }}
-{{- if .Values.proxy.enabled }}
+    {{- include "dify.labels" . | nindent 4 }}
+    {{- if .Values.service.labels }}
+    {{- toYaml .Values.service.labels | nindent 4 }}
+    {{- end }}
+    {{- if .Values.proxy.enabled }}
     component: "proxy"
-{{- end }}
-{{- with .Values.service.annotations }}
+    {{- end }}
+  {{- with .Values.service.annotations }}
   annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-{{- if (or (eq .Values.service.type "ClusterIP") (empty .Values.service.type)) }}
+  {{- if (or (eq .Values.service.type "ClusterIP") (empty .Values.service.type)) }}
   type: ClusterIP
   {{- if .Values.service.clusterIP }}
   clusterIP: {{ .Values.service.clusterIP }}
   {{- end }}
-{{- else if eq .Values.service.type "LoadBalancer" }}
+  {{- else if eq .Values.service.type "LoadBalancer" }}
   type: LoadBalancer
   {{- if .Values.service.loadBalancerIP }}
   loadBalancerIP: {{ .Values.service.loadBalancerIP }}
   {{- end }}
   {{- if .Values.service.loadBalancerSourceRanges }}
   loadBalancerSourceRanges:
-{{ toYaml .Values.service.loadBalancerSourceRanges | indent 4 }}
+    {{- toYaml .Values.service.loadBalancerSourceRanges | nindent 4 }}
   {{- end -}}
-{{- else }}
+  {{- else }}
   type: {{ .Values.service.type }}
-{{- end }}
+  {{- end }}
   ports:
     - name: http-dify
       port: {{ .Values.service.port }}
       protocol: TCP
       targetPort: dify
-{{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.nodePort))) }}
+      {{- if (and (eq .Values.service.type "NodePort") (not (empty .Values.service.nodePort))) }}
       nodePort: {{.Values.service.nodePort}}
-{{- end }}
+      {{- end }}
   selector:
-{{ include "dify.selectorLabels" . | indent 4 }}
-{{- if and .Values.proxy.enabled }}
+    {{- include "dify.selectorLabels" . | nindent 4 }}
+    {{- if and .Values.proxy.enabled }}
     component: "proxy"
-{{- end }}
+    {{- end }}
 {{- end }}

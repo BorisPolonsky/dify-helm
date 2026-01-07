@@ -4,19 +4,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-{{ include "dify.ud.annotations" . | indent 4 }}
+    {{- include "dify.ud.annotations" . | nindent 4 }}
     descriptions: worker
   labels:
-{{- include "dify.labels" . | nindent 4 }}
+    {{- include "dify.labels" . | nindent 4 }}
     component: worker
     # app: {{ template "dify.worker.fullname" . }}
-{{ include "dify.ud.labels" . | indent 4 }}
+    {{- include "dify.ud.labels" . | nindent 4 }}
   name: {{ template "dify.worker.fullname" . }}
 spec:
   replicas: {{ .Values.worker.replicas }}
   selector:
     matchLabels:
-{{- include "dify.selectorLabels" . | nindent 6 }}
+      {{- include "dify.selectorLabels" . | nindent 6 }}
       component: worker
       {{/*
       # Required labels for istio
@@ -31,16 +31,16 @@ spec:
       annotations:
         checksum/worker-config: {{ include (print $.Template.BasePath "/worker-config.yaml") . | sha256sum }}
         checksum/worker-secret: {{ include (print $.Template.BasePath "/worker-secret.yaml") . | sha256sum }}
-{{ include "dify.ud.annotations" . | indent 8 }}
+        {{- include "dify.ud.annotations" . | nindent 8 }}
       labels:
-{{- include "dify.selectorLabels" . | nindent 8 }}
+        {{- include "dify.selectorLabels" . | nindent 8 }}
         component: worker
         {{/*
         # Required labels for istio
         # app: {{ template "dify.worker.fullname" . }}
         # version: {{ .Values.istioServiceMesh.version | quote }}
         */}}
-{{ include "dify.ud.labels" . | indent 8 }}
+        {{- include "dify.ud.labels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "dify.worker.serviceAccountName" . }}
       {{- if .Values.worker.priorityClassName }}
@@ -54,108 +54,108 @@ spec:
       {{- end }}
       {{- if .Values.worker.hostAliases }}
       hostAliases:
-      {{- toYaml .Values.worker.hostAliases | nindent 8 }}
+        {{- toYaml .Values.worker.hostAliases | nindent 8 }}
       {{- end }}
       {{- if .Values.worker.podSecurityContext.enabled }}
       securityContext: {{- omit .Values.worker.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       {{- if .Values.api.migration }}
       initContainers:
-      - name: check-api
-        image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
-        command:
-          - sh
-          - -c
-          - |
-            until curl http://{{ template "dify.api.fullname" . }}:{{ .Values.api.service.port }}/health; do
-              echo "Waiting for API service to be available..."
-              sleep 1
-            done
-        # We don't require a privileged container in this case
-        {{- if .Values.worker.containerSecurityContext.enabled }}
-        securityContext: {{- omit .Values.worker.containerSecurityContext "enabled" | toYaml | nindent 10 }}
-        {{- end }}
-        envFrom:
-        - configMapRef:
-            name: {{ template "dify.worker.fullname" . }}
-        - secretRef:
-            name: {{ template "dify.worker.fullname" . }}
-        resources:
-          {{- toYaml .Values.worker.resources | nindent 12 }}
+        - name: check-api
+          image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
+          command:
+            - sh
+            - -c
+            - |
+              until curl http://{{ template "dify.api.fullname" . }}:{{ .Values.api.service.port }}/health; do
+                echo "Waiting for API service to be available..."
+                sleep 1
+              done
+          # We don't require a privileged container in this case
+          {{- if .Values.worker.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.worker.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "dify.worker.fullname" . }}
+            - secretRef:
+                name: {{ template "dify.worker.fullname" . }}
+          resources:
+            {{- toYaml .Values.worker.resources | nindent 14 }}
       {{- end }}
       containers:
-      - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
-        imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
-        name: worker
-        {{- if .Values.worker.customLivenessProbe }}
-        livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.worker.customLivenessProbe "context" $) | nindent 10 }}
-        {{- end }}
-        {{- if .Values.worker.customReadinessProbe }}
-        readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.worker.customReadinessProbe "context" $) | nindent 10 }}
-        {{- end }}
-        {{- if .Values.worker.customStartupProbe }}
-        startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.worker.customStartupProbe "context" $) | nindent 10 }}
-        {{- end }}
-        # We don't require a privileged container in this case
-        {{- if .Values.worker.containerSecurityContext.enabled }}
-        securityContext: {{- omit .Values.worker.containerSecurityContext "enabled" | toYaml | nindent 10 }}
-        {{- end }}
-        env:
-        - name: MODE
-          value: "worker"
-        # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
-        - name: LOG_LEVEL
-          value: {{ .Values.worker.logLevel | quote }}
-        {{- if .Values.worker.extraEnv }}
-          {{- toYaml .Values.worker.extraEnv | nindent 8 }}
-        {{- end }}
-        envFrom:
-        - configMapRef:
-            name: {{ template "dify.worker.fullname" . }}
-        - secretRef:
-            name: {{ template "dify.worker.fullname" . }}
-        resources:
-          {{- toYaml .Values.worker.resources | nindent 12 }}
-        volumeMounts:
-        {{- if $usePvc }}
-        - name: app-data
-          mountPath: {{ .Values.api.persistence.mountPath | quote }}
-          subPath: {{ .Values.api.persistence.persistentVolumeClaim.subPath | default "" }}
-        {{- end }}
-        {{- if .Values.worker.extraVolumeMounts }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.worker.extraVolumeMounts "context" $) | nindent 8 }}
-        {{- end }}
+        - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
+          imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
+          name: worker
+          {{- if .Values.worker.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.worker.customLivenessProbe "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.worker.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.worker.customReadinessProbe "context" $) | nindent 12 }}
+          {{- end }}
+          {{- if .Values.worker.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.worker.customStartupProbe "context" $) | nindent 12 }}
+          {{- end }}
+          # We don't require a privileged container in this case
+          {{- if .Values.worker.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.worker.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          env:
+            - name: MODE
+              value: "worker"
+            # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+            - name: LOG_LEVEL
+              value: {{ .Values.worker.logLevel | quote }}
+          {{- if .Values.worker.extraEnv }}
+            {{- toYaml .Values.worker.extraEnv | nindent 12 }}
+          {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "dify.worker.fullname" . }}
+            - secretRef:
+                name: {{ template "dify.worker.fullname" . }}
+          resources:
+            {{- toYaml .Values.worker.resources | nindent 14 }}
+          volumeMounts:
+            {{- if $usePvc }}
+            - name: app-data
+              mountPath: {{ .Values.api.persistence.mountPath | quote }}
+              subPath: {{ .Values.api.persistence.persistentVolumeClaim.subPath | default "" }}
+            {{- end }}
+            {{- if .Values.worker.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.worker.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.worker.nodeSelector) }}
       nodeSelector:
-{{ toYaml .Values.nodeSelector | indent 8 }}
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if .Values.worker.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.worker.nodeSelector | indent 8 }}
+        {{- toYaml .Values.worker.nodeSelector | nindent 8 }}
     {{- end }}
     {{- if and (.Values.affinity) (not .Values.worker.affinity) }}
       affinity:
-{{ toYaml .Values.affinity | indent 8 }}
+        {{- toYaml .Values.affinity | nindent 8 }}
     {{- end }}
     {{- if .Values.worker.affinity }}
       affinity:
-{{ toYaml .Values.worker.affinity | indent 8 }}
+        {{- toYaml .Values.worker.affinity | nindent 8 }}
     {{- end }}
     {{- if and (.Values.tolerations) (not .Values.worker.tolerations) }}
       tolerations:
-{{ toYaml .Values.tolerations | indent 8 }}
+        {{- toYaml .Values.tolerations | nindent 8 }}
     {{- end }}
     {{- if .Values.worker.tolerations }}
       tolerations:
-{{ toYaml .Values.worker.tolerations | indent 8 }}
+        {{- toYaml .Values.worker.tolerations | nindent 8 }}
     {{- end }}
       volumes:
-      {{- if $usePvc }}
-      - name: app-data
-        persistentVolumeClaim:
-          claimName: {{ .Values.api.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.fullname" . | trunc 58)) }}
-      {{- end }}
-      {{- if .Values.worker.extraVolumes }}
-      {{- include "common.tplvalues.render" (dict "value" .Values.worker.extraVolumes "context" $) | nindent 6 }}
-      {{- end }}
+        {{- if $usePvc }}
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.api.persistence.persistentVolumeClaim.existingClaim | default (printf "%s" (include "dify.fullname" . | trunc 58)) }}
+        {{- end }}
+        {{- if .Values.worker.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.worker.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
 {{- end }}
