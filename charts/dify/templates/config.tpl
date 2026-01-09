@@ -330,7 +330,12 @@ REDIS_SENTINEL_USERNAME: ""
 REDIS_SENTINEL_SOCKET_TIMEOUT: "0.1"
   {{- else }}
 # Standalone Redis configuration
-    {{- $redisHost := printf "%s-redis-master" $releaseName -}}
+    {{- $redisHost := "" }}
+    {{- if .fullnameOverride }}
+    {{- $redisHost = printf "%s-master" .fullnameOverride }}
+    {{- else }}
+    {{- $redisHost = printf "%s-redis-master" $releaseName }}
+    {{- end }}
     {{- $redisPort := .master.service.ports.redis }}
 REDIS_HOST: {{ $redisHost | quote }}
 REDIS_PORT: {{ $redisPort | toString | quote }}
@@ -391,7 +396,12 @@ CELERY_USE_SENTINEL: "true"
 # Use standalone redis as the broker, and redis db 1 for celery broker. (redis_username is usually set by defualt as empty)
 # Format as follows: `redis://<redis_username>:<redis_password>@<redis_host>:<redis_port>/<redis_database>`.
 # Example: redis://:difyai123456@redis:6379/1
-    {{- $redisHost := printf "%s-redis-master" $releaseName -}}
+    {{- $redisHost := "" }}
+    {{- if .fullnameOverride }}
+    {{- $redisHost = printf "%s-master" .fullnameOverride }}
+    {{- else }}
+    {{- $redisHost = printf "%s-redis-master" $releaseName }}
+    {{- end }}
     {{- $redisPort := .master.service.ports.redis }}
 # CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost $redisPort | quote }}
   {{- end }}
