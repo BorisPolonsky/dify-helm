@@ -316,10 +316,10 @@ REDIS_DB: {{ .db.app | default 0 | toString | quote }}
     {{- $masterSet := .sentinel.masterSet -}}
     {{- $password := .auth.password -}}
 # Redis Sentinel configuration
-{{- $sentinelHosts := list }}
-{{- range $i, $e := until (.replica.replicaCount | int) }}
-{{- $sentinelHosts = append $sentinelHosts (printf "%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d" $releaseName $i $releaseName $namespace $sentinelPort) }}
-{{- end }}
+    {{- $sentinelHosts := list }}
+    {{- range $i, $e := until (.replica.replicaCount | int) }}
+    {{- $sentinelHosts = append $sentinelHosts (printf "%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d" $releaseName $i $releaseName $namespace $sentinelPort) }}
+    {{- end }}
 # use redis db 0 for redis cache
 REDIS_DB: "0"
 REDIS_USE_SENTINEL: "true"
@@ -381,11 +381,10 @@ CELERY_USE_SENTINEL: "true"
 # If use Redis Sentinel, format as follows: `sentinel://<redis_username>:<redis_password>@<sentinel_host1>:<sentinel_port>/<redis_database>`
 # For high availability, you can configure multiple Sentinel nodes (if provided) separated by semicolons like below example:
 # Example: sentinel://:difyai123456@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1
-
-{{- $sentinelUrls := list }}
-{{- range $i, $e := until (.replica.replicaCount | int) }}
-{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/1" $password $releaseName $i $releaseName $namespace $sentinelPort) }}
-{{- end }}
+    {{- $sentinelUrls := list }}
+    {{- range $i, $e := until (.replica.replicaCount | int) }}
+    {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/1" $password $releaseName $i $releaseName $namespace $sentinelPort) }}
+    {{- end }}
 # CELERY_BROKER_URL: {{ join ";" $sentinelUrls | quote }}
 CELERY_SENTINEL_MASTER_NAME: {{ $masterSet | quote }}
 # Note: In sentinel mode, the password is already included in the broker URL

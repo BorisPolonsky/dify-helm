@@ -120,12 +120,12 @@ REDIS_SENTINEL_PASSWORD: {{ .auth.password | b64enc | quote }}
 # If use Redis Sentinel, format as follows: `sentinel://<redis_username>:<redis_password>@<sentinel_host1>:<sentinel_port>/<redis_database>`
 # For high availability, you can configure multiple Sentinel nodes (if provided) separated by semicolons like below example:
 # Example: sentinel://:difyai123456@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1
-{{- $redisPassword := .password }}
-{{- $redisCeleryDB := .db.celery}}
-{{- $sentinelUrls := list }}
-{{- range $sentinel := .sentinel.sentinels }}
-{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s/%v" $redisPassword $sentinel $redisCeleryDB) }}
-{{- end }}
+      {{- $redisPassword := .password }}
+      {{- $redisCeleryDB := .db.celery}}
+      {{- $sentinelUrls := list }}
+      {{- range $sentinel := .sentinel.sentinels }}
+      {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s/%v" $redisPassword $sentinel $redisCeleryDB) }}
+      {{- end }}
 CELERY_BROKER_URL: {{ join ";" $sentinelUrls | b64enc | quote }}
 CELERY_SENTINEL_PASSWORD: {{ .sentinel.password | b64enc | quote }}
     {{- else }}
@@ -147,10 +147,10 @@ CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/%v" $scheme .username .password .
 # If use Redis Sentinel, format as follows: `sentinel://<redis_username>:<redis_password>@<sentinel_host1>:<sentinel_port>/<redis_database>`
 # For high availability, you can configure multiple Sentinel nodes (if provided) separated by semicolons like below example:
 # Example: sentinel://:difyai123456@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1
-{{- $sentinelUrls := list }}
-{{- range $i, $e := until (.replica.replicaCount | int) }}
-{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/1" $password $releaseName $i $releaseName $namespace $sentinelPort) }}
-{{- end }}
+    {{- $sentinelUrls := list }}
+    {{- range $i, $e := until (.replica.replicaCount | int) }}
+    {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/1" $password $releaseName $i $releaseName $namespace $sentinelPort) }}
+    {{- end }}
 CELERY_BROKER_URL: {{ join ";" $sentinelUrls | b64enc | quote }}
 CELERY_SENTINEL_PASSWORD: {{ .auth.password | b64enc | quote }}
   {{- else }}
