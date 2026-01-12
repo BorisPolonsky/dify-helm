@@ -137,15 +137,9 @@ CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/%v" $scheme .username .password .
     {{- end }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
-{{- $releaseName := printf "%s" .Release.Name -}}
 {{- $namespace := .Release.Namespace -}}
 {{- with .Values.redis }}
-  {{- $redisFullname := "" }}
-  {{- if .fullnameOverride }}
-  {{- $redisFullname = .fullnameOverride }}
-  {{- else }}
-  {{- $redisFullname = printf "%s-redis" $releaseName }}
-  {{- end }}
+  {{- $redisFullname := include "dify.redis.fullname" $ }}
   {{- if .sentinel.enabled }}
     {{- $sentinelPort := .sentinel.service.ports.sentinel | int -}}
     {{- $masterSet := .sentinel.masterSet -}}

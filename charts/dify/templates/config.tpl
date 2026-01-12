@@ -308,15 +308,9 @@ REDIS_USE_SSL: {{ .useSSL | toString | quote }}
 REDIS_DB: {{ .db.app | default 0 | toString | quote }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
-{{- $releaseName := printf "%s" .Release.Name -}}
 {{- $namespace := .Release.Namespace -}}
 {{- with .Values.redis }}
-  {{- $redisFullname := "" }}
-  {{- if .fullnameOverride }}
-  {{- $redisFullname = .fullnameOverride }}
-  {{- else }}
-  {{- $redisFullname = printf "%s-redis" $releaseName }}
-  {{- end }}
+  {{- $redisFullname := include "dify.redis.fullname" $ }}
   {{- if .sentinel.enabled }}
     {{- $sentinelPort := .sentinel.service.ports.sentinel | int -}}
     {{- $masterSet := .sentinel.masterSet -}}
@@ -372,15 +366,9 @@ CELERY_USE_SENTINEL: "true"
     {{- end }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
-{{- $releaseName := printf "%s" .Release.Name -}}
 {{- $namespace := .Release.Namespace -}}
 {{- with .Values.redis }}
-  {{- $redisFullname := "" }}
-  {{- if .fullnameOverride }}
-  {{- $redisFullname = .fullnameOverride }}
-  {{- else }}
-  {{- $redisFullname = printf "%s-redis" $releaseName }}
-  {{- end }}
+  {{- $redisFullname := include "dify.redis.fullname" $ }}
   {{- if .sentinel.enabled }}
     {{- $sentinelPort := .sentinel.service.ports.sentinel | int -}}
     {{- $masterSet := .sentinel.masterSet -}}

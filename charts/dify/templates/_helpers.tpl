@@ -217,3 +217,23 @@ Create the name of the service account to use for the Dify Plugin Daemon
     {{ default "default" .Values.pluginDaemon.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create the Redis fullname following the same logic as the Redis subchart's common.names.fullname.
+This matches the naming convention used by the Bitnami Redis chart.
+Note: This helper should only be called when redis.enabled is true.
+*/}}
+{{- define "dify.redis.fullname" -}}
+{{- if and .Values.redis .Values.redis.fullnameOverride -}}
+{{- .Values.redis.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else if .Values.redis -}}
+{{- $name := default "redis" .Values.redis.nameOverride -}}
+{{- if contains $name .Release.Name -}}
+{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- else -}}
+{{- printf "%s-redis" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
