@@ -311,6 +311,12 @@ REDIS_DB: {{ .db.app | default 0 | toString | quote }}
 {{- $releaseName := printf "%s" .Release.Name -}}
 {{- $namespace := .Release.Namespace -}}
 {{- with .Values.redis }}
+  {{- $redisFullname := "" }}
+  {{- if .fullnameOverride }}
+  {{- $redisFullname = .fullnameOverride }}
+  {{- else }}
+  {{- $redisFullname = printf "%s-redis" $releaseName }}
+  {{- end }}
   {{- if .sentinel.enabled }}
     {{- $sentinelPort := .sentinel.service.ports.sentinel | int -}}
     {{- $masterSet := .sentinel.masterSet -}}
@@ -318,7 +324,7 @@ REDIS_DB: {{ .db.app | default 0 | toString | quote }}
 # Redis Sentinel configuration
     {{- $sentinelHosts := list }}
     {{- range $i, $e := until (.replica.replicaCount | int) }}
-    {{- $sentinelHosts = append $sentinelHosts (printf "%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d" $releaseName $i $releaseName $namespace $sentinelPort) }}
+    {{- $sentinelHosts = append $sentinelHosts (printf "%s-node-%d.%s-headless.%s.svc.cluster.local:%d" $redisFullname $i $redisFullname $namespace $sentinelPort) }}
     {{- end }}
 # use redis db 0 for redis cache
 REDIS_DB: "0"
@@ -330,12 +336,7 @@ REDIS_SENTINEL_USERNAME: ""
 REDIS_SENTINEL_SOCKET_TIMEOUT: "0.1"
   {{- else }}
 # Standalone Redis configuration
-    {{- $redisHost := "" }}
-    {{- if .fullnameOverride }}
-    {{- $redisHost = printf "%s-master" .fullnameOverride }}
-    {{- else }}
-    {{- $redisHost = printf "%s-redis-master" $releaseName }}
-    {{- end }}
+    {{- $redisHost := printf "%s-master" $redisFullname }}
     {{- $redisPort := .master.service.ports.redis }}
 REDIS_HOST: {{ $redisHost | quote }}
 REDIS_PORT: {{ $redisPort | toString | quote }}
@@ -374,6 +375,12 @@ CELERY_USE_SENTINEL: "true"
 {{- $releaseName := printf "%s" .Release.Name -}}
 {{- $namespace := .Release.Namespace -}}
 {{- with .Values.redis }}
+  {{- $redisFullname := "" }}
+  {{- if .fullnameOverride }}
+  {{- $redisFullname = .fullnameOverride }}
+  {{- else }}
+  {{- $redisFullname = printf "%s-redis" $releaseName }}
+  {{- end }}
   {{- if .sentinel.enabled }}
     {{- $sentinelPort := .sentinel.service.ports.sentinel | int -}}
     {{- $masterSet := .sentinel.masterSet -}}
@@ -383,7 +390,7 @@ CELERY_USE_SENTINEL: "true"
 # Example: sentinel://:difyai123456@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1
     {{- $sentinelUrls := list }}
     {{- range $i, $e := until (.replica.replicaCount | int) }}
-    {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/1" $password $releaseName $i $releaseName $namespace $sentinelPort) }}
+    {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-node-%d.%s-headless.%s.svc.cluster.local:%d/1" $password $redisFullname $i $redisFullname $namespace $sentinelPort) }}
     {{- end }}
 # CELERY_BROKER_URL: {{ join ";" $sentinelUrls | quote }}
 CELERY_SENTINEL_MASTER_NAME: {{ $masterSet | quote }}
@@ -395,12 +402,7 @@ CELERY_USE_SENTINEL: "true"
 # Use standalone redis as the broker, and redis db 1 for celery broker. (redis_username is usually set by defualt as empty)
 # Format as follows: `redis://<redis_username>:<redis_password>@<redis_host>:<redis_port>/<redis_database>`.
 # Example: redis://:difyai123456@redis:6379/1
-    {{- $redisHost := "" }}
-    {{- if .fullnameOverride }}
-    {{- $redisHost = printf "%s-master" .fullnameOverride }}
-    {{- else }}
-    {{- $redisHost = printf "%s-redis-master" $releaseName }}
-    {{- end }}
+    {{- $redisHost := printf "%s-master" $redisFullname }}
     {{- $redisPort := .master.service.ports.redis }}
 # CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost $redisPort | quote }}
   {{- end }}

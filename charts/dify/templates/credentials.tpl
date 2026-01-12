@@ -140,6 +140,12 @@ CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/%v" $scheme .username .password .
 {{- $releaseName := printf "%s" .Release.Name -}}
 {{- $namespace := .Release.Namespace -}}
 {{- with .Values.redis }}
+  {{- $redisFullname := "" }}
+  {{- if .fullnameOverride }}
+  {{- $redisFullname = .fullnameOverride }}
+  {{- else }}
+  {{- $redisFullname = printf "%s-redis" $releaseName }}
+  {{- end }}
   {{- if .sentinel.enabled }}
     {{- $sentinelPort := .sentinel.service.ports.sentinel | int -}}
     {{- $masterSet := .sentinel.masterSet -}}
@@ -149,7 +155,7 @@ CELERY_BROKER_URL: {{ printf "%s://%s:%s@%s:%v/%v" $scheme .username .password .
 # Example: sentinel://:difyai123456@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1
     {{- $sentinelUrls := list }}
     {{- range $i, $e := until (.replica.replicaCount | int) }}
-    {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/1" $password $releaseName $i $releaseName $namespace $sentinelPort) }}
+    {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-node-%d.%s-headless.%s.svc.cluster.local:%d/1" $password $redisFullname $i $redisFullname $namespace $sentinelPort) }}
     {{- end }}
 CELERY_BROKER_URL: {{ join ";" $sentinelUrls | b64enc | quote }}
 CELERY_SENTINEL_PASSWORD: {{ .auth.password | b64enc | quote }}
@@ -157,12 +163,7 @@ CELERY_SENTINEL_PASSWORD: {{ .auth.password | b64enc | quote }}
 # Use standalone redis as the broker, and redis db 1 for celery broker. (redis_username is usually set by defualt as empty)
 # Format as follows: `redis://<redis_username>:<redis_password>@<redis_host>:<redis_port>/<redis_database>`.
 # Example: redis://:difyai123456@redis:6379/1
-    {{- $redisHost := "" }}
-    {{- if .fullnameOverride }}
-    {{- $redisHost = printf "%s-master" .fullnameOverride }}
-    {{- else }}
-    {{- $redisHost = printf "%s-redis-master" $releaseName }}
-    {{- end }}
+    {{- $redisHost := printf "%s-master" $redisFullname }}
     {{- $redisPort := .master.service.ports.redis }}
 CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost $redisPort | b64enc | quote }}
   {{- end }}
