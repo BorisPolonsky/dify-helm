@@ -308,18 +308,18 @@ REDIS_USE_SSL: {{ .useSSL | toString | quote }}
 REDIS_DB: {{ .db.app | default 0 | toString | quote }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
-{{- $releaseName := printf "%s" .Release.Name -}}
 {{- $namespace := .Release.Namespace -}}
 {{- with .Values.redis }}
+  {{- $redisFullname := include "dify.redis.fullname" $ }}
   {{- if .sentinel.enabled }}
     {{- $sentinelPort := .sentinel.service.ports.sentinel | int -}}
     {{- $masterSet := .sentinel.masterSet -}}
     {{- $password := .auth.password -}}
 # Redis Sentinel configuration
-{{- $sentinelHosts := list }}
-{{- range $i, $e := until (.replica.replicaCount | int) }}
-{{- $sentinelHosts = append $sentinelHosts (printf "%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d" $releaseName $i $releaseName $namespace $sentinelPort) }}
-{{- end }}
+    {{- $sentinelHosts := list }}
+    {{- range $i, $e := until (.replica.replicaCount | int) }}
+    {{- $sentinelHosts = append $sentinelHosts (printf "%s-node-%d.%s-headless.%s.svc.cluster.local:%d" $redisFullname $i $redisFullname $namespace $sentinelPort) }}
+    {{- end }}
 # use redis db 0 for redis cache
 REDIS_DB: "0"
 REDIS_USE_SENTINEL: "true"
@@ -330,7 +330,7 @@ REDIS_SENTINEL_USERNAME: ""
 REDIS_SENTINEL_SOCKET_TIMEOUT: "0.1"
   {{- else }}
 # Standalone Redis configuration
-    {{- $redisHost := printf "%s-redis-master" $releaseName -}}
+    {{- $redisHost := printf "%s-master" $redisFullname }}
     {{- $redisPort := .master.service.ports.redis }}
 REDIS_HOST: {{ $redisHost | quote }}
 REDIS_PORT: {{ $redisPort | toString | quote }}
@@ -366,9 +366,9 @@ CELERY_USE_SENTINEL: "true"
     {{- end }}
   {{- end }}
 {{- else if .Values.redis.enabled }}
-{{- $releaseName := printf "%s" .Release.Name -}}
 {{- $namespace := .Release.Namespace -}}
 {{- with .Values.redis }}
+  {{- $redisFullname := include "dify.redis.fullname" $ }}
   {{- if .sentinel.enabled }}
     {{- $sentinelPort := .sentinel.service.ports.sentinel | int -}}
     {{- $masterSet := .sentinel.masterSet -}}
@@ -376,11 +376,10 @@ CELERY_USE_SENTINEL: "true"
 # If use Redis Sentinel, format as follows: `sentinel://<redis_username>:<redis_password>@<sentinel_host1>:<sentinel_port>/<redis_database>`
 # For high availability, you can configure multiple Sentinel nodes (if provided) separated by semicolons like below example:
 # Example: sentinel://:difyai123456@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1;sentinel://:difyai12345@localhost:26379/1
-
-{{- $sentinelUrls := list }}
-{{- range $i, $e := until (.replica.replicaCount | int) }}
-{{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-redis-node-%d.%s-redis-headless.%s.svc.cluster.local:%d/1" $password $releaseName $i $releaseName $namespace $sentinelPort) }}
-{{- end }}
+    {{- $sentinelUrls := list }}
+    {{- range $i, $e := until (.replica.replicaCount | int) }}
+    {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-node-%d.%s-headless.%s.svc.cluster.local:%d/1" $password $redisFullname $i $redisFullname $namespace $sentinelPort) }}
+    {{- end }}
 # CELERY_BROKER_URL: {{ join ";" $sentinelUrls | quote }}
 CELERY_SENTINEL_MASTER_NAME: {{ $masterSet | quote }}
 # Note: In sentinel mode, the password is already included in the broker URL
@@ -391,7 +390,7 @@ CELERY_USE_SENTINEL: "true"
 # Use standalone redis as the broker, and redis db 1 for celery broker. (redis_username is usually set by defualt as empty)
 # Format as follows: `redis://<redis_username>:<redis_password>@<redis_host>:<redis_port>/<redis_database>`.
 # Example: redis://:difyai123456@redis:6379/1
-    {{- $redisHost := printf "%s-redis-master" $releaseName -}}
+    {{- $redisHost := printf "%s-master" $redisFullname }}
     {{- $redisPort := .master.service.ports.redis }}
 # CELERY_BROKER_URL: {{ printf "redis://:%s@%s:%v/1" .auth.password $redisHost $redisPort | quote }}
   {{- end }}
