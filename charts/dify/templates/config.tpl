@@ -208,11 +208,7 @@ DB_TYPE: postgresql
 # DB_PASSWORD: {{ .password | quote }}
   {{- end }}
   {{- end }}
-  {{- if eq .Values.postgresql.architecture "replication" }}
-DB_HOST: {{ .Release.Name }}-postgresql-primary
-  {{- else }}
-DB_HOST: {{ .Release.Name }}-postgresql
-  {{- end }}
+DB_HOST: {{ include "dify.postgresql.primary.fullname" . }}
 DB_PORT: "5432"
 DB_DATABASE: {{ .Values.postgresql.global.postgresql.auth.database }}
 {{- end }}
