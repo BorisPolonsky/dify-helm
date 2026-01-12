@@ -237,3 +237,38 @@ Note: This helper should only be called when redis.enabled is true.
 {{- printf "%s-redis" .Release.Name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Create the PostgreSQL fullname following the same logic as the PostgreSQL subchart's common.names.fullname.
+This matches the naming convention used by the Bitnami PostgreSQL chart.
+Note: This helper should only be called when postgresql.enabled is true.
+*/}}
+{{- define "dify.postgresql.fullname" -}}
+{{- if and .Values.postgresql .Values.postgresql.fullnameOverride }}
+    {{- .Values.postgresql.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else if .Values.postgresql }}
+    {{- $name := default "postgresql" .Values.postgresql.nameOverride -}}
+    {{- if contains $name .Release.Name }}
+        {{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+    {{- else }}
+        {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+    {{- end -}}
+{{- else }}
+    {{- printf "%s-postgresql" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the PostgreSQL primary fullname following the same logic as the PostgreSQL subchart's postgresql.primary.fullname.
+This matches the service name used by the Bitnami PostgreSQL chart for the primary database service.
+Note: This helper should only be called when postgresql.enabled is true.
+*/}}
+{{- define "dify.postgresql.primary.fullname" -}}
+{{- if eq .Values.postgresql.architecture "replication" }}
+    {{- $fullname := include "dify.postgresql.fullname" . -}}
+    {{- $primaryName := default "primary" .Values.postgresql.primary.name -}}
+    {{- printf "%s-%s" $fullname $primaryName | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+    {{- include "dify.postgresql.fullname" . -}}
+{{- end -}}
+{{- end -}}
