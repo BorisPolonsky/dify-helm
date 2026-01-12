@@ -1,7 +1,8 @@
-name: Red Hat Chart Certification
+name: OpenShift Compatibility Check
 
-# Runs Red Hat Chart Verifier to check if the chart passes Red Hat certification checks
-# This workflow is triggered manually to validate chart compliance with Red Hat standards
+# Runs Red Hat Chart Verifier to check OpenShift compatibility
+# Disables certification-specific checks (certified images, annotations) since we use community images
+# Focuses on OpenShift compatibility and chart quality checks
 
 permissions:
   contents: read
@@ -54,7 +55,7 @@ jobs:
           source: github
           chart-verifier: latest
 
-      - name: Run Red Hat Chart Verifier
+      - name: Run OpenShift Compatibility Check
         id: verify
         uses: redhat-actions/chart-verifier@v1
         continue-on-error: true
@@ -62,7 +63,10 @@ jobs:
           chart_uri: charts/dify/${{ steps.package.outputs.chart_file }}
           report_type: all
           fail: false
-          verify_args: "--openshift-version 4.15"
+          # Disable certification-specific checks, keep OpenShift compatibility checks
+          # --disable: Skip checks that require Red Hat certification
+          # --openshift-version: Test against OpenShift 4.15
+          verify_args: "--openshift-version 4.15 --disable images-are-certified,required-annotations-present"
 
       - name: Process Verification Results
         if: always()
@@ -95,10 +99,10 @@ jobs:
             
             # Extract pass/fail status
             if grep -q "passed: true" "$REPORT_FILE"; then
-              echo "✅ Chart passed Red Hat certification checks"
+              echo "✅ Chart passed OpenShift compatibility checks"
               echo "passed=true" >> $GITHUB_OUTPUT
             else
-              echo "⚠️ Chart did not pass all Red Hat certification checks"
+              echo "⚠️ Chart did not pass all OpenShift compatibility checks"
               echo "passed=false" >> $GITHUB_OUTPUT
             fi
             
@@ -114,7 +118,7 @@ jobs:
       - name: Generate Summary
         if: always()
         run: |
-          echo "## 🔴 Red Hat Chart Certification Report" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔵 OpenShift Compatibility Check Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Chart:** ${{ steps.package.outputs.chart_file }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -122,9 +126,9 @@ jobs:
           if [ -f charts/dify/report.yaml ]; then
             # Extract key information from report
             if grep -q "passed: true" charts/dify/report.yaml; then
-              echo "✅ **Status:** Chart passed Red Hat certification checks" >> $GITHUB_STEP_SUMMARY
+              echo "✅ **Status:** Chart passed OpenShift compatibility checks" >> $GITHUB_STEP_SUMMARY
             else
-              echo "⚠️ **Status:** Chart did not pass all certification checks" >> $GITHUB_STEP_SUMMARY
+              echo "⚠️ **Status:** Chart did not pass all OpenShift compatibility checks" >> $GITHUB_STEP_SUMMARY
             fi
             
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -132,8 +136,10 @@ jobs:
             echo "- Passed: ${{ steps.verify.outputs.passed }}" >> $GITHUB_STEP_SUMMARY
             echo "- Failed: ${{ steps.verify.outputs.failed }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Note:** Some checks may require a Kubernetes cluster connection." >> $GITHUB_STEP_SUMMARY
-            echo "For full certification, run chart-verifier with cluster access." >> $GITHUB_STEP_SUMMARY
+            echo "**Note:**" >> $GITHUB_STEP_SUMMARY
+            echo "- Certification-specific checks (certified images, annotations) are disabled" >> $GITHUB_STEP_SUMMARY
+            echo "- This validates OpenShift compatibility, not Red Hat certification" >> $GITHUB_STEP_SUMMARY
+            echo "- Some checks may require a Kubernetes cluster connection" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "See the workflow logs or download the report artifact for details." >> $GITHUB_STEP_SUMMARY
           else
@@ -144,11 +150,11 @@ jobs:
             echo "- Failed: ${{ steps.verify.outputs.failed }}" >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: Upload Chart Verifier Report
+      - name: Upload OpenShift Compatibility Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: redhat-certification-report
+          name: openshift-compatibility-report
           path: |
             charts/dify/report.yaml
             charts/dify/${{ steps.package.outputs.chart_file }}
