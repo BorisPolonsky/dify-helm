@@ -1,0 +1,138 @@
+name: Red Hat Chart Certification
+
+# Runs Red Hat Chart Verifier to check if the chart passes Red Hat certification checks
+# This workflow is triggered manually to validate chart compliance with Red Hat standards
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      chart_version:
+        description: 'Chart version to verify (leave empty for current version)'
+        required: false
+        type: string
+
+jobs:
+  redhat-certification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.2.0
+        with:
+          version: v3.12.0
+
+      - name: Install chart dependencies
+        run: |
+          cd charts/dify
+          helm dependency update || true
+
+      - name: Package Helm chart
+        id: package
+        run: |
+          cd charts/dify
+          CHART_VERSION="${{ inputs.chart_version }}"
+          if [ -z "$CHART_VERSION" ]; then
+            # Use version from Chart.yaml
+            CHART_VERSION=$(grep '^version:' Chart.yaml | awk '{print $2}')
+          fi
+          helm package . --version "$CHART_VERSION"
+          CHART_FILE=$(ls -t *.tgz | head -1)
+          echo "chart_file=$CHART_FILE" >> $GITHUB_OUTPUT
+          echo "chart_path=$(pwd)/$CHART_FILE" >> $GITHUB_OUTPUT
+          echo "Chart packaged: $CHART_FILE"
+
+      - name: Install Chart Verifier
+        run: |
+          # Download latest chart-verifier binary
+          VERIFIER_VERSION=$(curl -s https://api.github.com/repos/redhat-certification/chart-verifier/releases/latest | grep tag_name | cut -d '"' -f 4)
+          echo "Installing chart-verifier version: $VERIFIER_VERSION"
+          
+          curl -LO "https://github.com/redhat-certification/chart-verifier/releases/latest/download/chart-verifier-linux-amd64.tar.gz"
+          tar -xzf chart-verifier-linux-amd64.tar.gz
+          sudo mv chart-verifier /usr/local/bin/
+          chmod +x /usr/local/bin/chart-verifier
+          chart-verifier version
+
+      - name: Run Chart Verifier
+        id: verify
+        continue-on-error: true
+        run: |
+          cd charts/dify
+          CHART_FILE="${{ steps.package.outputs.chart_file }}"
+          
+          echo "Running chart-verifier on: $CHART_FILE"
+          echo "=========================================="
+          
+          # Run chart verifier and capture output
+          # Note: Some checks may require a Kubernetes cluster connection
+          # Use --enable flag to enable specific checks that don't require cluster
+          chart-verifier verify "$CHART_FILE" \
+            --enable helm-lint,is-helm-v3,has-readme,has-kubeversion,not-contains-crds,images-are-accessible \
+            --output yaml \
+            --write-to-file report.yaml || true
+          
+          # Display report
+          if [ -f report.yaml ]; then
+            echo ""
+            echo "=========================================="
+            echo "Chart Verifier Report:"
+            echo "=========================================="
+            cat report.yaml
+            echo ""
+            
+            # Extract pass/fail status
+            if grep -q "passed: true" report.yaml; then
+              echo "✅ Chart passed Red Hat certification checks"
+              echo "passed=true" >> $GITHUB_OUTPUT
+            else
+              echo "⚠️ Chart did not pass all Red Hat certification checks"
+              echo "passed=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "⚠️ Report file not generated"
+            echo "passed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          echo "## 🔴 Red Hat Chart Certification Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f charts/dify/report.yaml ]; then
+            echo "**Chart:** ${{ steps.package.outputs.chart_file }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Extract key information from report
+            if grep -q "passed: true" charts/dify/report.yaml; then
+              echo "✅ **Status:** Chart passed Red Hat certification checks" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⚠️ **Status:** Chart did not pass all certification checks" >> $GITHUB_STEP_SUMMARY
+            fi
+            
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Note:** Some checks may require a Kubernetes cluster connection." >> $GITHUB_STEP_SUMMARY
+            echo "For full certification, run chart-verifier with cluster access." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "See the workflow logs or download the report artifact for details." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Report generation failed. Check workflow logs for details." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Chart Verifier Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: redhat-certification-report
+          path: |
+            charts/dify/report.yaml
+            charts/dify/${{ steps.package.outputs.chart_file }}
+          retention-days: 30
+          if-no-files-found: ignore
