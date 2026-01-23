@@ -74,7 +74,6 @@ jobs:
       - name: Run OpenShift Compatibility Check
         id: verify
         uses: redhat-actions/chart-verifier@v1
-        continue-on-error: true
         with:
           chart_uri: charts/dify/${{ steps.package.outputs.chart_file }}
           report_type: all
@@ -173,10 +172,3 @@ jobs:
             charts/dify/${{ steps.package.outputs.chart_file }}
           retention-days: 30
           if-no-files-found: ignore
-
-      - name: Verify all checks passed
-        if: always() && steps.process.outputs.passed != 'true'
-        run: |
-          echo "❌ Workflow failed: OpenShift compatibility checks failed"
-          echo "Failed checks: ${{ steps.verify.outputs.failed }}"
-          exit 1
