@@ -1,9 +1,9 @@
 name: OpenShift Compatibility Check
 
 # Runs Red Hat Chart Verifier to check OpenShift compatibility
-# Uses 'community' profile instead of 'partner' profile to avoid certification-specific checks
-# Community profile doesn't require Red Hat certified images or annotations
-# Focuses on OpenShift compatibility and chart quality checks
+# Profile is configurable via workflow inputs (default: community)
+# - community: OpenShift compatibility checks only (no certification requirements)
+# - partner/redhat: Full Red Hat certification checks (requires certified images, annotations)
 
 permissions:
   contents: read
@@ -15,6 +15,20 @@ on:
         description: 'Chart version to verify (leave empty for current version)'
         required: false
         type: string
+      profile_name:
+        description: 'Profile name (community, partner, or redhat). Default: community'
+        required: false
+        type: choice
+        default: 'community'
+        options:
+          - community
+          - partner
+          - redhat
+      profile_version:
+        description: 'Profile version (1.1, 1.2, 1.3, etc.). Default: 1.1'
+        required: false
+        type: string
+        default: '1.1'
 
 jobs:
   redhat-certification:
@@ -64,11 +78,11 @@ jobs:
           chart_uri: charts/dify/${{ steps.package.outputs.chart_file }}
           report_type: all
           fail: false
-          # Use community profile instead of partner profile
+          # Use configurable profile (default: community)
           # Community profile doesn't require Red Hat certification checks (certified images, annotations)
-          # Focuses on OpenShift compatibility and chart quality checks
-          profile_name: "community"
-          profile_version: "1.1"
+          # Partner/RedHat profiles require full Red Hat certification
+          profile_name: ${{ inputs.profile_name || 'community' }}
+          profile_version: ${{ inputs.profile_version || '1.1' }}
           verify_args: "--openshift-version 4.15"
 
       - name: Process Verification Results
@@ -143,10 +157,17 @@ jobs:
             echo "- Passed: ${{ steps.verify.outputs.passed }}" >> $GITHUB_STEP_SUMMARY
             echo "- Failed: ${{ steps.verify.outputs.failed }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Profile:** ${{ inputs.profile_name || 'community' }} v${{ inputs.profile_version || '1.1' }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Note:**" >> $GITHUB_STEP_SUMMARY
-            echo "- Using 'community' profile (not 'partner' profile)" >> $GITHUB_STEP_SUMMARY
-            echo "- Community profile doesn't require Red Hat certification checks (certified images, annotations)" >> $GITHUB_STEP_SUMMARY
-            echo "- This validates OpenShift compatibility, not Red Hat certification" >> $GITHUB_STEP_SUMMARY
+            PROFILE_NAME="${{ inputs.profile_name || 'community' }}"
+            if [ "$PROFILE_NAME" = "community" ]; then
+              echo "- Community profile doesn't require Red Hat certification checks (certified images, annotations)" >> $GITHUB_STEP_SUMMARY
+              echo "- This validates OpenShift compatibility, not Red Hat certification" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- $PROFILE_NAME profile requires full Red Hat certification checks" >> $GITHUB_STEP_SUMMARY
+              echo "- This validates both OpenShift compatibility and Red Hat certification requirements" >> $GITHUB_STEP_SUMMARY
+            fi
             echo "- Some checks may require a Kubernetes cluster connection" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "See the workflow logs or download the report artifact for details." >> $GITHUB_STEP_SUMMARY
