@@ -1,7 +1,8 @@
 name: OpenShift Compatibility Check
 
 # Runs Red Hat Chart Verifier to check OpenShift compatibility
-# Disables certification-specific checks (certified images, annotations) since we use community images
+# Uses 'community' profile instead of 'partner' profile to avoid certification-specific checks
+# Community profile doesn't require Red Hat certified images or annotations
 # Focuses on OpenShift compatibility and chart quality checks
 
 permissions:
@@ -63,10 +64,12 @@ jobs:
           chart_uri: charts/dify/${{ steps.package.outputs.chart_file }}
           report_type: all
           fail: false
-          # Disable certification-specific checks, keep OpenShift compatibility checks
-          # --disable: Skip checks that require Red Hat certification
-          # --openshift-version: Test against OpenShift 4.15
-          verify_args: "--openshift-version 4.15 --disable images-are-certified,required-annotations-present"
+          # Use community profile instead of partner profile
+          # Community profile doesn't require Red Hat certification checks (certified images, annotations)
+          # Focuses on OpenShift compatibility and chart quality checks
+          profile_name: "community"
+          profile_version: "1.1"
+          verify_args: "--openshift-version 4.15"
 
       - name: Process Verification Results
         if: always()
@@ -137,7 +140,8 @@ jobs:
             echo "- Failed: ${{ steps.verify.outputs.failed }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Note:**" >> $GITHUB_STEP_SUMMARY
-            echo "- Certification-specific checks (certified images, annotations) are disabled" >> $GITHUB_STEP_SUMMARY
+            echo "- Using 'community' profile (not 'partner' profile)" >> $GITHUB_STEP_SUMMARY
+            echo "- Community profile doesn't require Red Hat certification checks (certified images, annotations)" >> $GITHUB_STEP_SUMMARY
             echo "- This validates OpenShift compatibility, not Red Hat certification" >> $GITHUB_STEP_SUMMARY
             echo "- Some checks may require a Kubernetes cluster connection" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
