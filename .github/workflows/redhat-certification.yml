@@ -100,18 +100,20 @@ jobs:
             mkdir -p charts/dify
             cp "$REPORT_FILE" charts/dify/report.yaml
             
-            # Extract pass/fail status
-            if grep -q "passed: true" "$REPORT_FILE"; then
-              echo "✅ Chart passed OpenShift compatibility checks"
-              echo "passed=true" >> $GITHUB_OUTPUT
-            else
-              echo "⚠️ Chart did not pass all OpenShift compatibility checks"
-              echo "passed=false" >> $GITHUB_OUTPUT
-            fi
-            
-            # Display check counts
+            # Display check counts from action outputs
             echo "Passed checks: ${{ steps.verify.outputs.passed }}"
             echo "Failed checks: ${{ steps.verify.outputs.failed }}"
+            
+            # Determine overall status based on mandatory check failures
+            # In community profile, only mandatory checks count toward pass/fail
+            FAILED_COUNT="${{ steps.verify.outputs.failed }}"
+            if [ "$FAILED_COUNT" = "0" ]; then
+              echo "✅ Chart passed all mandatory OpenShift compatibility checks"
+              echo "passed=true" >> $GITHUB_OUTPUT
+            else
+              echo "⚠️ Chart did not pass all mandatory OpenShift compatibility checks"
+              echo "passed=false" >> $GITHUB_OUTPUT
+            fi
           else
             echo "⚠️ Report file not found. Searching for report files..."
             find . -name "report.yaml" -o -name "*.yaml" | head -10
@@ -127,11 +129,13 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ -f charts/dify/report.yaml ]; then
-            # Extract key information from report
-            if grep -q "passed: true" charts/dify/report.yaml; then
-              echo "✅ **Status:** Chart passed OpenShift compatibility checks" >> $GITHUB_STEP_SUMMARY
+            # Determine status based on mandatory check failures
+            # In community profile, only mandatory checks count toward pass/fail
+            FAILED_COUNT="${{ steps.verify.outputs.failed }}"
+            if [ "$FAILED_COUNT" = "0" ]; then
+              echo "✅ **Status:** Chart passed all mandatory OpenShift compatibility checks" >> $GITHUB_STEP_SUMMARY
             else
-              echo "⚠️ **Status:** Chart did not pass all OpenShift compatibility checks" >> $GITHUB_STEP_SUMMARY
+              echo "⚠️ **Status:** Chart did not pass all mandatory OpenShift compatibility checks" >> $GITHUB_STEP_SUMMARY
             fi
             
             echo "" >> $GITHUB_STEP_SUMMARY
