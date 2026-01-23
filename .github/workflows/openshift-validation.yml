@@ -84,6 +84,7 @@ jobs:
           verify_args: "--openshift-version 4.15"
 
       - name: Process Verification Results
+        id: process
         if: always()
         run: |
           # Use the report_file output from the action
@@ -116,14 +117,12 @@ jobs:
             echo "Passed checks: ${{ steps.verify.outputs.passed }}"
             echo "Failed checks: ${{ steps.verify.outputs.failed }}"
             
-            # Determine overall status based on mandatory check failures
-            # In community profile, only mandatory checks count toward pass/fail
             FAILED_COUNT="${{ steps.verify.outputs.failed }}"
             if [ "$FAILED_COUNT" = "0" ]; then
-              echo "✅ Chart passed all mandatory OpenShift compatibility checks"
+              echo "✅ OpenShift compatibility checks passed"
               echo "passed=true" >> $GITHUB_OUTPUT
             else
-              echo "⚠️ Chart did not pass all mandatory OpenShift compatibility checks"
+              echo "⚠️ OpenShift compatibility checks failed"
               echo "passed=false" >> $GITHUB_OUTPUT
             fi
           else
@@ -141,13 +140,11 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ -f charts/dify/report.yaml ]; then
-            # Determine status based on mandatory check failures
-            # In community profile, only mandatory checks count toward pass/fail
             FAILED_COUNT="${{ steps.verify.outputs.failed }}"
             if [ "$FAILED_COUNT" = "0" ]; then
-              echo "✅ **Status:** Chart passed all mandatory OpenShift compatibility checks" >> $GITHUB_STEP_SUMMARY
+              echo "✅ **Status:** OpenShift compatibility checks passed" >> $GITHUB_STEP_SUMMARY
             else
-              echo "⚠️ **Status:** Chart did not pass all mandatory OpenShift compatibility checks" >> $GITHUB_STEP_SUMMARY
+              echo "⚠️ **Status:** OpenShift compatibility checks failed" >> $GITHUB_STEP_SUMMARY
             fi
             
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -176,3 +173,10 @@ jobs:
             charts/dify/${{ steps.package.outputs.chart_file }}
           retention-days: 30
           if-no-files-found: ignore
+
+      - name: Verify all checks passed
+        if: always() && steps.process.outputs.passed != 'true'
+        run: |
+          echo "❌ Workflow failed: OpenShift compatibility checks failed"
+          echo "Failed checks: ${{ steps.verify.outputs.failed }}"
+          exit 1
