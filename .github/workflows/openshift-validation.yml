@@ -25,9 +25,14 @@ on:
         required: false
         type: string
         default: '1.1'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'charts/dify/Chart.yaml'
 
 jobs:
-  redhat-certification:
+  openshift-validation:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
