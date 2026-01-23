@@ -52,9 +52,11 @@ jobs:
 
       - name: Package Helm chart
         id: package
+        env:
+          INPUT_CHART_VERSION: ${{ inputs.chart_version }}
         run: |
           cd charts/dify
-          CHART_VERSION="${{ inputs.chart_version }}"
+          CHART_VERSION="$INPUT_CHART_VERSION"
           if [ -z "$CHART_VERSION" ]; then
             # Use version from Chart.yaml
             CHART_VERSION=$(grep '^version:' Chart.yaml | awk '{print $2}')
@@ -132,6 +134,9 @@ jobs:
 
       - name: Generate Summary
         if: always()
+        env:
+          INPUT_PROFILE_NAME: ${{ inputs.profile_name || 'community' }}
+          INPUT_PROFILE_VERSION: ${{ inputs.profile_version || '1.3' }}
         run: |
           echo "## 🔵 OpenShift Compatibility Check Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -151,7 +156,7 @@ jobs:
             echo "- Passed: ${{ steps.verify.outputs.passed }}" >> $GITHUB_STEP_SUMMARY
             echo "- Failed: ${{ steps.verify.outputs.failed }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Profile:** ${{ inputs.profile_name || 'community' }} v${{ inputs.profile_version || '1.3' }}" >> $GITHUB_STEP_SUMMARY
+            echo "**Profile:** $INPUT_PROFILE_NAME $INPUT_PROFILE_VERSION" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "See the workflow logs or download the report artifact for details." >> $GITHUB_STEP_SUMMARY
           else
