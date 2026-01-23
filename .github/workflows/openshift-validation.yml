@@ -172,3 +172,9 @@ jobs:
             charts/dify/${{ steps.package.outputs.chart_file }}
           retention-days: 30
           if-no-files-found: ignore
+      - name: Verify all checks passed
+        if: always() && steps.process.outputs.passed != 'true'
+        run: |
+          echo "❌ Workflow failed: OpenShift compatibility checks failed"
+          echo "Failed checks: ${{ steps.verify.outputs.failed }}"
+          exit 1
