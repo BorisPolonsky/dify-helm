@@ -103,7 +103,12 @@ OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.api.otel.metricExportTimeout | toString |
 {{- end }}
 
 {{- define "dify.worker.config" -}}
+# api service
+{{ include "dify.api.config" . }}
+
 # worker service
+MODE: worker
+
 # The Celery worker for processing the queue.
 
 
@@ -690,7 +695,7 @@ refresh_pattern .		0	20%	4320
 
 ################################## Reverse Proxy To Sandbox ################################
 http_port {{ .Values.sandbox.service.port }} accel vhost
-cache_peer {{ template "dify.sandbox.fullname" .}} parent {{ .Values.sandbox.service.port }} 0 no-query originserver
+cache_peer {{ template "dify.sandbox.fullname" .}}.{{ .Release.Namespace }}.svc.cluster.local parent {{ .Values.sandbox.service.port }} 0 no-query originserver
 acl src_all src all
 http_access allow src_all
 
