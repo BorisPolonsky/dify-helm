@@ -180,19 +180,6 @@
           }
         },
         "logLevel": { "type": "string" },
-        "url": {
-          "type": "object",
-          "properties": {
-            "consoleApi": { "type": "string" },
-            "consoleWeb": { "type": "string" },
-            "serviceApi": { "type": "string" },
-            "appApi": { "type": "string" },
-            "appWeb": { "type": "string" },
-            "files": { "type": "string" },
-            "marketplaceApi": { "type": "string" },
-            "marketplace": { "type": "string" }
-          }
-        },
         "mail": {
           "type": "object",
           "properties": {
@@ -224,7 +211,6 @@
           }
         },
         "migration": { "type": "boolean" },
-        "secretKey": { "type": "string" },
         "persistence": {
           "type": "object",
           "properties": {
@@ -770,13 +756,6 @@
                 "subPath": { "type": "string" }
               }
             }
-          }
-        },
-        "marketplace": {
-          "type": "object",
-          "properties": {
-            "enabled": { "type": "boolean" },
-            "apiProxyEnabled": { "type": "boolean" }
           }
         },
         "serviceAccount": {
