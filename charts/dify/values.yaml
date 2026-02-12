@@ -28,6 +28,9 @@ global:
   # or download URL to the front-end or as a multi-modal model input;
   # In order to prevent others from forging, the image preview URL is signed and has a 5-minute expiration time.
   filesDomain: ""
+  # Trigger service domain, used by API and workers for trigger functionality.
+  # If empty, trigger functionality may not work properly. Example: trigger.dify.ai
+  triggerDomain: ""
   marketplace:
     enabled: true
     url: "https://marketplace.dify.ai"
