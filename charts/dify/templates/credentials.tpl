@@ -1,6 +1,6 @@
 {{- define "dify.api.credentials" -}}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-SECRET_KEY: {{ .Values.api.secretKey | default .Values.global.appSecretKey | b64enc | quote }}
+SECRET_KEY: {{ .Values.global.appSecretKey | b64enc | quote }}
 {{- if .Values.sandbox.enabled }}
 CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | default .Values.global.internalApiKey | b64enc | quote }}
 {{- end }}
@@ -23,7 +23,7 @@ OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.worker.credentials" -}}
-SECRET_KEY: {{ .Values.api.secretKey | default .Values.global.appSecretKey | b64enc | quote }}
+SECRET_KEY: {{ .Values.global.appSecretKey | b64enc | quote }}
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
 {{ include "dify.db.credentials" . }}

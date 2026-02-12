@@ -163,27 +163,6 @@ api:
     clusterIP: ""
   # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
   logLevel: INFO
-  url:
-    # The backend URL of the console API, used to concatenate the authorization callback.
-    # If empty, it is the same domain. Example: https://api.console.dify.ai
-    consoleApi: ""
-    # The front-end URL of the console web, used to concatenate some front-end addresses and for CORS configuration use.
-    # If empty, it is the same domain. Example: https://console.dify.ai
-    consoleWeb: ""
-    # Service API URL, used to display Service API Base URL to the front-end.
-    # If empty, it is the same domain. Example: https://api.dify.ai
-    serviceApi: ""
-    # WebApp API backend URL, used to declare the back-end URL for the front-end API.
-    # If empty, it is the same domain. Example: https://app.dify.ai
-    appApi: ""
-    # WebApp URL, used to display WebAPP API Base URL to the front-end. If empty, it is the same domain. Example: https://api.app.dify.ai
-    appWeb: ""
-    # File preview or download URL prefix, used to display the file preview
-    # or download URL to the front-end or as a multi-modal model input;
-    # In order to prevent others from forging, the image preview URL is signed and has a 5-minute expiration time.
-    files: ""
-    marketplaceApi: "https://marketplace.dify.ai"
-    marketplace: "https://marketplace.dify.ai"
   mail:
     # default email sender from email address, if not given a specific address
     defaultSender: "YOUR EMAIL FROM (e.g.: no-reply <no-reply@dify.ai>)"
@@ -205,8 +184,6 @@ api:
         optimistic: false
   # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
   migration: true
-  # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-  secretKey: ""
   ## Storage for `api` and `worker`
   ## Ignored if `.Values.externalS3.enabled` is true
   ##
@@ -728,12 +705,6 @@ pluginDaemon:
       accessModes: ReadWriteMany
       size: 5Gi
       subPath: ""
-  marketplace:
-    enabled: true
-    # Takes effect only if built-in `nginx` were enabled
-    # If enabled, route marketplace api call to built-in `nginx` and strip headers for tracking.
-    # https://github.com/BorisPolonsky/dify-helm/pull/131
-    apiProxyEnabled: false
   ## pluginDaemon ServiceAccount configuration
   ##
   serviceAccount:

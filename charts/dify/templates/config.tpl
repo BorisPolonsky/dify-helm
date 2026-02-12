@@ -2,23 +2,23 @@
 # The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
-CONSOLE_WEB_URL: {{ .Values.api.url.consoleWeb | default .Values.global.consoleWebDomain | quote }}
+CONSOLE_WEB_URL: {{ .Values.global.consoleWebDomain | quote }}
 # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
-CONSOLE_API_URL: {{ .Values.api.url.consoleApi | default .Values.global.consoleApiDomain | quote }}
+CONSOLE_API_URL: {{ .Values.global.consoleApiDomain | quote }}
 # The URL prefix for Service API endpoints, refers to the base URL of the current API service if api domain is
 # different from console domain.
 # example: http://api.dify.ai
-SERVICE_API_URL: {{ .Values.api.url.serviceApi | default .Values.global.serviceApiDomain | quote }}
+SERVICE_API_URL: {{ .Values.global.serviceApiDomain | quote }}
 # The URL prefix for Web APP frontend, refers to the Web App base URL of WEB service if web app domain is different from
 # console or api domain.
 # example: http://udify.app
-APP_WEB_URL: {{ .Values.api.url.appWeb | default .Values.global.appWebDomain | quote }}
+APP_WEB_URL: {{ .Values.global.appWebDomain | quote }}
 # File preview or download Url prefix.
 # used to display File preview or download Url to the front-end or as Multi-model inputs;
 # Url is signed and has expiration time.
-FILES_URL: {{ .Values.api.url.files | default .Values.global.filesDomain | quote }}
+FILES_URL: {{ .Values.global.filesDomain | quote }}
 {{- end }}
 
 {{- define "dify.api.config" -}}
@@ -26,7 +26,7 @@ FILES_URL: {{ .Values.api.url.files | default .Values.global.filesDomain | quote
 MODE: api
 {{- include "dify.common.config" . }}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-# SECRET_KEY: {{ .Values.api.secretKey }}
+# SECRET_KEY: {{ .Values.global.appSecretKey }}
 
 {{- include "dify.marketplace.config" . }}
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
@@ -115,7 +115,7 @@ MODE: worker
 {{- include "dify.common.config" . }}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 # same as the API service
-# SECRET_KEY: {{ .Values.api.secretKey }}
+# SECRET_KEY: {{ .Values.global.appSecretKey }}
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
 {{ include "dify.db.config" . }}
@@ -172,19 +172,19 @@ EDITION: {{ .Values.global.edition | quote }}
 # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
-CONSOLE_API_URL: {{ .Values.api.url.consoleApi | default .Values.global.consoleApiDomain | quote }}
+CONSOLE_API_URL: {{ .Values.global.consoleApiDomain | quote }}
 # The URL for Web APP api server, refers to the Web App base URL of WEB service if web app domain is different from
 # console or api domain.
 # example: http://udify.app
-APP_API_URL: {{ .Values.api.url.appApi | default .Values.global.appApiDomain | quote }}
+APP_API_URL: {{ .Values.global.appApiDomain | quote }}
 # The DSN for Sentry
-{{- if and .Values.pluginDaemon.enabled (.Values.pluginDaemon.marketplace.enabled | default .Values.global.marketplace.enabled) (.Values.pluginDaemon.marketplace.apiProxyEnabled | default .Values.global.marketplace.apiProxyEnabled) }}
+{{- if and .Values.pluginDaemon.enabled .Values.global.marketplace.enabled .Values.global.marketplace.apiProxyEnabled }}
 MARKETPLACE_ENABLED: "true"
 MARKETPLACE_API_URL: "/marketplace"
 {{- else }}
 {{- include "dify.marketplace.config" . }}
 {{- end }}
-MARKETPLACE_URL: {{ .Values.api.url.marketplace | default .Values.global.marketplace.url | quote }}
+MARKETPLACE_URL: {{ .Values.global.marketplace.url | quote }}
 {{- end }}
 
 {{- define "dify.db.config" -}}
@@ -614,11 +614,11 @@ server {
       include proxy.conf;
     }
 
-    {{- if and .Values.pluginDaemon.enabled (.Values.pluginDaemon.marketplace.enabled | default .Values.global.marketplace.enabled) (.Values.pluginDaemon.marketplace.apiProxyEnabled | default .Values.global.marketplace.apiProxyEnabled) }}
+    {{- if and .Values.pluginDaemon.enabled .Values.global.marketplace.enabled .Values.global.marketplace.apiProxyEnabled }}
     location /marketplace {
       rewrite ^/marketplace/(.*)$ /$1 break;
       proxy_ssl_server_name on;
-{{- $marketplaceUrl := (.Values.api.url.marketplace | default .Values.global.marketplace.url) -}}
+{{- $marketplaceUrl := .Values.global.marketplace.url -}}
       proxy_pass {{ $marketplaceUrl | quote }};
       proxy_pass_request_headers off;
       proxy_set_header Host {{ regexReplaceAll "^https?://([^/]+).*" $marketplaceUrl "${1}" | quote }};
@@ -734,9 +734,9 @@ DIFY_INNER_API_URL: "http://{{ template "dify.api.fullname" . }}:{{ .Values.api.
 {{- end }}
 
 {{- define "dify.marketplace.config" }}
-{{- if .Values.pluginDaemon.marketplace.enabled | default .Values.global.marketplace.enabled }}
+{{- if .Values.global.marketplace.enabled }}
 MARKETPLACE_ENABLED: "true"
-MARKETPLACE_API_URL: {{ .Values.api.url.marketplaceApi | default .Values.global.marketplace.apiUrl | quote }}
+MARKETPLACE_API_URL: {{ .Values.global.marketplace.apiUrl | quote }}
 {{- else }}
 MARKETPLACE_ENABLED: "false"
 {{- end }}
