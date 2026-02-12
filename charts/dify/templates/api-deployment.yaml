@@ -98,6 +98,9 @@ spec:
           securityContext: {{- omit .Values.api.containerSecurityContext "enabled" | toYaml | nindent 12 }}
           {{- end }}
           env:
+            # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
+            - name: LOG_LEVEL
+              value: {{ .Values.api.logLevel | quote }}
             {{- if .Values.sandbox.enabled }}
             - name: CODE_EXECUTION_API_KEY
               valueFrom:

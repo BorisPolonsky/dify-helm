@@ -1,10 +1,4 @@
-{{- define "dify.api.config" -}}
-# Startup mode, 'api' starts the API server.
-MODE: api
-# The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
-LOG_LEVEL: {{ .Values.api.logLevel | quote }}
-# A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
-# SECRET_KEY: {{ .Values.api.secretKey }}
+{{- define "dify.common.config" -}}
 # The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
@@ -25,6 +19,15 @@ APP_WEB_URL: {{ .Values.api.url.appWeb | default .Values.global.appWebDomain | q
 # used to display File preview or download Url to the front-end or as Multi-model inputs;
 # Url is signed and has expiration time.
 FILES_URL: {{ .Values.api.url.files | default .Values.global.filesDomain | quote }}
+{{- end }}
+
+{{- define "dify.api.config" -}}
+# Startup mode, 'api' starts the API server.
+MODE: api
+{{- include "dify.common.config" . }}
+# A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
+# SECRET_KEY: {{ .Values.api.secretKey }}
+
 {{- include "dify.marketplace.config" . }}
 # When enabled, migrations will be executed prior to application startup and the application will start after the migrations have completed.
 MIGRATION_ENABLED: {{ .Values.api.migration | toString | quote }}
@@ -103,21 +106,13 @@ OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.api.otel.metricExportTimeout | toString |
 {{- end }}
 
 {{- define "dify.worker.config" -}}
-# api service
-{{ include "dify.api.config" . }}
-
 # worker service
 MODE: worker
 
 # The Celery worker for processing the queue.
 
-
-# The base URL of console application web frontend, refers to the Console base URL of WEB service if console domain is
-# different from api or web app domain.
-# example: http://cloud.dify.ai
-CONSOLE_WEB_URL: {{ .Values.api.url.consoleWeb | default .Values.global.consoleWebDomain | quote }}
 # --- All the configurations below are the same as those in the 'api' service. ---
-
+{{- include "dify.common.config" . }}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 # same as the API service
 # SECRET_KEY: {{ .Values.api.secretKey }}
