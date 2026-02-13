@@ -19,6 +19,10 @@ APP_WEB_URL: {{ .Values.global.appWebDomain | quote }}
 # used to display File preview or download Url to the front-end or as Multi-model inputs;
 # Url is signed and has expiration time.
 FILES_URL: {{ .Values.global.filesDomain | quote }}
+# Trigger external URL
+# used to display trigger endpoint API Base URL to the front-end.
+# Example: https://api.dify.ai
+TRIGGER_URL: {{ .Values.global.triggerDomain | quote }}
 {{- end }}
 
 {{- define "dify.api.config" -}}
