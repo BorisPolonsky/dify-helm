@@ -61,6 +61,7 @@ graph TB
 
     %% Internal Communications
     APIPod -.->|Code Execution| SandboxService
+    SandboxPod -.->|API callbacks| APIService
     APIPod -.->|SSRF Protection| SSRFService
     APIPod -.->|Plugin Management| PluginService
     WorkerPod -.->|Background Tasks| APIPod

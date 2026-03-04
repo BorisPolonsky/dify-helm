@@ -521,6 +521,8 @@ SMTP_OPPORTUNISTIC_TLS: {{ .Values.api.mail.smtp.tls.optimistic | toString | quo
 {{- define "dify.sandbox.config" -}}
 GIN_MODE: release
 SANDBOX_PORT: '8194'
+CLI_API_URL: "http://{{ include "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
+FILES_API_URL: "http://{{ include "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
 {{- if .Values.ssrfProxy.enabled }}
 HTTP_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
 HTTPS_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
