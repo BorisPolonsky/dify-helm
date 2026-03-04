@@ -398,7 +398,7 @@ worker:
     annotations: {}
 
 beat:
-  enabled: false
+  enabled: true
   resources: {}
   nodeSelector: {}
   affinity: {}
