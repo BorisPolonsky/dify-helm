@@ -52,6 +52,14 @@
             "tag": { "type": "string" },
             "pullPolicy": { "type": "string" }
           }
+        },
+        "agentbox": {
+          "type": "object",
+          "properties": {
+            "repository": { "type": "string" },
+            "tag": { "type": "string" },
+            "pullPolicy": { "type": "string" }
+          }
         }
       }
     },
@@ -608,6 +616,57 @@
             "annotations": { "type": "object" }
           }
         }
+      }
+    },
+    "agentbox": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "resources": { "type": "object" },
+        "nodeSelector": { "type": "object" },
+        "affinity": { "type": "object" },
+        "tolerations": { "type": "array" },
+        "priorityClassName": { "type": "string" },
+        "podSecurityContext": { "type": "object" },
+        "containerSecurityContext": { "type": "object" },
+        "extraEnv": { "type": "array" },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
+        "service": {
+          "type": "object",
+          "properties": {
+            "port": { "type": "integer" },
+            "annotations": { "type": "object" },
+            "labels": { "type": "object" },
+            "clusterIP": { "type": "string" }
+          }
+        },
+        "serviceAccount": {
+          "type": "object",
+          "properties": {
+            "create": { "type": "boolean" },
+            "name": { "type": "string" },
+            "automountServiceAccountToken": { "type": "boolean" },
+            "annotations": { "type": "object" }
+          }
+        },
+        "updateStrategy": { "type": "object" },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
+        "sshUsername": { "type": "string" },
+        "sshPassword": { "type": "string" }
       }
     },
     "ssrfProxy": {

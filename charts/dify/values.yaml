@@ -110,6 +110,17 @@ image:
     # pullSecrets:
     #   - myRegistryKeySecretName
 
+  agentbox:
+    repository: langgenius/dify-agentbox
+    tag: latest
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ##
+    # pullSecrets:
+    #   - myRegistryKeySecretName
+
 ## @section -- Dify micro-service parameters
 ## Parameters for dify components including api(worker), web, sandbox, etc.
 
@@ -744,6 +755,37 @@ sandbox:
     ## @param sandbox.serviceAccount.annotations Additional custom annotations for the ServiceAccount
     ##
     annotations: {}
+
+agentbox:
+  enabled: false
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  priorityClassName: ""
+  podSecurityContext: {}
+  # agentbox entrypoint needs root (mkdir /run/sshd, ssh-keygen, chpasswd, sshd). Override if your cluster restricts root.
+  containerSecurityContext:
+    runAsUser: 0
+    runAsGroup: 0
+  extraEnv: []
+  extraVolumes: []
+  extraVolumeMounts: []
+  service:
+    port: 22
+    annotations: {}
+    labels: {}
+    clusterIP: ""
+  serviceAccount:
+    create: false
+    name: ""
+    automountServiceAccountToken: false
+    annotations: {}
+  updateStrategy: {}
+  hostAliases: []
+  ## Agentbox-specific (under consideration).
+  sshUsername: "agentbox"
+  sshPassword: "agentbox"
 
 ssrfProxy:
   enabled: false

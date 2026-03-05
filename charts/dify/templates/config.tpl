@@ -529,6 +529,14 @@ HTTPS_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfPro
 {{- end }}
 {{- end }}
 
+{{- define "dify.agentbox.config" -}}
+AGENTBOX_SSH_USERNAME: {{ .Values.agentbox.sshUsername | quote }}
+AGENTBOX_SSH_PASSWORD: {{ .Values.agentbox.sshPassword | quote }}
+AGENTBOX_SSH_PORT: "2222"
+AGENTBOX_SOCAT_TARGET_HOST: {{ (include "dify.api.fullname" .) | quote }}
+AGENTBOX_SOCAT_TARGET_PORT: {{ (.Values.api.service.port | toString) | quote }}
+{{- end }}
+
 {{- define "dify.nginx.config.proxy" }}
 proxy_set_header Host $host;
 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

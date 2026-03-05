@@ -1,0 +1,29 @@
+{{- if .Values.agentbox.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "dify.agentbox.fullname" . }}
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    {{- if .Values.agentbox.service.labels }}
+    {{- toYaml .Values.agentbox.service.labels | nindent 4 }}
+    {{- end }}
+    component: "agentbox"
+  {{- with .Values.agentbox.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  {{- if .Values.agentbox.service.clusterIP }}
+  clusterIP: {{ .Values.agentbox.service.clusterIP }}
+  {{- end }}
+  ports:
+    - name: ssh
+      port: {{ .Values.agentbox.service.port }}
+      protocol: TCP
+      targetPort: ssh
+  selector:
+    {{- include "dify.selectorLabels" . | nindent 4 }}
+    component: "agentbox"
+{{- end }}

@@ -65,6 +65,39 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a default fully qualified agentbox name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "dify.agentbox.fullname" -}}
+{{ template "dify.fullname" . }}-agentbox
+{{- end -}}
+
+{{/*
+dify.agentbox.entrypoint - entrypoint script for agentbox (sshd + socat to API).
+*/}}
+{{- define "dify.agentbox.entrypoint" -}}
+#!/bin/sh
+set -e
+if ! command -v sshd >/dev/null 2>&1; then
+  apt-get update
+  DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server
+  rm -rf /var/lib/apt/lists/*
+fi
+mkdir -p /run/sshd
+ssh-keygen -A
+if [ "{{ "$" }}AGENTBOX_SSH_USERNAME" = "root" ]; then
+  echo "root:{{ "$" }}AGENTBOX_SSH_PASSWORD" | chpasswd
+  grep -q '^PermitRootLogin' /etc/ssh/sshd_config && sed -i 's/^PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config || echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
+else
+  id -u "{{ "$" }}AGENTBOX_SSH_USERNAME" >/dev/null 2>&1 || useradd -m -s /bin/bash "{{ "$" }}AGENTBOX_SSH_USERNAME"
+  echo "{{ "$" }}AGENTBOX_SSH_USERNAME:{{ "$" }}AGENTBOX_SSH_PASSWORD" | chpasswd
+fi
+grep -q '^PasswordAuthentication' /etc/ssh/sshd_config && sed -i 's/^PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config || echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config
+nohup socat TCP-LISTEN:{{ "$" }}{AGENTBOX_SOCAT_TARGET_PORT},bind=127.0.0.1,fork,reuseaddr TCP:{{ "$" }}{AGENTBOX_SOCAT_TARGET_HOST}:{{ "$" }}{AGENTBOX_SOCAT_TARGET_PORT} >/tmp/socat.log 2>&1 &
+exec /usr/sbin/sshd -D -p {{ "$" }}{AGENTBOX_SSH_PORT}
+{{- end -}}
+
+{{/*
 Create a default fully qualified web name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
@@ -159,6 +192,17 @@ Create the name of the service account to use for the Sandbox
     {{ default (include "dify.sandbox.fullname" .) .Values.sandbox.serviceAccount.name | trunc 63 | trimSuffix "-" }}
 {{- else -}}
     {{ default "default" .Values.sandbox.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for the agentbox
+*/}}
+{{- define "dify.agentbox.serviceAccountName" -}}
+{{- if .Values.agentbox.serviceAccount.create -}}
+    {{ default (include "dify.agentbox.fullname" .) .Values.agentbox.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.agentbox.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 
