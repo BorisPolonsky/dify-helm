@@ -23,6 +23,10 @@ FILES_URL: {{ .Values.global.filesDomain | quote }}
 # used to display trigger endpoint API Base URL to the front-end.
 # Example: https://api.dify.ai
 TRIGGER_URL: {{ .Values.global.triggerDomain | quote }}
+{{- if .Values.agentbox.enabled }}
+CLI_API_URL: "http://{{ include "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
+FILES_API_URL: "http://{{ include "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
+{{- end }}
 {{- end }}
 
 {{- define "dify.api.config" -}}
@@ -521,8 +525,6 @@ SMTP_OPPORTUNISTIC_TLS: {{ .Values.api.mail.smtp.tls.optimistic | toString | quo
 {{- define "dify.sandbox.config" -}}
 GIN_MODE: release
 SANDBOX_PORT: '8194'
-CLI_API_URL: "http://{{ include "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
-FILES_API_URL: "http://{{ include "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
 {{- if .Values.ssrfProxy.enabled }}
 HTTP_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
 HTTPS_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfProxy.service.port }}
