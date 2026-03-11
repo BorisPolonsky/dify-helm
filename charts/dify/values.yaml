@@ -133,7 +133,7 @@ agentbox:
     minReplicas: 1
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
-  
+
   livenessProbe:
     enabled: true
     initialDelaySeconds: 1
@@ -160,22 +160,22 @@ agentbox:
   customReadinessProbe: {}
   customStartupProbe: {}
   hostAliases: []
-  
+
   podSecurityContext: {}
   containerSecurityContext:
     runAsUser: 0
-  
+
   extraEnv: []
-  
+
   extraVolumes: []
   extraVolumeMounts: []
-  
+
   service:
     port: 22
     annotations: {}
     labels: {}
     clusterIP: ""
-    
+
   environment:
     sshUsername: "agentbox"
     sshPassword: "agentbox_password" # Change in production
@@ -262,36 +262,36 @@ api:
     enabled: true
     runAsUser: 1001
   extraEnv:
-  # Apply your own Environment Variables if necessary.
-  # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
-  # Direct value assignment
-  # - name: LANG
-  #   value: "C.UTF-8"
-  #   - name: SECRET_KEY
-  # Use existing k8s secrets
-  #  - name: DB_PASSWORD
-  #    valueFrom:
-  #      secretKeyRef:
-  #        name: my-secret
-  #        key: DB_PASSWORD
-  - name: CHECK_UPDATE_URL
-    # Won't check for updates if left empty
-    #   value: https://updates.dify.ai
-    value: ""
-  - name: CODE_MAX_NUMBER
-    value: "9223372036854775807"
-  - name: CODE_MIN_NUMBER
-    value: "-9223372036854775808"
-  - name: CODE_MAX_STRING_LENGTH
-    value: "80000"
-  - name: TEMPLATE_TRANSFORM_MAX_LENGTH
-    value: "80000"
-  - name: CODE_MAX_STRING_ARRAY_LENGTH
-    value: "30"
-  - name: CODE_MAX_OBJECT_ARRAY_LENGTH
-    value: "30"
-  - name: CODE_MAX_NUMBER_ARRAY_LENGTH
-    value: "1000"
+    # Apply your own Environment Variables if necessary.
+    # Variables defined here take higher priority than those from `ConfigMap` generated given `.Values`
+    # Direct value assignment
+    # - name: LANG
+    #   value: "C.UTF-8"
+    #   - name: SECRET_KEY
+    # Use existing k8s secrets
+    #  - name: DB_PASSWORD
+    #    valueFrom:
+    #      secretKeyRef:
+    #        name: my-secret
+    #        key: DB_PASSWORD
+    - name: CHECK_UPDATE_URL
+      # Won't check for updates if left empty
+      #   value: https://updates.dify.ai
+      value: ""
+    - name: CODE_MAX_NUMBER
+      value: "9223372036854775807"
+    - name: CODE_MIN_NUMBER
+      value: "-9223372036854775808"
+    - name: CODE_MAX_STRING_LENGTH
+      value: "80000"
+    - name: TEMPLATE_TRANSFORM_MAX_LENGTH
+      value: "80000"
+    - name: CODE_MAX_STRING_ARRAY_LENGTH
+      value: "30"
+    - name: CODE_MAX_OBJECT_ARRAY_LENGTH
+      value: "30"
+    - name: CODE_MAX_NUMBER_ARRAY_LENGTH
+      value: "1000"
   ## OpenTelemetry (OTEL) configuration
   otel:
     enabled: false
@@ -785,11 +785,11 @@ sandbox:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv:
-  # Apply your own Environment Variables if necessary
-  # - name: LANG
-  #   value: "C.UTF-8"
-  - name: WORKER_TIMEOUT
-    value: "15"
+    # Apply your own Environment Variables if necessary
+    # - name: LANG
+    #   value: "C.UTF-8"
+    - name: WORKER_TIMEOUT
+      value: "15"
   ## @param sandbox.extraVolumes Optionally specify extra list of additional volumes for the Sandbox pod(s)
   ##
   extraVolumes: []
@@ -1097,14 +1097,14 @@ weaviate:
   # example setting the nofile limit
   command: ["/bin/weaviate"]
   args:
-    - '--host'
-    - '0.0.0.0'
-    - '--port'
-    - '8080'
-    - '--scheme'
-    - 'http'
-    - '--config-file'
-    - '/weaviate-config/conf.yaml'
+    - "--host"
+    - "0.0.0.0"
+    - "--port"
+    - "8080"
+    - "--scheme"
+    - "http"
+    - "--config-file"
+    - "/weaviate-config/conf.yaml"
     - --read-timeout=60s
     - --write-timeout=60s
 
@@ -1280,7 +1280,6 @@ weaviate:
     successThreshold: 1
     timeoutSeconds: 3
 
-
   terminationGracePeriodSeconds: 600
 
   # Weaviate Config
@@ -1320,11 +1319,11 @@ weaviate:
     admin_list:
       enabled: true
       users:
-      # Examples
-      # - admin_user1
-      # - admin_user2
-      # - api-key-user-admin
-      - hello@dify.ai
+        # Examples
+        # - admin_user1
+        # - admin_user2
+        # - api-key-user-admin
+        - hello@dify.ai
       read_only_users:
       # Examples
       # - readonly_user1
@@ -1334,7 +1333,6 @@ weaviate:
   query_defaults:
     limit: 100
   debug: false
-
 
   # Insert any custom environment variables or envSecrets by putting the exact name
   # and desired value into the settings below. Any env name passed will be automatically
@@ -1437,7 +1435,6 @@ weaviate:
     AUTHENTICATION_APIKEY_USERS: "hello@dify.ai"
     AUTHORIZATION_ADMINLIST_ENABLED: "true"
     AUTHORIZATION_ADMINLIST_USERS: "hello@dify.ai"
-
 
   envSecrets:
     # create a Kubernetes secret with AUTHENTICATION_APIKEY_ALLOWED_KEYS key and its respective value
@@ -1617,7 +1614,6 @@ weaviate:
       #   AZURE_STORAGE_KEY: name-of-the-k8s-secret-containing-account-key
       #   AZURE_STORAGE_CONNECTION_STRING: name-of-the-k8s-secret-containing-connection-string
 
-
   # modules are extensions to Weaviate, they can be used to support various
   # ML-models, but also other features unrelated to model inference.
   # An inference/vectorizer module is not required, you can also run without any
@@ -1634,7 +1630,7 @@ weaviate:
   # values.yaml will be ignored when defining a custom config map.
   custom_config_map:
     enabled: false
-    name: 'custom-config'
+    name: "custom-config"
 
   # Pass any annotations to Weaviate pods
   annotations:
@@ -1675,8 +1671,7 @@ service:
 ingress:
   enabled: false
   className: ""
-  annotations:
-    {}
+  annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
     # nginx.ingress.kubernetes.io/backend-protocol: HTTP
@@ -2902,7 +2897,6 @@ externalRedis:
       - "sentinel3.example:26379"
     password: ""
 
-
 ## @Section Extenral storage backend
 ##
 
@@ -3109,7 +3103,6 @@ externalElasticsearch:
   # Note: When using ExternalSecret, these values are managed externally
   username: ""
   password: ""
-
 
 ## @section (Experimental): External Secret Operator
 ##
