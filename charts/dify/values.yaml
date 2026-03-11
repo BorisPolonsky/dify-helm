@@ -87,10 +87,20 @@ image:
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
-
   ssrfProxy:
     repository: ubuntu/squid
     tag: latest
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ##
+    # pullSecrets:
+    #   - myRegistryKeySecretName
+
+  agentbox:
+    repository: langgenius/dify-agentbox
+    tag: 0.5.3-local
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -109,6 +119,75 @@ image:
     ##
     # pullSecrets:
     #   - myRegistryKeySecretName
+
+agentbox:
+  enabled: true
+  replicas: 1
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  priorityClassName: ""
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+  
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 1
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  updateStrategy: {}
+  customLivenessProbe: {}
+  customReadinessProbe: {}
+  customStartupProbe: {}
+  hostAliases: []
+  
+  podSecurityContext: {}
+  containerSecurityContext:
+    runAsUser: 0
+  
+  extraEnv: []
+  
+  extraVolumes: []
+  extraVolumeMounts: []
+  
+  service:
+    port: 22
+    annotations: {}
+    labels: {}
+    clusterIP: ""
+    
+  environment:
+    sshUsername: "agentbox"
+    sshPassword: "agentbox_password" # Change in production
+    sshPort: "22"
+    socatTargetHost: "api"
+    socatTargetPort: "5001"
+
+  serviceAccount:
+    create: false
+    name: ""
+    automountServiceAccountToken: false
+    annotations: {}
 
 ## @section -- Dify micro-service parameters
 ## Parameters for dify components including api(worker), web, sandbox, etc.
@@ -3153,6 +3232,17 @@ externalSecret:
         property: "api_key"
 
   # Configuration for plugin daemon secret
+  # Configuration for agentbox secret
+  agentbox:
+    enabled: true
+    remoteRefs:
+      AGENTBOX_SSH_USERNAME:
+        key: "dify/agentbox"
+        property: "ssh_username"
+      AGENTBOX_SSH_PASSWORD:
+        key: "dify/agentbox"
+        property: "ssh_password"
+
   pluginDaemon:
     # Whether to create ExternalSecret for plugin daemon
     enabled: true

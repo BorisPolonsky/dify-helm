@@ -65,6 +65,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a default fully qualified agentbox name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "dify.agentbox.fullname" -}}
+{{ template "dify.fullname" . }}-agentbox
+{{- end -}}
+
+{{/*
 Create a default fully qualified web name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
@@ -159,6 +167,17 @@ Create the name of the service account to use for the Sandbox
     {{ default (include "dify.sandbox.fullname" .) .Values.sandbox.serviceAccount.name | trunc 63 | trimSuffix "-" }}
 {{- else -}}
     {{ default "default" .Values.sandbox.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for the Agentbox
+*/}}
+{{- define "dify.agentbox.serviceAccountName" -}}
+{{- if .Values.agentbox.serviceAccount.create -}}
+    {{ default (include "dify.agentbox.fullname" .) .Values.agentbox.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.agentbox.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 

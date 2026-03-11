@@ -1,0 +1,28 @@
+{{- if .Values.agentbox.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "dify.agentbox.fullname" . }}
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    component: agentbox
+    {{- include "dify.ud.labels" . | nindent 4 }}
+  annotations:
+    {{- include "dify.ud.annotations" . | nindent 4 }}
+    {{- if .Values.agentbox.service.annotations }}
+      {{- toYaml .Values.agentbox.service.annotations | nindent 4 }}
+    {{- end }}
+spec:
+  type: ClusterIP
+  {{- if .Values.agentbox.service.clusterIP }}
+  clusterIP: {{ .Values.agentbox.service.clusterIP }}
+  {{- end }}
+  ports:
+    - name: agentbox
+      port: {{ .Values.agentbox.service.port }}
+      targetPort: 22
+      protocol: TCP
+  selector:
+    {{- include "dify.selectorLabels" . | nindent 4 }}
+    component: agentbox
+{{- end }}
