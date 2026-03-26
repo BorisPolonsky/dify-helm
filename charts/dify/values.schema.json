@@ -665,8 +665,13 @@
             "required": ["ip", "hostnames"]
           }
         },
-        "sshUsername": { "type": "string" },
-        "sshPassword": { "type": "string" }
+        "auth": {
+          "type": "object",
+          "properties": {
+            "username": { "type": "string" },
+            "password": { "type": "string" }
+          }
+        }
       }
     },
     "ssrfProxy": {

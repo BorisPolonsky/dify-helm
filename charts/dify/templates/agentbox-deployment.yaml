@@ -29,6 +29,7 @@ spec:
     metadata:
       annotations:
         checksum/agentbox-config: {{ include (print $.Template.BasePath "/agentbox-config.yaml") . | sha256sum }}
+        checksum/agentbox-secret: {{ include (print $.Template.BasePath "/agentbox-secret.yaml") . | sha256sum }}
         checksum/agentbox-entrypoint: {{ include (print $.Template.BasePath "/agentbox-entrypoint.yaml") . | sha256sum }}
         {{- include "dify.ud.annotations" . | nindent 8 }}
       labels:
@@ -70,6 +71,8 @@ spec:
           {{- end }}
           envFrom:
             - configMapRef:
+                name: {{ template "dify.agentbox.fullname" . }}
+            - secretRef:
                 name: {{ template "dify.agentbox.fullname" . }}
           {{- if .Values.agentbox.extraEnv }}
           env:

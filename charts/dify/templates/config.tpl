@@ -532,8 +532,8 @@ HTTPS_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfPro
 {{- end }}
 
 {{- define "dify.agentbox.config" -}}
-AGENTBOX_SSH_USERNAME: {{ .Values.agentbox.sshUsername | quote }}
-AGENTBOX_SSH_PASSWORD: {{ .Values.agentbox.sshPassword | quote }}
+AGENTBOX_SSH_USERNAME: {{ .Values.agentbox.auth.username | quote }}
+# AGENTBOX_SSH_PASSWORD: {{ .Values.agentbox.auth.password | quote }}
 AGENTBOX_SSH_PORT: "2222"
 AGENTBOX_SOCAT_TARGET_HOST: {{ (include "dify.api.fullname" .) | quote }}
 AGENTBOX_SOCAT_TARGET_PORT: {{ (.Values.api.service.port | toString) | quote }}

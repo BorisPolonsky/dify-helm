@@ -783,9 +783,10 @@ agentbox:
     annotations: {}
   updateStrategy: {}
   hostAliases: []
-  ## Agentbox-specific (under consideration).
-  sshUsername: "agentbox"
-  sshPassword: "agentbox"
+  ## Agentbox SSH credentials (under consideration).
+  auth:
+    username: "agentbox"
+    password: "agentbox"
 
 ssrfProxy:
   enabled: false
