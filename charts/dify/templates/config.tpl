@@ -25,7 +25,12 @@ FILES_URL: {{ .Values.global.filesDomain | quote }}
 TRIGGER_URL: {{ .Values.global.triggerDomain | quote }}
 {{- if .Values.agentbox.enabled }}
 CLI_API_URL: "http://{{ include "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
+{{- if .Values.global.filesDomain }}
+# Workaround for skill configuration failure in dify-1.14.0-rc1
+FILES_API_URL: {{ .Values.global.filesDomain | quote }}
+{{- else }}
 FILES_API_URL: "http://{{ include "dify.api.fullname" . }}:{{ .Values.api.service.port }}"
+{{- end }}
 {{- end }}
 {{- end }}
 
