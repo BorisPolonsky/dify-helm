@@ -63,13 +63,16 @@ graph TB
     SSRFService[🛡️ SSRF Proxy Service<br/>Port: 3128] --> SSRFPod[📦 SSRF Proxy Pod<br/>ubuntu/squid:latest<br/>Port: 3128]
 
     %% Internal Communications
-    APIPod -.->|Code Execution| SandboxService
-    APIPod -.->| Shell Execution | AgentboxService
+    APIPod -.->|"Code execution<br/>(non-streamed workflow, debugging)"| SandboxService
+    WorkerPod -.->|"Code execution<br/>(streamed workflow, etc.)"| SandboxService
+    APIPod -.->|"Shell execution<br/>(non-streamed workflow, debugging)"| AgentboxService
+    WorkerPod -.->|"Shell execution<br/>(streamed workflow, etc.)"| AgentboxService
     AgentboxPod -.->|API callbacks| APIService
     SandboxPod -.->|API callbacks| APIService
     APIPod -.->|SSRF Protection| SSRFService
-    APIPod -.->|Plugin Management| PluginService
-    WorkerPod -.->|Background Tasks| APIPod
+    WorkerPod -.->|SSRF Protection| SSRFService
+    APIPod -.->|Plugin management| PluginService
+    WorkerPod -.->|Plugin invoke| PluginService
 
     %% Data Layer - Databases
     subgraph DataLayer [🗄️ Data Layer]
@@ -83,8 +86,8 @@ graph TB
     WorkerPod -.->|Database Operations| PostgresService
     PluginPod -.->|Database Operations| PostgresService
 
-    APIPod -.->|Cache & Sessions| RedisService
-    WorkerPod -.->|Task Processing| RedisService
+    APIPod -.->|Cache & Sessions, Celery, Pub/Sub| RedisService
+    WorkerPod -.->|Celery, Pub/Sub| RedisService
     BeatPod -.->|Task Scheduling| RedisService
 
     APIPod -.->|Vector Storage| VectorDBService
