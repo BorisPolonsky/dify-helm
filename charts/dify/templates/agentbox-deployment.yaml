@@ -1,0 +1,127 @@
+{{- if .Values.agentbox.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    {{- include "dify.ud.annotations" . | nindent 4 }}
+    descriptions: agentbox
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    component: agentbox
+    # app: {{ template "dify.agentbox.fullname" . }}
+    {{- include "dify.ud.labels" . | nindent 4 }}
+  name: {{ template "dify.agentbox.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "dify.selectorLabels" . | nindent 6 }}
+      component: agentbox
+      {{/*
+      # Required labels for istio
+      # app: {{ template "dify.agentbox.fullname" . }}
+      # version: {{ .Values.istioServiceMesh.version | quote }}
+      */}}
+  {{- if .Values.agentbox.updateStrategy }}
+  strategy: {{- toYaml .Values.agentbox.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        checksum/agentbox-config: {{ include (print $.Template.BasePath "/agentbox-config.yaml") . | sha256sum }}
+        checksum/agentbox-secret: {{ include (print $.Template.BasePath "/agentbox-secret.yaml") . | sha256sum }}
+        checksum/agentbox-entrypoint: {{ include (print $.Template.BasePath "/agentbox-entrypoint.yaml") . | sha256sum }}
+        {{- include "dify.ud.annotations" . | nindent 8 }}
+      labels:
+        {{- include "dify.selectorLabels" . | nindent 8 }}
+        component: agentbox
+        {{/*
+        # Required labels for istio
+        # app: {{ template "dify.agentbox.fullname" . }}
+        # version: {{ .Values.istioServiceMesh.version | quote }}
+        */}}
+        {{- include "dify.ud.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "dify.agentbox.serviceAccountName" . }}
+      {{- if .Values.agentbox.priorityClassName }}
+      priorityClassName: {{ .Values.agentbox.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.image.agentbox.pullSecrets }}
+      imagePullSecrets:
+        {{- range .Values.image.agentbox.pullSecrets }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.agentbox.hostAliases }}
+      hostAliases:
+        {{- toYaml .Values.agentbox.hostAliases | nindent 8 }}
+      {{- end }}
+      {{- if .Values.agentbox.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.agentbox.podSecurityContext | nindent 8 }}
+      {{- end }}
+      containers:
+        - image: "{{ .Values.image.agentbox.repository }}:{{ .Values.image.agentbox.tag }}"
+          imagePullPolicy: "{{ .Values.image.agentbox.pullPolicy }}"
+          name: agentbox
+          command: ["/bin/sh", "/scripts/entrypoint.sh"]
+          {{- if .Values.agentbox.containerSecurityContext }}
+          securityContext:
+            {{- toYaml .Values.agentbox.containerSecurityContext | nindent 12 }}
+          {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "dify.agentbox.fullname" . }}
+            - secretRef:
+                name: {{ template "dify.agentbox.fullname" . }}
+          {{- if .Values.agentbox.extraEnv }}
+          env:
+            {{- toYaml .Values.agentbox.extraEnv | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: ssh
+              containerPort: 2222
+              protocol: TCP
+          volumeMounts:
+            - name: entrypoint
+              mountPath: /scripts/entrypoint.sh
+              subPath: entrypoint.sh
+              readOnly: true
+          {{- if .Values.agentbox.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.agentbox.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.agentbox.resources | nindent 14 }}
+      volumes:
+        - name: entrypoint
+          configMap:
+            name: {{ template "dify.agentbox.fullname" . }}-entrypoint
+            defaultMode: 0755
+      {{- if .Values.agentbox.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.agentbox.extraVolumes "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if and (.Values.nodeSelector) (not .Values.agentbox.nodeSelector) }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.agentbox.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.agentbox.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if and (.Values.affinity) (not .Values.agentbox.affinity) }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.agentbox.affinity }}
+      affinity:
+        {{- toYaml .Values.agentbox.affinity | nindent 8 }}
+      {{- end }}
+      {{- if and (.Values.tolerations) (not .Values.agentbox.tolerations) }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.agentbox.tolerations }}
+      tolerations:
+        {{- toYaml .Values.agentbox.tolerations | nindent 8 }}
+      {{- end }}
+{{- end }}

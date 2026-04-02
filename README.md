@@ -56,14 +56,23 @@ graph TB
     %% Sandbox Service
     SandboxService[🏖️ Sandbox Service<br/>Port: 8194] --> SandboxPod[📦 Sandbox Pod<br/>langgenius/dify-sandbox:0.2.12<br/>Port: 8194]
 
+    %% Agentbox (built-in, single-replica SSH endpoint for SSHSandboxEnvironment)
+    AgentboxService[🤖 Agentbox Service<br/>SSH: 22] --> AgentboxPod[📦 Agentbox Pod<br/>langgenius/dify-agentbox<br/>Port: 22]
+
     %% SSRF Proxy Service
     SSRFService[🛡️ SSRF Proxy Service<br/>Port: 3128] --> SSRFPod[📦 SSRF Proxy Pod<br/>ubuntu/squid:latest<br/>Port: 3128]
 
     %% Internal Communications
-    APIPod -.->|Code Execution| SandboxService
+    APIPod -.->|"Code execution<br/>(non-streamed workflow, debugging)"| SandboxService
+    WorkerPod -.->|"Code execution<br/>(streamed workflow, etc.)"| SandboxService
+    APIPod -.->|"Shell execution<br/>(non-streamed workflow, debugging)"| AgentboxService
+    WorkerPod -.->|"Shell execution<br/>(streamed workflow, etc.)"| AgentboxService
+    AgentboxPod -.->|API callbacks| APIService
+    SandboxPod -.->|API callbacks| APIService
     APIPod -.->|SSRF Protection| SSRFService
-    APIPod -.->|Plugin Management| PluginService
-    WorkerPod -.->|Background Tasks| APIPod
+    WorkerPod -.->|SSRF Protection| SSRFService
+    APIPod -.->|Plugin management| PluginService
+    WorkerPod -.->|Plugin invoke| PluginService
 
     %% Data Layer - Databases
     subgraph DataLayer [🗄️ Data Layer]
@@ -77,8 +86,8 @@ graph TB
     WorkerPod -.->|Database Operations| PostgresService
     PluginPod -.->|Database Operations| PostgresService
 
-    APIPod -.->|Cache & Sessions| RedisService
-    WorkerPod -.->|Task Processing| RedisService
+    APIPod -.->|Cache & Sessions, Celery, Pub/Sub| RedisService
+    WorkerPod -.->|Celery, Pub/Sub| RedisService
     BeatPod -.->|Task Scheduling| RedisService
 
     APIPod -.->|Vector Storage| VectorDBService
@@ -136,8 +145,8 @@ graph TB
     classDef storageClass fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
     classDef externalClass fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
 
-    class APIPod,WebPod,WorkerPod,BeatPod,SandboxPod,SSRFPod,PluginPod podClass
-    class APIService,WebService,SandboxService,SSRFService,PluginService,ProxyService serviceClass
+    class APIPod,WebPod,WorkerPod,BeatPod,SandboxPod,AgentboxPod,SSRFPod,PluginPod podClass
+    class APIService,WebService,SandboxService,AgentboxService,SSRFService,PluginService,ProxyService serviceClass
     class PostgresService,RedisService,VectorDBService,WeaviateDB,QdrantDB,MilvusDB,PGVectorDB storageClass
     class ExternalDB,ExternalRedis,ExternalVector,ExternalStorage,S3Storage,AzureStorage,GCSStorage externalClass
 ```

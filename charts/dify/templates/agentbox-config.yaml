@@ -1,0 +1,11 @@
+{{- if .Values.agentbox.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "dify.agentbox.fullname" . }}
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    component: agentbox
+data:
+  {{- include "dify.agentbox.config" . | nindent 2 }}
+{{- end }}

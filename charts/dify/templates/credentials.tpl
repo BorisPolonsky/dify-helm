@@ -216,6 +216,10 @@ SMTP_PASSWORD: {{ .Values.api.mail.smtp.password | b64enc | quote }}
 API_KEY: {{ .Values.sandbox.auth.apiKey | default .Values.global.internalApiKey | b64enc | quote }}
 {{- end }}
 
+{{- define "dify.agentbox.credentials" -}}
+AGENTBOX_SSH_PASSWORD: {{ .Values.agentbox.auth.password | b64enc | quote }}
+{{- end }}
+
 {{- define "dify.pluginDaemon.credentials" -}}
 {{ include "dify.db.credentials" . }}
 {{ include "dify.redis.credentials" . }}
