@@ -46,6 +46,9 @@ spec:
       {{- if .Values.agentbox.priorityClassName }}
       priorityClassName: {{ .Values.agentbox.priorityClassName | quote }}
       {{- end }}
+      {{- if .Values.agentbox.shareProcessNamespace }}
+      shareProcessNamespace: {{ .Values.agentbox.shareProcessNamespace }}
+      {{- end }}
       {{- if .Values.image.agentbox.pullSecrets }}
       imagePullSecrets:
         {{- range .Values.image.agentbox.pullSecrets }}

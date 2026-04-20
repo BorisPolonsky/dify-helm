@@ -69,7 +69,7 @@ spec:
         {{- toYaml .Values.pluginDaemon.hostAliases | nindent 8 }}
       {{- end }}
       {{- if .Values.pluginDaemon.shareProcessNamespace }}
-      shareProcessNamespace: true
+      shareProcessNamespace: {{ .Values.pluginDaemon.shareProcessNamespace }}
       {{- end }}
       {{- if .Values.pluginDaemon.podSecurityContext }}
       securityContext:

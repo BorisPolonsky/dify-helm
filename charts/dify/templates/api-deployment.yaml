@@ -46,6 +46,9 @@ spec:
       {{- if .Values.api.priorityClassName }}
       priorityClassName: {{ .Values.api.priorityClassName | quote }}
       {{- end }}
+      {{- if .Values.api.shareProcessNamespace }}
+      shareProcessNamespace: {{ .Values.api.shareProcessNamespace }}
+      {{- end }}
       {{- if eq .Release.Name "dify"}}
       {{/*
       Disable service environment variables,

@@ -44,6 +44,9 @@ spec:
       {{- if .Values.web.priorityClassName }}
       priorityClassName: {{ .Values.web.priorityClassName | quote }}
       {{- end }}
+      {{- if .Values.web.shareProcessNamespace }}
+      shareProcessNamespace: {{ .Values.web.shareProcessNamespace }}
+      {{- end }}
       enableServiceLinks: {{ .Values.web.enableServiceLinks }}
       {{- if .Values.image.web.pullSecrets }}
       imagePullSecrets:

@@ -43,6 +43,9 @@ spec:
       {{- if .Values.beat.priorityClassName }}
       priorityClassName: {{ .Values.beat.priorityClassName | quote }}
       {{- end }}
+      {{- if .Values.beat.shareProcessNamespace }}
+      shareProcessNamespace: {{ .Values.beat.shareProcessNamespace }}
+      {{- end }}
       {{- if .Values.image.api.pullSecrets }}
       imagePullSecrets:
       {{- range .Values.image.api.pullSecrets }}

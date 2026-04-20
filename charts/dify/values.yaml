@@ -132,6 +132,10 @@ api:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param api.shareProcessNamespace Share a single process namespace between all of the containers in Dify API pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ##
+  shareProcessNamespace: false
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -333,6 +337,10 @@ worker:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param worker.shareProcessNamespace Share a single process namespace between all of the containers in Dify worker pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ##
+  shareProcessNamespace: false
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -415,6 +423,10 @@ beat:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param beat.shareProcessNamespace Share a single process namespace between all of the containers in Dify Celery Beat pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ##
+  shareProcessNamespace: false
   ## Configure extra options for celery beat containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param beat.customLivenessProbe Custom livenessProbe that overrides the default one (None)
@@ -484,6 +496,10 @@ proxy:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param proxy.shareProcessNamespace Share a single process namespace between all of the containers in Dify nginx proxy pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ##
+  shareProcessNamespace: false
   ## Configure extra options for proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param proxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -577,6 +593,10 @@ web:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param web.shareProcessNamespace Share a single process namespace between all of the containers in Dify web pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ##
+  shareProcessNamespace: false
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -667,6 +687,10 @@ sandbox:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param sandbox.shareProcessNamespace Share a single process namespace between all of the containers in Dify sandbox pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ##
+  shareProcessNamespace: false
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -763,6 +787,10 @@ agentbox:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param agentbox.shareProcessNamespace Share a single process namespace between all of the containers in Dify agentbox pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ##
+  shareProcessNamespace: false
   podSecurityContext: {}
   # agentbox entrypoint needs root (mkdir /run/sshd, ssh-keygen, chpasswd, sshd). Override if your cluster restricts root.
   containerSecurityContext:
@@ -796,6 +824,10 @@ ssrfProxy:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param ssrfProxy.shareProcessNamespace Share a single process namespace between all of the containers in Dify SSRF proxy pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ##
+  shareProcessNamespace: false
   ## Configure extra options for ssrf proxy containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param ssrfProxy.customLivenessProbe Custom livenessProbe that overrides the default one
@@ -877,13 +909,8 @@ pluginDaemon:
   affinity: {}
   tolerations: []
   priorityClassName: ""
-  ## @param pluginDaemon.shareProcessNamespace Enable process namespace sharing on the pod.
-  ## When true, the K8s pause container occupies PID 1 and the daemon runs as PID >1.
-  ## Required on Kubernetes because the embedded `dify_plugin` Python SDK (in every
-  ## plugin's .venv) self-terminates via `os._exit(-1)` when `os.getppid() == 1` — a
-  ## naive orphan check that assumes Docker `--init`/tini is injecting PID 1. Without
-  ## this flag, every plugin subprocess exits ~500ms after launch on Kubernetes and
-  ## dispatch requests fail with `no proper instance`.
+  ## @param pluginDaemon.shareProcessNamespace Share a single process namespace between all of the containers in Dify plugin daemon pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
   ##
   shareProcessNamespace: false
   ## Configure extra options for plugin daemon containers' liveness, readiness, and startup probes
