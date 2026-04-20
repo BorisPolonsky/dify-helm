@@ -45,6 +45,9 @@ spec:
       {{- if .Values.sandbox.priorityClassName }}
       priorityClassName: {{ .Values.sandbox.priorityClassName | quote }}
       {{- end }}
+      {{- if .Values.sandbox.shareProcessNamespace }}
+      shareProcessNamespace: {{ .Values.sandbox.shareProcessNamespace }}
+      {{- end }}
       {{- if .Values.image.sandbox.pullSecrets }}
       imagePullSecrets:
         {{- range .Values.image.sandbox.pullSecrets }}

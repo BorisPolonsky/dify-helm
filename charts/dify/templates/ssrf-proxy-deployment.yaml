@@ -44,6 +44,9 @@ spec:
       {{- if .Values.ssrfProxy.priorityClassName }}
       priorityClassName: {{ .Values.ssrfProxy.priorityClassName | quote }}
       {{- end }}
+      {{- if .Values.ssrfProxy.shareProcessNamespace }}
+      shareProcessNamespace: {{ .Values.ssrfProxy.shareProcessNamespace }}
+      {{- end }}
       {{- if .Values.image.ssrfProxy.pullSecrets }}
       imagePullSecrets:
         {{- range .Values.image.ssrfProxy.pullSecrets }}
