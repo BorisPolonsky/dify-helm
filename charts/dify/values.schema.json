@@ -760,6 +760,10 @@
         "affinity": { "type": "object" },
         "tolerations": { "type": "array" },
         "priorityClassName": { "type": "string" },
+        "shareProcessNamespace": {
+          "type": "boolean",
+          "description": "Share a single process namespace between all containers in Dify plugin daemon pods."
+        },
         "customLivenessProbe": { "type": "object" },
         "customReadinessProbe": { "type": "object" },
         "customStartupProbe": { "type": "object" },
