@@ -877,6 +877,15 @@ pluginDaemon:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param pluginDaemon.shareProcessNamespace Enable process namespace sharing on the pod.
+  ## When true, the K8s pause container occupies PID 1 and the daemon runs as PID >1.
+  ## Required on Kubernetes because the embedded `dify_plugin` Python SDK (in every
+  ## plugin's .venv) self-terminates via `os._exit(-1)` when `os.getppid() == 1` — a
+  ## naive orphan check that assumes Docker `--init`/tini is injecting PID 1. Without
+  ## this flag, every plugin subprocess exits ~500ms after launch on Kubernetes and
+  ## dispatch requests fail with `no proper instance`.
+  ##
+  shareProcessNamespace: false
   ## Configure extra options for plugin daemon containers' liveness, readiness, and startup probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
   ## @param pluginDaemon.customLivenessProbe Custom livenessProbe that overrides the default one
