@@ -911,6 +911,7 @@ pluginDaemon:
   priorityClassName: ""
   ## @param pluginDaemon.shareProcessNamespace Share a single process namespace between all of the containers in Dify plugin daemon pods
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ## Set to true to work around the issue described in https://github.com/BorisPolonsky/dify-helm/pull/402
   ##
   shareProcessNamespace: false
   ## Configure extra options for plugin daemon containers' liveness, readiness, and startup probes
