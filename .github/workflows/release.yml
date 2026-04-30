@@ -12,16 +12,23 @@ permissions:
   contents: write
 
 jobs:
+  # Pauses until someone approves in repo Settings → Environments →
+  # "chart-release" (or rename below) → Required reviewers.
+  approval-gate:
+    name: Maintainer approval (chart release)
+    runs-on: ubuntu-latest
+    environment: chart-release
+    steps:
+      - name: Approval granted
+        run: echo "Chart release approved"
+
   release:
+    needs: approval-gate
+    if: |
+      always() &&
+      needs.approval-gate.result == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Check if owner triggered the workflow
-        run: |
-          if [ "$GITHUB_ACTOR" != "$GITHUB_REPOSITORY_OWNER" ]; then
-            echo "Workflow can only be triggered by the repository owner."
-            exit 1
-          fi
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
