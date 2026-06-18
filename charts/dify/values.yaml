@@ -477,6 +477,68 @@ beat:
     ##
     annotations: {}
 
+apiWebsocket:
+  enabled: false
+  # Public WebSocket URL for browser clients (NEXT_PUBLIC_SOCKET_URL).
+  # Example: wss://your-domain
+  socketUrl: ""
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  priorityClassName: ""
+  ## @param apiWebsocket.shareProcessNamespace Share a single process namespace between all containers in api-websocket pods
+  shareProcessNamespace: false
+  ## Configure extra options for api-websocket containers' liveness, readiness, and startup probes
+  customLivenessProbe: {}
+  customReadinessProbe: {}
+  customStartupProbe: {}
+  ## @param apiWebsocket.updateStrategy Update strategy type and configuration parameters
+  updateStrategy:
+    type: Recreate
+  hostAliases: []
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+  extraEnv: []
+  logLevel: INFO
+  extraVolumes: []
+  extraVolumeMounts: []
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  service:
+    port: 5001
+    annotations: {}
+    labels: {}
+    clusterIP: ""
+  serviceAccount:
+    create: false
+    name: ""
+    automountServiceAccountToken: false
+    annotations: {}
+
 proxy:
   enabled: true
   replicas: 1

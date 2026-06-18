@@ -359,6 +359,69 @@
         }
       }
     },
+    "apiWebsocket": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "socketUrl": { "type": "string" },
+        "resources": { "type": "object" },
+        "nodeSelector": { "type": "object" },
+        "affinity": { "type": "object" },
+        "tolerations": { "type": "array" },
+        "priorityClassName": { "type": "string" },
+        "shareProcessNamespace": { "type": "boolean" },
+        "customLivenessProbe": { "type": "object" },
+        "customReadinessProbe": { "type": "object" },
+        "customStartupProbe": { "type": "object" },
+        "updateStrategy": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string" }
+          }
+        },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
+        "podSecurityContext": { "type": "object" },
+        "containerSecurityContext": { "type": "object" },
+        "extraEnv": { "type": ["array", "null"] },
+        "logLevel": { "type": "string" },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
+        "livenessProbe": { "type": "object" },
+        "readinessProbe": { "type": "object" },
+        "startupProbe": { "type": "object" },
+        "service": {
+          "type": "object",
+          "properties": {
+            "port": { "type": "integer" },
+            "annotations": { "type": "object" },
+            "labels": { "type": "object" },
+            "clusterIP": { "type": "string" }
+          }
+        },
+        "serviceAccount": {
+          "type": "object",
+          "properties": {
+            "create": { "type": "boolean" },
+            "name": { "type": "string" },
+            "automountServiceAccountToken": { "type": "boolean" },
+            "annotations": { "type": "object" }
+          }
+        }
+      }
+    },
     "proxy": {
       "type": "object",
       "properties": {

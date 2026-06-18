@@ -47,6 +47,13 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{ template "dify.fullname" . }}-beat
 {{- end -}}
 
+{{/*
+Create a default fully qualified api-websocket name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "dify.apiWebsocket.fullname" -}}
+{{ template "dify.fullname" . }}-api-websocket
+{{- end -}}
 
 {{/*
 Create a default fully qualified web name.
@@ -206,6 +213,16 @@ Create the name of the service account to use for the celery beat
 {{- end -}}
 {{- end -}}
 
+{{/*
+Create the name of the service account to use for the api-websocket pod
+*/}}
+{{- define "dify.apiWebsocket.serviceAccountName" -}}
+{{- if .Values.apiWebsocket.serviceAccount.create -}}
+    {{ default (include "dify.apiWebsocket.fullname" .) .Values.apiWebsocket.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.apiWebsocket.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Create the name of the service account to use for the Dify Plugin Daemon

@@ -1,0 +1,156 @@
+{{- if and .Values.apiWebsocket.enabled .Values.api.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    {{- include "dify.ud.annotations" . | nindent 4 }}
+    descriptions: api-websocket
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    component: api-websocket
+    # app: {{ template "dify.apiWebsocket.fullname" . }}
+    {{- include "dify.ud.labels" . | nindent 4 }}
+  name: {{ template "dify.apiWebsocket.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "dify.selectorLabels" . | nindent 6 }}
+      component: api-websocket
+      {{/*
+      # Required labels for istio
+      # app: {{ template "dify.apiWebsocket.fullname" . }}
+      # version: {{ .Values.istioServiceMesh.version | quote }}
+      */}}
+  {{- if .Values.apiWebsocket.updateStrategy }}
+  strategy: {{- toYaml .Values.apiWebsocket.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        checksum/api-config: {{ include (print $.Template.BasePath "/api-config.yaml") . | sha256sum }}
+        checksum/api-secret: {{ include (print $.Template.BasePath "/api-secret.yaml") . | sha256sum }}
+        {{- include "dify.ud.annotations" . | nindent 8 }}
+      labels:
+        {{- include "dify.selectorLabels" . | nindent 8 }}
+        component: api-websocket
+        {{/*
+        # Required labels for istio
+        # app: {{ template "dify.apiWebsocket.fullname" . }}
+        # version: {{ .Values.istioServiceMesh.version | quote }}
+        */}}
+        {{- include "dify.ud.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "dify.apiWebsocket.serviceAccountName" . }}
+      {{- if .Values.apiWebsocket.priorityClassName }}
+      priorityClassName: {{ .Values.apiWebsocket.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.apiWebsocket.shareProcessNamespace }}
+      shareProcessNamespace: {{ .Values.apiWebsocket.shareProcessNamespace }}
+      {{- end }}
+      {{- if eq .Release.Name "dify"}}
+      {{/*
+      Disable service environment variables,
+      otherwise they will clash with `DIFY_PORT` which is needed in entrypoint.sh
+      */}}
+      enableServiceLinks: false
+      {{- end }}
+      {{- if .Values.image.api.pullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.api.pullSecrets }}
+        - name: {{ . }}
+      {{- end }}
+      {{- end }}
+      {{- if .Values.apiWebsocket.hostAliases }}
+      hostAliases:
+        {{- toYaml .Values.apiWebsocket.hostAliases | nindent 8 }}
+      {{- end }}
+      {{- if .Values.apiWebsocket.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.apiWebsocket.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      containers:
+        - image: "{{ .Values.image.api.repository }}:{{ default .Chart.AppVersion .Values.image.api.tag }}"
+          imagePullPolicy: "{{ .Values.image.api.pullPolicy }}"
+          name: api-websocket
+          {{- if .Values.apiWebsocket.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.apiWebsocket.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.apiWebsocket.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.apiWebsocket.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: api
+          {{- end }}
+          {{- if .Values.apiWebsocket.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.apiWebsocket.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.apiWebsocket.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.apiWebsocket.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /health
+              port: api
+          {{- end }}
+          {{- if .Values.apiWebsocket.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.apiWebsocket.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.apiWebsocket.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.apiWebsocket.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: api
+          {{- end }}
+          {{- if .Values.apiWebsocket.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.apiWebsocket.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          env:
+            - name: MIGRATION_ENABLED
+              value: "false"
+            - name: SERVER_WORKER_AMOUNT
+              value: "1"
+            - name: SERVER_WORKER_CLASS
+              value: "geventwebsocket.gunicorn.workers.GeventWebSocketWorker"
+            - name: LOG_LEVEL
+              value: {{ .Values.apiWebsocket.logLevel | quote }}
+            {{- if .Values.apiWebsocket.extraEnv }}
+              {{- toYaml .Values.apiWebsocket.extraEnv | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "dify.api.fullname" . }}
+            - secretRef:
+                name: {{ template "dify.api.fullname" . }}
+          ports:
+            - name: api
+              containerPort: 5001
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.apiWebsocket.resources | nindent 14 }}
+          {{- if .Values.apiWebsocket.extraVolumeMounts }}
+          volumeMounts:
+            {{- include "common.tplvalues.render" (dict "value" .Values.apiWebsocket.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+    {{- if and (.Values.nodeSelector) (not .Values.apiWebsocket.nodeSelector) }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+    {{- end }}
+    {{- if .Values.apiWebsocket.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.apiWebsocket.nodeSelector | nindent 8 }}
+    {{- end }}
+    {{- if and (.Values.affinity) (not .Values.apiWebsocket.affinity) }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+    {{- end }}
+    {{- if .Values.apiWebsocket.affinity }}
+      affinity:
+        {{- toYaml .Values.apiWebsocket.affinity | nindent 8 }}
+    {{- end }}
+    {{- if and (.Values.tolerations) (not .Values.apiWebsocket.tolerations) }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+    {{- end }}
+    {{- if .Values.apiWebsocket.tolerations }}
+      tolerations:
+        {{- toYaml .Values.apiWebsocket.tolerations | nindent 8 }}
+    {{- end }}
+      {{- if .Values.apiWebsocket.extraVolumes }}
+      volumes:
+        {{- include "common.tplvalues.render" (dict "value" .Values.apiWebsocket.extraVolumes "context" $) | nindent 8 }}
+      {{- end }}
+{{- end }}
