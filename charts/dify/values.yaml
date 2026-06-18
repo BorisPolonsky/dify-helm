@@ -3144,6 +3144,9 @@ externalSecret:
       SECRET_KEY:
         key: "dify/api"
         property: "secret_key"
+      CODE_EXECUTION_API_KEY:
+        key: "dify/sandbox"
+        property: "api_key"
       DB_USERNAME:
         key: "dify/database"
         property: "username"

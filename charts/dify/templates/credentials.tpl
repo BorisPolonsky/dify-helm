@@ -24,6 +24,9 @@ OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
 
 {{- define "dify.worker.credentials" -}}
 SECRET_KEY: {{ .Values.global.appSecretKey | b64enc | quote }}
+{{- if .Values.sandbox.enabled }}
+CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | default .Values.global.internalApiKey | b64enc | quote }}
+{{- end }}
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
 {{ include "dify.db.credentials" . }}
