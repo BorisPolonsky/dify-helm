@@ -109,13 +109,6 @@ spec:
             # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
             - name: LOG_LEVEL
               value: {{ .Values.worker.logLevel | quote }}
-            {{- if .Values.sandbox.enabled }}
-            - name: CODE_EXECUTION_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "dify.sandbox.fullname" . }}
-                  key: "API_KEY"
-            {{- end }}
           {{- if .Values.worker.extraEnv }}
             {{- toYaml .Values.worker.extraEnv | nindent 12 }}
           {{- end }}
