@@ -115,20 +115,6 @@ api:
       # Won't check for updates if left empty
       #   value: https://updates.dify.ai
       value: ""
-    - name: CODE_MAX_NUMBER
-      value: "9223372036854775807"
-    - name: CODE_MIN_NUMBER
-      value: "-9223372036854775808"
-    - name: CODE_MAX_STRING_LENGTH
-      value: "80000"
-    - name: TEMPLATE_TRANSFORM_MAX_LENGTH
-      value: "80000"
-    - name: CODE_MAX_STRING_ARRAY_LENGTH
-      value: "30"
-    - name: CODE_MAX_OBJECT_ARRAY_LENGTH
-      value: "30"
-    - name: CODE_MAX_NUMBER_ARRAY_LENGTH
-      value: "1000"
 
   ## OpenTelemetry (OTEL) configuration
   otel:
