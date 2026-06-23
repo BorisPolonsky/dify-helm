@@ -23,7 +23,7 @@ def is_langgenius(name: str) -> bool:
 
 def slug(name: str) -> str:
     """Turn image ref like langgenius/dify-api:1.10.1 into a short display name."""
-    # Fallback path.stem is sanitized: langgenius/dify-api:1.10.1 -> langgenius_dify-api_1.14.2
+    # Fallback path.stem (workflow tr '/:' '__'): langgenius/dify-api:1.10.1 -> langgenius_dify-api_1.10.1 -> dify-api-1.10.1
     if not ("/" in name or ":" in name) and name.startswith(LANGGENIUS_PREFIX_FALLBACK):
         rest = name[len(LANGGENIUS_PREFIX_FALLBACK) :].replace("_", "-")
         return rest if rest else name
