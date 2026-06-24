@@ -28,7 +28,7 @@ TRIGGER_URL: {{ .Values.global.triggerDomain | quote }}
 {{- define "dify.api.config" -}}
 # Startup mode, 'api' starts the API server.
 MODE: api
-{{- include "dify.common.config" . }}
+{{ include "dify.common.config" . }}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 # SECRET_KEY: {{ .Values.global.appSecretKey }}
 
@@ -116,7 +116,7 @@ MODE: worker
 # The Celery worker for processing the queue.
 
 # --- All the configurations below are the same as those in the 'api' service. ---
-{{- include "dify.common.config" . }}
+{{ include "dify.common.config" . }}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 # same as the API service
 # SECRET_KEY: {{ .Values.global.appSecretKey }}
