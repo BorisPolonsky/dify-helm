@@ -6,7 +6,7 @@ in the same format as Langgenius/Dify container security scan reports.
 from pathlib import Path
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from collections import defaultdict
 
 # Image name prefix for "Langgenius Supported Images"; others go to "Third-Party"
@@ -23,7 +23,7 @@ def is_langgenius(name: str) -> bool:
 
 def slug(name: str) -> str:
     """Turn image ref like langgenius/dify-api:1.10.1 into a short display name."""
-    # Fallback path.stem is sanitized: langgenius/dify-api:1.10.1 -> langgenius_dify-api_1.14.2
+    # Fallback path.stem (workflow tr '/:' '__'): langgenius/dify-api:1.10.1 -> langgenius_dify-api_1.10.1 -> dify-api-1.10.1
     if not ("/" in name or ":" in name) and name.startswith(LANGGENIUS_PREFIX_FALLBACK):
         rest = name[len(LANGGENIUS_PREFIX_FALLBACK) :].replace("_", "-")
         return rest if rest else name
@@ -42,8 +42,60 @@ def count_severities(vulns: list) -> tuple[int, int]:
     return critical, high
 
 
-def load_result(path: Path) -> tuple[str, int, int] | None:
-    """Load one Trivy JSON file. Return (artifact_name, critical, high) or None."""
+def escape_md_cell(value: str) -> str:
+    """Escape characters that break markdown table cells."""
+    return value.replace("|", "\\|").replace("\n", " ")
+
+
+def extract_critical_vulns(data: dict) -> list[dict]:
+    """Collect CRITICAL vulnerabilities from all Trivy result targets."""
+    critical: list[dict] = []
+    for res in data.get("Results") or []:
+        for v in res.get("Vulnerabilities") or []:
+            if (v.get("Severity") or "").upper() != "CRITICAL":
+                continue
+            critical.append(
+                {
+                    "cve": v.get("VulnerabilityID") or "UNKNOWN",
+                    "pkg": v.get("PkgName") or "—",
+                    "installed": v.get("InstalledVersion") or "—",
+                    "fixed": v.get("FixedVersion") or "—",
+                    "status": v.get("Status") or "—",
+                    "title": v.get("Title") or v.get("Description") or "—",
+                    "url": v.get("PrimaryURL") or "",
+                }
+            )
+    critical.sort(key=lambda row: (row["cve"], row["pkg"], row["installed"]))
+    return critical
+
+
+def format_critical_table(critical: list[dict]) -> list[str]:
+    """Render a markdown table of critical vulnerabilities."""
+    lines = [
+        "**Critical vulnerabilities:**",
+        "",
+        "| CVE | Package | Installed | Fixed | Status | Title |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for row in critical:
+        cve = row["cve"]
+        if row["url"]:
+            cve = f"[{cve}]({row['url']})"
+        cells = [
+            cve,
+            escape_md_cell(row["pkg"]),
+            escape_md_cell(row["installed"]),
+            escape_md_cell(row["fixed"]),
+            escape_md_cell(row["status"]),
+            escape_md_cell(row["title"]),
+        ]
+        lines.append("| " + " | ".join(cells) + " |")
+    lines.append("")
+    return lines
+
+
+def load_result(path: Path) -> tuple[str, int, int, list[dict]] | None:
+    """Load one Trivy JSON file. Return (artifact_name, critical, high, critical_details) or None."""
     try:
         with open(path) as f:
             data = json.load(f)
@@ -56,7 +108,7 @@ def load_result(path: Path) -> tuple[str, int, int] | None:
         c, h = count_severities(vulns)
         total_c += c
         total_h += h
-    return (name, total_c, total_h)
+    return (name, total_c, total_h, extract_critical_vulns(data))
 
 
 def main():
@@ -78,25 +130,25 @@ def main():
         print(f"Not a directory: {report_dir}", file=sys.stderr)
         sys.exit(1)
 
-    # Collect (display_name, critical, high) per image
-    by_image: dict[str, tuple[int, int]] = {}
+    # Collect (display_name, critical, high, critical_details) per image
+    by_image: dict[str, tuple[int, int, list[dict]]] = {}
     for f in sorted(report_dir.glob("*.json")):
         row = load_result(f)
         if row:
-            name, c, h = row
-            by_image[name] = (c, h)
+            name, c, h, critical = row
+            by_image[name] = (c, h, critical)
 
-    langgenius: list[tuple[str, int, int]] = []
-    third_party: list[tuple[str, int, int]] = []
+    langgenius: list[tuple[str, int, int, list[dict]]] = []
+    third_party: list[tuple[str, int, int, list[dict]]] = []
     for name in sorted(by_image.keys()):
-        c, h = by_image[name]
+        c, h, critical = by_image[name]
         display = slug(name)
         if is_langgenius(name):
-            langgenius.append((display, c, h))
+            langgenius.append((display, c, h, critical))
         else:
-            third_party.append((display, c, h))
+            third_party.append((display, c, h, critical))
 
-    scan_date = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+    scan_date = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     lines = [
         "# Container Security Scan Results",
         "",
@@ -111,11 +163,13 @@ def main():
     # Langgenius Supported Images
     lines.append("### Langgenius Supported Images")
     lines.append("")
-    for display, c, h in langgenius:
+    for display, c, h, critical in langgenius:
         lines.append(f"#### {display}")
         lines.append(f"- **CRITICAL vulnerabilities:** {c}")
         lines.append(f"- **HIGH vulnerabilities:** {h}")
         lines.append("")
+        if critical:
+            lines.extend(format_critical_table(critical))
     if langgenius:
         tc = sum(x[1] for x in langgenius)
         th = sum(x[2] for x in langgenius)
@@ -129,11 +183,13 @@ def main():
     # Third-Party Images
     lines.append("### Third-Party Images")
     lines.append("")
-    for display, c, h in third_party:
+    for display, c, h, critical in third_party:
         lines.append(f"#### {display}")
         lines.append(f"- **CRITICAL vulnerabilities:** {c}")
         lines.append(f"- **HIGH vulnerabilities:** {h}")
         lines.append("")
+        if critical:
+            lines.extend(format_critical_table(critical))
     if third_party:
         tc = sum(x[1] for x in third_party)
         th = sum(x[2] for x in third_party)
