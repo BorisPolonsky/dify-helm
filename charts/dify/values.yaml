@@ -1636,6 +1636,38 @@ ingress:
   #    hosts:
   #      - dify-example.local
 
+httproute:
+  # Create an HTTPRoute (Gateway API) to expose Dify as an alternative to
+  # Ingress. Requires the Gateway API CRDs to be installed in the cluster
+  # (https://gateway-api.sigs.k8s.io/). Disabled by default; enabling it does
+  # not affect the existing ingress above.
+  enabled: false
+  # HTTPRoute apiVersion (defaults to "gateway.networking.k8s.io/v1" when empty)
+  apiVersion: ""
+  annotations: {}
+  labels: {}
+  # parentRefs reference the Gateway(s) this HTTPRoute is attached to
+  # parentRefs:
+  #   - name: my-gateway
+  #     namespace: gateway-system
+  #     sectionName: http
+  parentRefs: []
+  # hostnames matched against the HTTP Host header to select this route
+  # hostnames:
+  #   - dify-example.local
+  hostnames: []
+  # matches define conditions used to match incoming requests against the rule.
+  # Defaults to a PathPrefix "/" match (mirrors the Ingress behavior above).
+  matches:
+    - path:
+        type: PathPrefix
+        value: /
+  # filters applied to requests that match this rule
+  filters: []
+  # additionalRules (templated) prepends custom HTTPRoute rules before the
+  # default single-backend rule above
+  additionalRules: []
+
 # Global node selector
 # If set, this will apply to all dify components
 # Individual components can be set to a different node selector
