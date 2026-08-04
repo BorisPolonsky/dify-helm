@@ -12,7 +12,7 @@ metadata:
     {{- include "dify.ud.labels" . | nindent 4 }}
   name: {{ template "dify.localSandbox.fullname" . }}
 spec:
-  replicas: {{ .Values.localSandbox.replicas }}
+  replicas: 1
   selector:
     matchLabels:
       {{- include "dify.selectorLabels" . | nindent 6 }}

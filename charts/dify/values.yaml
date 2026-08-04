@@ -1062,7 +1062,6 @@ agentBackend:
 
 localSandbox:
   enabled: true
-  replicas: 1
   resources: {}
   nodeSelector: {}
   affinity: {}
@@ -1098,15 +1097,16 @@ localSandbox:
     timeoutSeconds: 5
     failureThreshold: 2
     successThreshold: 1
-  ## @param localSandbox.updateStrategy Update strategy type and configuration parameters
-  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
-  updateStrategy: {}
   ## @param localSandbox.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
   ## @param localSandbox.customReadinessProbe Custom readinessProbe that overrides the default one
   customReadinessProbe: {}
   ## @param localSandbox.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
+  ## @param localSandbox.updateStrategy Update strategy type and configuration parameters
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  updateStrategy:
+    type: Recreate
   ## @param localSandbox.hostAliases Add deployment host aliases
   ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
   ##
