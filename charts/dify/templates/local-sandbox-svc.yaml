@@ -1,0 +1,29 @@
+{{- if .Values.localSandbox.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "dify.localSandbox.fullname" . }}
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    {{- if .Values.localSandbox.service.labels }}
+    {{- toYaml .Values.localSandbox.service.labels | nindent 4 }}
+    {{- end }}
+    component: "local-sandbox"
+  {{- with .Values.localSandbox.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  {{- if .Values.localSandbox.service.clusterIP }}
+  clusterIP: {{ .Values.localSandbox.service.clusterIP }}
+  {{- end }}
+  ports:
+    - name: http-local-sandbox
+      port: {{ .Values.localSandbox.service.port }}
+      protocol: TCP
+      targetPort: local-sandbox
+  selector:
+    {{- include "dify.selectorLabels" . | nindent 4 }}
+    component: "local-sandbox"
+{{- end }}

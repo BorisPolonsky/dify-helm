@@ -46,7 +46,7 @@ global:
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.14.2"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -57,7 +57,7 @@ image:
 
   web:
     repository: langgenius/dify-web
-    tag: "1.14.2"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -101,7 +101,29 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.6.1-local
+    tag: 0.6.3-local
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ##
+    # pullSecrets:
+    #   - myRegistryKeySecretName
+
+  agentBackend:
+    repository: langgenius/dify-agent-backend
+    tag: "1.16.1"
+    pullPolicy: IfNotPresent
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ##
+    # pullSecrets:
+    #   - myRegistryKeySecretName
+
+  localSandbox:
+    repository: langgenius/dify-agent-local-sandbox
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -936,6 +958,190 @@ pluginDaemon:
     ##
     automountServiceAccountToken: false
     ## @param pluginDaemon.serviceAccount.annotations Additional custom annotations for the ServiceAccount
+    ##
+    annotations: {}
+
+agentBackend:
+  enabled: true
+  replicas: 1
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  priorityClassName: ""
+  ## @param agentBackend.shareProcessNamespace Share a single process namespace between all of the containers in Dify agent backend pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ##
+  shareProcessNamespace: false
+  ## Configure extra options for agent backend containers' liveness, readiness, and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param agentBackend.livenessProbe.enabled Enable livenessProbe on agent backend nodes
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  ## @param agentBackend.readinessProbe.enabled Enable readinessProbe on agent backend nodes
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 5
+    successThreshold: 1
+  ## @param agentBackend.startupProbe.enabled Enable startupProbe on agent backend containers
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  ## @param agentBackend.updateStrategy Update strategy type and configuration parameters
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  updateStrategy: {}
+  ## @param agentBackend.customLivenessProbe Custom livenessProbe that overrides the default one
+  customLivenessProbe: {}
+  ## @param agentBackend.customReadinessProbe Custom readinessProbe that overrides the default one
+  customReadinessProbe: {}
+  ## @param agentBackend.customStartupProbe Custom startupProbe that overrides the default one
+  customStartupProbe: {}
+  ## @param agentBackend.hostAliases Add deployment host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  # Configure Pods Security Context
+  podSecurityContext: {}
+  # Configure Container Security Context
+  containerSecurityContext: {}
+  extraEnv: []
+  ## @param agentBackend.extraVolumes Optionally specify extra list of additional volumes for the agent backend pod(s)
+  ##
+  extraVolumes: []
+  ## @param agentBackend.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the agent backend container(s)
+  ##
+  extraVolumeMounts: []
+  service:
+    port: 5050
+    annotations: {}
+    labels: {}
+    clusterIP: ""
+  auth:
+    ## @param agentBackend.auth.apiToken Bearer token for /runs; shared as API/worker AGENT_BACKEND_API_TOKEN and agent DIFY_AGENT_API_TOKEN.
+    ## If not set, uses global.internalApiKey
+    ##
+    apiToken: ""
+    ## @param agentBackend.auth.serverSecretKey Production secret (JWE for Agent Stub tokens).
+    ## This is security-sensitive: it derives the JWE encryption key for Agent Stub bearer tokens.
+    ## Replace this development default in production.
+    ## Generate one with: python -c 'import secrets; print(secrets.token_urlsafe(32))'
+    ##
+    serverSecretKey: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY"
+    ## @param agentBackend.auth.shellctlAuthToken Shared as agent DIFY_AGENT_SHELLCTL_AUTH_TOKEN and localSandbox SHELLCTL_AUTH_TOKEN
+    ##
+    shellctlAuthToken: ""
+
+  ## Agent Backend ServiceAccount configuration
+  ##
+  serviceAccount:
+    ## @param agentBackend.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: false
+    ## @param agentBackend.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param agentBackend.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+    ##
+    automountServiceAccountToken: false
+    ## @param agentBackend.serviceAccount.annotations Additional custom annotations for the ServiceAccount
+    ##
+    annotations: {}
+
+localSandbox:
+  enabled: true
+  resources: {}
+  nodeSelector: {}
+  affinity: {}
+  tolerations: []
+  priorityClassName: ""
+  ## @param localSandbox.shareProcessNamespace Share a single process namespace between all of the containers in Dify local sandbox pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ##
+  shareProcessNamespace: false
+  ## Configure extra options for local sandbox containers' liveness, readiness, and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param localSandbox.livenessProbe.enabled Enable livenessProbe on local sandbox nodes
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param localSandbox.readinessProbe.enabled Enable readinessProbe on local sandbox nodes
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  ## @param localSandbox.startupProbe.enabled Enable startupProbe on local sandbox containers
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 2
+    successThreshold: 1
+  ## @param localSandbox.customLivenessProbe Custom livenessProbe that overrides the default one
+  customLivenessProbe: {}
+  ## @param localSandbox.customReadinessProbe Custom readinessProbe that overrides the default one
+  customReadinessProbe: {}
+  ## @param localSandbox.customStartupProbe Custom startupProbe that overrides the default one
+  customStartupProbe: {}
+  ## @param localSandbox.updateStrategy Update strategy type and configuration parameters
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  updateStrategy:
+    type: Recreate
+  ## @param localSandbox.hostAliases Add deployment host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
+  hostAliases: []
+  # Configure Pods Security Context
+  podSecurityContext: {}
+  # Configure Container Security Context
+  containerSecurityContext: {}
+  extraEnv: []
+  ## @param localSandbox.extraVolumes Optionally specify extra list of additional volumes for the local sandbox pod(s)
+  ##
+  extraVolumes: []
+  ## @param localSandbox.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the local sandbox container(s)
+  ##
+  extraVolumeMounts: []
+  service:
+    port: 5004
+    annotations: {}
+    labels: {}
+    clusterIP: ""
+
+  ## Local Sandbox ServiceAccount configuration
+  ##
+  serviceAccount:
+    ## @param localSandbox.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
+    create: false
+    ## @param localSandbox.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
+    name: ""
+    ## @param localSandbox.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+    ##
+    automountServiceAccountToken: false
+    ## @param localSandbox.serviceAccount.annotations Additional custom annotations for the ServiceAccount
     ##
     annotations: {}
 
@@ -2864,6 +3070,7 @@ externalRedis:
   db:
     app: 0
     celery: 1
+    agent: 2
   useSSL: false
   sentinel:
     enabled: false
@@ -3150,6 +3357,10 @@ externalSecret:
       OTLP_API_KEY:
         key: "dify/otel"
         property: "api_key"
+      # Shared with agentBackend DIFY_AGENT_API_TOKEN
+      AGENT_BACKEND_API_TOKEN:
+        key: "dify/agent-backend"
+        property: "api_token"
     data:
       CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
@@ -3195,6 +3406,10 @@ externalSecret:
       OTLP_API_KEY:
         key: "dify/otel"
         property: "api_key"
+      # Shared with agentBackend DIFY_AGENT_API_TOKEN
+      AGENT_BACKEND_API_TOKEN:
+        key: "dify/agent-backend"
+        property: "api_token"
     data:
       CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
@@ -3205,6 +3420,46 @@ externalSecret:
       API_KEY:
         key: "dify/sandbox"
         property: "api_key"
+
+  # Configuration for agent backend secret
+  agentBackend:
+    # Whether to create ExternalSecret for agent backend
+    enabled: true
+    # Remote references for external secret store
+    remoteRefs:
+      REDIS_PASSWORD:
+        key: "dify/redis"
+        property: "password"
+      # Shared with api/worker AGENT_BACKEND_API_TOKEN
+      DIFY_AGENT_API_TOKEN:
+        key: "dify/agent-backend"
+        property: "api_token"
+      DIFY_AGENT_SERVER_SECRET_KEY:
+        key: "dify/agent-backend"
+        property: "server_secret_key"
+      # Shared with localSandbox SHELLCTL_AUTH_TOKEN
+      DIFY_AGENT_SHELLCTL_AUTH_TOKEN:
+        key: "dify/agent-backend"
+        property: "shellctl_auth_token"
+      DIFY_AGENT_PLUGIN_DAEMON_API_KEY:
+        key: "dify/plugin-daemon"
+        property: "server_key"
+      DIFY_AGENT_INNER_API_KEY:
+        key: "dify/plugin-daemon"
+        property: "dify_api_key"
+    data:
+      # Use redis db 2 for agent backend (avoids collision with app REDIS_DB=0 and Celery /1).
+      DIFY_AGENT_REDIS_URL: "redis://:{{ .REDIS_PASSWORD }}@redis:6379/2"
+
+  # Configuration for local sandbox secret
+  localSandbox:
+    # Whether to create ExternalSecret for local sandbox
+    enabled: true
+    remoteRefs:
+      # Shared with agentBackend DIFY_AGENT_SHELLCTL_AUTH_TOKEN
+      SHELLCTL_AUTH_TOKEN:
+        key: "dify/agent-backend"
+        property: "shellctl_auth_token"
 
   # Configuration for plugin daemon secret
   pluginDaemon:

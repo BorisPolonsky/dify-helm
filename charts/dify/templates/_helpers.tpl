@@ -89,6 +89,22 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a default fully qualified agent-backend name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "dify.agentBackend.fullname" -}}
+{{ template "dify.fullname" . }}-agent-backend
+{{- end -}}
+
+{{/*
+Create a default fully qualified local-sandbox name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "dify.localSandbox.fullname" -}}
+{{ template "dify.fullname" . }}-local-sandbox
+{{- end -}}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "dify.chart" -}}
@@ -215,6 +231,28 @@ Create the name of the service account to use for the Dify Plugin Daemon
     {{ default (include "dify.pluginDaemon.fullname" .) .Values.pluginDaemon.serviceAccount.name | trunc 63 | trimSuffix "-" }}
 {{- else -}}
     {{ default "default" .Values.pluginDaemon.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for the Agent Backend
+*/}}
+{{- define "dify.agentBackend.serviceAccountName" -}}
+{{- if .Values.agentBackend.serviceAccount.create -}}
+    {{ default (include "dify.agentBackend.fullname" .) .Values.agentBackend.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.agentBackend.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for the Local Sandbox
+*/}}
+{{- define "dify.localSandbox.serviceAccountName" -}}
+{{- if .Values.localSandbox.serviceAccount.create -}}
+    {{ default (include "dify.localSandbox.fullname" .) .Values.localSandbox.serviceAccount.name | trunc 63 | trimSuffix "-" }}
+{{- else -}}
+    {{ default "default" .Values.localSandbox.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 
