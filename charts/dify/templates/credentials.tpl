@@ -231,9 +231,10 @@ API_KEY: {{ .Values.sandbox.auth.apiKey | default .Values.global.internalApiKey 
   {{- with .Values.externalRedis }}
     {{- if .sentinel.enabled }}
       {{- $redisPassword := .password }}
+      {{- $redisAgentDB := .db.agent}}
       {{- $sentinelUrls := list }}
       {{- range $sentinel := .sentinel.sentinels }}
-      {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s/2" $redisPassword $sentinel) }}
+      {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s/%v" $redisPassword $sentinel $redisAgentDB) }}
       {{- end }}
 DIFY_AGENT_REDIS_URL: {{ join ";" $sentinelUrls | b64enc | quote }}
     {{- else }}
@@ -241,7 +242,7 @@ DIFY_AGENT_REDIS_URL: {{ join ";" $sentinelUrls | b64enc | quote }}
       {{- if .useSSL }}
         {{- $scheme = "rediss" }}
       {{- end }}
-DIFY_AGENT_REDIS_URL: {{ printf "%s://%s:%s@%s:%v/2" $scheme .username .password .host .port | b64enc | quote }}
+DIFY_AGENT_REDIS_URL: {{ printf "%s://%s:%s@%s:%v/%v" $scheme .username .password .host .port .db.agent | b64enc | quote }}
     {{- end }}
   {{- end }}
 {{- else if .Values.redis.enabled }}

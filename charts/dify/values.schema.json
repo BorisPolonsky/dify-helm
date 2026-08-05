@@ -1078,7 +1078,8 @@
           "type": "object",
           "properties": {
             "app": { "type": "integer" },
-            "celery": { "type": "integer" }
+            "celery": { "type": "integer" },
+            "agent": { "type": "integer" }
           }
         },
         "useSSL": { "type": "boolean" },

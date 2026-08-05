@@ -3070,6 +3070,7 @@ externalRedis:
   db:
     app: 0
     celery: 1
+    agent: 2
   useSSL: false
   sentinel:
     enabled: false
