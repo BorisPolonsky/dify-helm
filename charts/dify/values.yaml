@@ -1029,7 +1029,7 @@ agentBackend:
     labels: {}
     clusterIP: ""
   auth:
-    ## @param agentBackend.auth.apiToken Bearer token for /runs; shared with API/worker AGENT_BACKEND_API_TOKEN.
+    ## @param agentBackend.auth.apiToken Bearer token for /runs; shared as API/worker AGENT_BACKEND_API_TOKEN and agent DIFY_AGENT_API_TOKEN.
     ## If not set, uses global.internalApiKey
     ##
     apiToken: ""
@@ -1039,7 +1039,7 @@ agentBackend:
     ## Generate one with: python -c 'import secrets; print(secrets.token_urlsafe(32))'
     ##
     serverSecretKey: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY"
-    ## @param agentBackend.auth.shellctlAuthToken Shared with localSandbox SHELLCTL_AUTH_TOKEN
+    ## @param agentBackend.auth.shellctlAuthToken Shared as agent DIFY_AGENT_SHELLCTL_AUTH_TOKEN and localSandbox SHELLCTL_AUTH_TOKEN
     ##
     shellctlAuthToken: ""
 
@@ -3356,6 +3356,10 @@ externalSecret:
       OTLP_API_KEY:
         key: "dify/otel"
         property: "api_key"
+      # Shared with agentBackend DIFY_AGENT_API_TOKEN
+      AGENT_BACKEND_API_TOKEN:
+        key: "dify/agent-backend"
+        property: "api_token"
     data:
       CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
@@ -3401,6 +3405,10 @@ externalSecret:
       OTLP_API_KEY:
         key: "dify/otel"
         property: "api_key"
+      # Shared with agentBackend DIFY_AGENT_API_TOKEN
+      AGENT_BACKEND_API_TOKEN:
+        key: "dify/agent-backend"
+        property: "api_token"
     data:
       CELERY_BROKER_URL: "redis://:{{ .REDIS_PASSWORD }}@redis:6379/1"
 
@@ -3411,6 +3419,46 @@ externalSecret:
       API_KEY:
         key: "dify/sandbox"
         property: "api_key"
+
+  # Configuration for agent backend secret
+  agentBackend:
+    # Whether to create ExternalSecret for agent backend
+    enabled: true
+    # Remote references for external secret store
+    remoteRefs:
+      REDIS_PASSWORD:
+        key: "dify/redis"
+        property: "password"
+      # Shared with api/worker AGENT_BACKEND_API_TOKEN
+      DIFY_AGENT_API_TOKEN:
+        key: "dify/agent-backend"
+        property: "api_token"
+      DIFY_AGENT_SERVER_SECRET_KEY:
+        key: "dify/agent-backend"
+        property: "server_secret_key"
+      # Shared with localSandbox SHELLCTL_AUTH_TOKEN
+      DIFY_AGENT_SHELLCTL_AUTH_TOKEN:
+        key: "dify/agent-backend"
+        property: "shellctl_auth_token"
+      DIFY_AGENT_PLUGIN_DAEMON_API_KEY:
+        key: "dify/plugin-daemon"
+        property: "server_key"
+      DIFY_AGENT_INNER_API_KEY:
+        key: "dify/plugin-daemon"
+        property: "dify_api_key"
+    data:
+      # Use redis db 2 for agent backend (avoids collision with app REDIS_DB=0 and Celery /1).
+      DIFY_AGENT_REDIS_URL: "redis://:{{ .REDIS_PASSWORD }}@redis:6379/2"
+
+  # Configuration for local sandbox secret
+  localSandbox:
+    # Whether to create ExternalSecret for local sandbox
+    enabled: true
+    remoteRefs:
+      # Shared with agentBackend DIFY_AGENT_SHELLCTL_AUTH_TOKEN
+      SHELLCTL_AUTH_TOKEN:
+        key: "dify/agent-backend"
+        property: "shellctl_auth_token"
 
   # Configuration for plugin daemon secret
   pluginDaemon:
