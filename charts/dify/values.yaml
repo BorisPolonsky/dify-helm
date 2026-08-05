@@ -260,6 +260,12 @@ api:
     annotations: {}
     labels: {}
     clusterIP: ""
+  auth:
+    ## @param api.auth.internalApiKey Key for interactions between `api`(`worker`) and trusted callers (`pluginDaemon`, `agentBackend`).
+    ## You can generate a strong key using `openssl rand -base64 42`.
+    ## If not set, uses global.internalApiKey
+    ##
+    internalApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
   # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
   logLevel: INFO
   mail:
@@ -913,11 +919,6 @@ pluginDaemon:
     ## If not set, uses global.internalApiKey
     ##
     serverKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
-    ## @param pluginDaemon.auth.difyApiKey A separate key for interactions between `api`(`worker`) and `pluginDaemon`.
-    ## You can generate a strong key using `openssl rand -base64 42`.
-    ## If not set, uses global.internalApiKey
-    ##
-    difyApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
   ## Storage for `pluginDaemon`
   ## Ignored if external object storage were configured via `.Values.externalS3` sections.
   ##

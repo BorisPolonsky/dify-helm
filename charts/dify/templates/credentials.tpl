@@ -15,7 +15,7 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | default .Values.global.
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
 PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.internalApiKey | b64enc | quote }}
-INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.internalApiKey | b64enc | quote }}
+INNER_API_KEY_FOR_PLUGIN: {{ .Values.api.auth.internalApiKey | default .Values.global.internalApiKey | b64enc | quote }}
 {{- end }}
 {{- if .Values.agentBackend.enabled }}
 AGENT_BACKEND_API_TOKEN: {{ .Values.agentBackend.auth.apiToken | default .Values.global.internalApiKey | b64enc | quote }}
@@ -45,7 +45,7 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | default .Values.global.
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
 PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.internalApiKey | b64enc | quote }}
-INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.internalApiKey | b64enc | quote }}
+INNER_API_KEY_FOR_PLUGIN: {{ .Values.api.auth.internalApiKey | default .Values.global.internalApiKey | b64enc | quote }}
 {{- end }}
 {{- if .Values.agentBackend.enabled }}
 AGENT_BACKEND_API_TOKEN: {{ .Values.agentBackend.auth.apiToken | default .Values.global.internalApiKey | b64enc | quote }}
@@ -266,7 +266,7 @@ DIFY_AGENT_REDIS_URL: {{ printf "redis://:%s@%s:%v/2" .auth.password $redisHost 
 {{- end }}
 {{- if .Values.pluginDaemon.enabled }}
 DIFY_AGENT_PLUGIN_DAEMON_API_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.internalApiKey | b64enc | quote }}
-DIFY_AGENT_INNER_API_KEY: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.internalApiKey | b64enc | quote }}
+DIFY_AGENT_INNER_API_KEY: {{ .Values.api.auth.internalApiKey | default .Values.global.internalApiKey | b64enc | quote }}
 {{- end }}
 DIFY_AGENT_SHELLCTL_AUTH_TOKEN: {{ .Values.agentBackend.auth.shellctlAuthToken | b64enc | quote }}
 DIFY_AGENT_SERVER_SECRET_KEY: {{ .Values.agentBackend.auth.serverSecretKey | b64enc | quote }}
@@ -282,7 +282,7 @@ SHELLCTL_AUTH_TOKEN: {{ .Values.agentBackend.auth.shellctlAuthToken | b64enc | q
 {{ include "dify.redis.credentials" . }}
 {{ include "dify.pluginDaemon.storage.credentials" . }}
 SERVER_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.internalApiKey | b64enc | quote }}
-DIFY_INNER_API_KEY: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.internalApiKey | b64enc | quote }}
+DIFY_INNER_API_KEY: {{ .Values.api.auth.internalApiKey | default .Values.global.internalApiKey | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.pluginDaemon.storage.credentials" -}}
