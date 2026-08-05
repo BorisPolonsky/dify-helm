@@ -147,6 +147,13 @@ api:
     annotations: {}
     labels: {}
     clusterIP: ""
+  auth:
+    ## @param api.auth.internalApiKey Key for trusted callers of API inner plugin endpoints.
+    ## Injected as INNER_API_KEY_FOR_PLUGIN (api/worker), DIFY_INNER_API_KEY (pluginDaemon),
+    ## and DIFY_AGENT_INNER_API_KEY (agentBackend). Must be the same value for all of them.
+    ## If not set, uses global.internalApiKey
+    ##
+    internalApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
   # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
   logLevel: INFO
   mail:
@@ -669,8 +676,6 @@ pluginDaemon:
     clusterIP: ""
   auth:
     serverKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
-    # A separate key for interactions between `api`(`worker`) and `pluginDaemon`
-    difyApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
   ## Storage for `pluginDaemon`
   ## Ignored if external object storage were configured via `.Values.externalS3` sections.
   ##
@@ -2646,6 +2651,8 @@ externalSecret:
       PLUGIN_DAEMON_KEY:
         key: "dify/plugin-daemon"
         property: "server_key"
+      # Corresponds to api.auth.internalApiKey (same value as DIFY_INNER_API_KEY / DIFY_AGENT_INNER_API_KEY).
+      # Remote property dify_api_key may remain for existing secret stores.
       INNER_API_KEY_FOR_PLUGIN:
         key: "dify/plugin-daemon"
         property: "dify_api_key"
@@ -2691,6 +2698,8 @@ externalSecret:
       PLUGIN_DAEMON_KEY:
         key: "dify/plugin-daemon"
         property: "server_key"
+      # Corresponds to api.auth.internalApiKey (same value as DIFY_INNER_API_KEY / DIFY_AGENT_INNER_API_KEY).
+      # Remote property dify_api_key may remain for existing secret stores.
       INNER_API_KEY_FOR_PLUGIN:
         key: "dify/plugin-daemon"
         property: "dify_api_key"
@@ -2732,6 +2741,8 @@ externalSecret:
       SERVER_KEY:
         key: "dify/plugin-daemon"
         property: "server_key"
+      # Corresponds to api.auth.internalApiKey (same value as INNER_API_KEY_FOR_PLUGIN / DIFY_AGENT_INNER_API_KEY).
+      # Remote property dify_api_key may remain for existing secret stores.
       DIFY_INNER_API_KEY:
         key: "dify/plugin-daemon"
         property: "dify_api_key"

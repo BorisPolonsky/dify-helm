@@ -200,6 +200,12 @@
             "clusterIP": { "type": "string" }
           }
         },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "internalApiKey": { "type": "string" }
+          }
+        },
         "logLevel": { "type": "string" },
         "mail": {
           "type": "object",
@@ -793,8 +799,7 @@
         "auth": {
           "type": "object",
           "properties": {
-            "serverKey": { "type": "string" },
-            "difyApiKey": { "type": "string" }
+            "serverKey": { "type": "string" }
           }
         },
         "persistence": {
