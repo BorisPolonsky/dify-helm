@@ -1,0 +1,143 @@
+{{- if .Values.localSandbox.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    {{- include "dify.ud.annotations" . | nindent 4 }}
+    descriptions: local-sandbox
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    component: local-sandbox
+    # app: {{ template "dify.localSandbox.fullname" . }}
+    {{- include "dify.ud.labels" . | nindent 4 }}
+  name: {{ template "dify.localSandbox.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "dify.selectorLabels" . | nindent 6 }}
+      component: local-sandbox
+      {{/*
+      # Required labels for istio
+      # app: {{ template "dify.localSandbox.fullname" . }}
+      # version: {{ .Values.istioServiceMesh.version | quote }}
+      */}}
+  {{- if .Values.localSandbox.updateStrategy }}
+  strategy: {{- toYaml .Values.localSandbox.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        checksum/local-sandbox-config: {{ include (print $.Template.BasePath "/local-sandbox-config.yaml") . | sha256sum }}
+        checksum/local-sandbox-secret: {{ include (print $.Template.BasePath "/local-sandbox-secret.yaml") . | sha256sum }}
+        {{- include "dify.ud.annotations" . | nindent 8 }}
+      labels:
+        {{- include "dify.selectorLabels" . | nindent 8 }}
+        component: local-sandbox
+        {{/*
+        # Required labels for istio
+        # app: {{ template "dify.localSandbox.fullname" . }}
+        # version: {{ .Values.istioServiceMesh.version | quote }}
+        */}}
+        {{- include "dify.ud.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "dify.localSandbox.serviceAccountName" . }}
+      {{- if .Values.localSandbox.priorityClassName }}
+      priorityClassName: {{ .Values.localSandbox.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.localSandbox.shareProcessNamespace }}
+      shareProcessNamespace: {{ .Values.localSandbox.shareProcessNamespace }}
+      {{- end }}
+      {{- if .Values.image.localSandbox.pullSecrets }}
+      imagePullSecrets:
+        {{- range .Values.image.localSandbox.pullSecrets }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.localSandbox.hostAliases }}
+      hostAliases:
+        {{- toYaml .Values.localSandbox.hostAliases | nindent 8 }}
+      {{- end }}
+      {{- if .Values.localSandbox.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.localSandbox.podSecurityContext | nindent 8 }}
+      {{- end }}
+      containers:
+        - image: "{{ .Values.image.localSandbox.repository }}:{{ .Values.image.localSandbox.tag }}"
+          imagePullPolicy: "{{ .Values.image.localSandbox.pullPolicy }}"
+          name: local-sandbox
+          {{- if .Values.localSandbox.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.localSandbox.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.localSandbox.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.localSandbox.livenessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /healthz
+              port: local-sandbox
+          {{- end }}
+          {{- if .Values.localSandbox.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.localSandbox.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.localSandbox.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.localSandbox.readinessProbe "enabled") "context" $) | nindent 12 }}
+            httpGet:
+              path: /healthz
+              port: local-sandbox
+          {{- end }}
+          {{- if .Values.localSandbox.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.localSandbox.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.localSandbox.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.localSandbox.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: local-sandbox
+          {{- end }}
+          {{- if .Values.localSandbox.containerSecurityContext }}
+          securityContext:
+            {{- toYaml .Values.localSandbox.containerSecurityContext | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.localSandbox.extraEnv }}
+              {{- toYaml .Values.localSandbox.extraEnv | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "dify.localSandbox.fullname" . }}
+            - secretRef:
+                name: {{ template "dify.localSandbox.fullname" . }}
+          ports:
+            - name: local-sandbox
+              containerPort: {{ .Values.localSandbox.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.localSandbox.resources | nindent 14 }}
+          {{- if .Values.localSandbox.extraVolumeMounts }}
+          volumeMounts:
+            {{- include "common.tplvalues.render" (dict "value" .Values.localSandbox.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+      {{- if .Values.localSandbox.extraVolumes }}
+      volumes:
+        {{- include "common.tplvalues.render" (dict "value" .Values.localSandbox.extraVolumes "context" $) | nindent 8 }}
+      {{- end }}
+    {{- if and (.Values.nodeSelector) (not .Values.localSandbox.nodeSelector) }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+    {{- end }}
+    {{- if .Values.localSandbox.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.localSandbox.nodeSelector | nindent 8 }}
+    {{- end }}
+    {{- if and (.Values.affinity) (not .Values.localSandbox.affinity) }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+    {{- end }}
+    {{- if .Values.localSandbox.affinity }}
+      affinity:
+        {{- toYaml .Values.localSandbox.affinity | nindent 8 }}
+    {{- end }}
+    {{- if and (.Values.tolerations) (not .Values.localSandbox.tolerations) }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+    {{- end }}
+    {{- if .Values.localSandbox.tolerations }}
+      tolerations:
+        {{- toYaml .Values.localSandbox.tolerations | nindent 8 }}
+    {{- end }}
+{{- end }}

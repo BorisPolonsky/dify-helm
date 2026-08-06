@@ -1,17 +1,17 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.12.1"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
 
   web:
     repository: langgenius/dify-web
-    tag: "1.12.1"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
 
   sandbox:
     repository: langgenius/dify-sandbox
-    tag: "0.2.12"
+    tag: "0.2.15"
     pullPolicy: IfNotPresent
 
   proxy:
@@ -26,7 +26,7 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.5.3-local
+    tag: 0.6.3-local
     pullPolicy: IfNotPresent
 
 api:
@@ -111,20 +111,6 @@ api:
       # Won't check for updates if left empty
       #   value: https://updates.dify.ai
       value: ""
-    - name: CODE_MAX_NUMBER
-      value: "9223372036854775807"
-    - name: CODE_MIN_NUMBER
-      value: "-9223372036854775808"
-    - name: CODE_MAX_STRING_LENGTH
-      value: "80000"
-    - name: TEMPLATE_TRANSFORM_MAX_LENGTH
-      value: "80000"
-    - name: CODE_MAX_STRING_ARRAY_LENGTH
-      value: "30"
-    - name: CODE_MAX_OBJECT_ARRAY_LENGTH
-      value: "30"
-    - name: CODE_MAX_NUMBER_ARRAY_LENGTH
-      value: "1000"
 
   ## OpenTelemetry (OTEL) configuration
   otel:
@@ -161,6 +147,13 @@ api:
     annotations: {}
     labels: {}
     clusterIP: ""
+  auth:
+    ## @param api.auth.internalApiKey Key for trusted callers of API inner plugin endpoints.
+    ## Injected as INNER_API_KEY_FOR_PLUGIN (api/worker), DIFY_INNER_API_KEY (pluginDaemon),
+    ## and DIFY_AGENT_INNER_API_KEY (agentBackend). Must be the same value for all of them.
+    ## If not set, uses global.internalApiKey
+    ##
+    internalApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
   # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
   logLevel: INFO
   mail:
@@ -683,8 +676,6 @@ pluginDaemon:
     clusterIP: ""
   auth:
     serverKey: "lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi"
-    # A separate key for interactions between `api`(`worker`) and `pluginDaemon`
-    difyApiKey: "QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1"
   ## Storage for `pluginDaemon`
   ## Ignored if external object storage were configured via `.Values.externalS3` sections.
   ##
@@ -2660,6 +2651,8 @@ externalSecret:
       PLUGIN_DAEMON_KEY:
         key: "dify/plugin-daemon"
         property: "server_key"
+      # Corresponds to api.auth.internalApiKey (same value as DIFY_INNER_API_KEY / DIFY_AGENT_INNER_API_KEY).
+      # Remote property dify_api_key may remain for existing secret stores.
       INNER_API_KEY_FOR_PLUGIN:
         key: "dify/plugin-daemon"
         property: "dify_api_key"
@@ -2684,6 +2677,9 @@ externalSecret:
       SECRET_KEY:
         key: "dify/api"
         property: "secret_key"
+      CODE_EXECUTION_API_KEY:
+        key: "dify/sandbox"
+        property: "api_key"
       DB_USERNAME:
         key: "dify/database"
         property: "username"
@@ -2702,6 +2698,8 @@ externalSecret:
       PLUGIN_DAEMON_KEY:
         key: "dify/plugin-daemon"
         property: "server_key"
+      # Corresponds to api.auth.internalApiKey (same value as DIFY_INNER_API_KEY / DIFY_AGENT_INNER_API_KEY).
+      # Remote property dify_api_key may remain for existing secret stores.
       INNER_API_KEY_FOR_PLUGIN:
         key: "dify/plugin-daemon"
         property: "dify_api_key"
@@ -2743,6 +2741,8 @@ externalSecret:
       SERVER_KEY:
         key: "dify/plugin-daemon"
         property: "server_key"
+      # Corresponds to api.auth.internalApiKey (same value as INNER_API_KEY_FOR_PLUGIN / DIFY_AGENT_INNER_API_KEY).
+      # Remote property dify_api_key may remain for existing secret stores.
       DIFY_INNER_API_KEY:
         key: "dify/plugin-daemon"
         property: "dify_api_key"

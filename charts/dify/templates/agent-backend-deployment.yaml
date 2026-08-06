@@ -1,0 +1,141 @@
+{{- if .Values.agentBackend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    {{- include "dify.ud.annotations" . | nindent 4 }}
+    descriptions: agent-backend
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    component: agent-backend
+    # app: {{ template "dify.agentBackend.fullname" . }}
+    {{- include "dify.ud.labels" . | nindent 4 }}
+  name: {{ template "dify.agentBackend.fullname" . }}
+spec:
+  replicas: {{ .Values.agentBackend.replicas }}
+  selector:
+    matchLabels:
+      {{- include "dify.selectorLabels" . | nindent 6 }}
+      component: agent-backend
+      {{/*
+      # Required labels for istio
+      # app: {{ template "dify.agentBackend.fullname" . }}
+      # version: {{ .Values.istioServiceMesh.version | quote }}
+      */}}
+  {{- if .Values.agentBackend.updateStrategy }}
+  strategy: {{- toYaml .Values.agentBackend.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        checksum/agent-backend-config: {{ include (print $.Template.BasePath "/agent-backend-config.yaml") . | sha256sum }}
+        checksum/agent-backend-secret: {{ include (print $.Template.BasePath "/agent-backend-secret.yaml") . | sha256sum }}
+        {{- include "dify.ud.annotations" . | nindent 8 }}
+      labels:
+        {{- include "dify.selectorLabels" . | nindent 8 }}
+        component: agent-backend
+        {{/*
+        # Required labels for istio
+        # app: {{ template "dify.agentBackend.fullname" . }}
+        # version: {{ .Values.istioServiceMesh.version | quote }}
+        */}}
+        {{- include "dify.ud.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "dify.agentBackend.serviceAccountName" . }}
+      {{- if .Values.agentBackend.priorityClassName }}
+      priorityClassName: {{ .Values.agentBackend.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.agentBackend.shareProcessNamespace }}
+      shareProcessNamespace: {{ .Values.agentBackend.shareProcessNamespace }}
+      {{- end }}
+      {{- if .Values.image.agentBackend.pullSecrets }}
+      imagePullSecrets:
+        {{- range .Values.image.agentBackend.pullSecrets }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.agentBackend.hostAliases }}
+      hostAliases:
+        {{- toYaml .Values.agentBackend.hostAliases | nindent 8 }}
+      {{- end }}
+      {{- if .Values.agentBackend.podSecurityContext }}
+      securityContext:
+        {{- toYaml .Values.agentBackend.podSecurityContext | nindent 8 }}
+      {{- end }}
+      containers:
+        - image: "{{ .Values.image.agentBackend.repository }}:{{ default .Chart.AppVersion .Values.image.agentBackend.tag }}"
+          imagePullPolicy: "{{ .Values.image.agentBackend.pullPolicy }}"
+          name: agent-backend
+          {{- if .Values.agentBackend.customLivenessProbe }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.agentBackend.customLivenessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.agentBackend.livenessProbe.enabled }}
+          livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.agentBackend.livenessProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: agent-backend
+          {{- end }}
+          {{- if .Values.agentBackend.customReadinessProbe }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.agentBackend.customReadinessProbe "context" $) | nindent 12 }}
+          {{- else if .Values.agentBackend.readinessProbe.enabled }}
+          readinessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.agentBackend.readinessProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: agent-backend
+          {{- end }}
+          {{- if .Values.agentBackend.customStartupProbe }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.agentBackend.customStartupProbe "context" $) | nindent 12 }}
+          {{- else if .Values.agentBackend.startupProbe.enabled }}
+          startupProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.agentBackend.startupProbe "enabled") "context" $) | nindent 12 }}
+            tcpSocket:
+              port: agent-backend
+          {{- end }}
+          {{- if .Values.agentBackend.containerSecurityContext }}
+          securityContext:
+            {{- toYaml .Values.agentBackend.containerSecurityContext | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.agentBackend.extraEnv }}
+              {{- toYaml .Values.agentBackend.extraEnv | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "dify.agentBackend.fullname" . }}
+            - secretRef:
+                name: {{ template "dify.agentBackend.fullname" . }}
+          ports:
+            - name: agent-backend
+              containerPort: {{ .Values.agentBackend.service.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.agentBackend.resources | nindent 14 }}
+          {{- if .Values.agentBackend.extraVolumeMounts }}
+          volumeMounts:
+            {{- include "common.tplvalues.render" (dict "value" .Values.agentBackend.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+      {{- if .Values.agentBackend.extraVolumes }}
+      volumes:
+        {{- include "common.tplvalues.render" (dict "value" .Values.agentBackend.extraVolumes "context" $) | nindent 8 }}
+      {{- end }}
+    {{- if and (.Values.nodeSelector) (not .Values.agentBackend.nodeSelector) }}
+      nodeSelector:
+        {{- toYaml .Values.nodeSelector | nindent 8 }}
+    {{- end }}
+    {{- if .Values.agentBackend.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.agentBackend.nodeSelector | nindent 8 }}
+    {{- end }}
+    {{- if and (.Values.affinity) (not .Values.agentBackend.affinity) }}
+      affinity:
+        {{- toYaml .Values.affinity | nindent 8 }}
+    {{- end }}
+    {{- if .Values.agentBackend.affinity }}
+      affinity:
+        {{- toYaml .Values.agentBackend.affinity | nindent 8 }}
+    {{- end }}
+    {{- if and (.Values.tolerations) (not .Values.agentBackend.tolerations) }}
+      tolerations:
+        {{- toYaml .Values.tolerations | nindent 8 }}
+    {{- end }}
+    {{- if .Values.agentBackend.tolerations }}
+      tolerations:
+        {{- toYaml .Values.agentBackend.tolerations | nindent 8 }}
+    {{- end }}
+{{- end }}

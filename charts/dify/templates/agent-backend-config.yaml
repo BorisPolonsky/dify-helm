@@ -1,0 +1,11 @@
+{{- if .Values.agentBackend.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "dify.agentBackend.fullname" . }}
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    component: agent-backend
+data:
+  {{- include "dify.agentBackend.config" . | nindent 2 }}
+{{- end }}

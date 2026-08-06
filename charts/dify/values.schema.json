@@ -52,6 +52,22 @@
             "tag": { "type": "string" },
             "pullPolicy": { "type": "string" }
           }
+        },
+        "agentBackend": {
+          "type": "object",
+          "properties": {
+            "repository": { "type": "string" },
+            "tag": { "type": "string" },
+            "pullPolicy": { "type": "string" }
+          }
+        },
+        "localSandbox": {
+          "type": "object",
+          "properties": {
+            "repository": { "type": "string" },
+            "tag": { "type": "string" },
+            "pullPolicy": { "type": "string" }
+          }
         }
       }
     },
@@ -182,6 +198,12 @@
             "annotations": { "type": "object" },
             "labels": { "type": "object" },
             "clusterIP": { "type": "string" }
+          }
+        },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "internalApiKey": { "type": "string" }
           }
         },
         "logLevel": { "type": "string" },
@@ -840,8 +862,7 @@
         "auth": {
           "type": "object",
           "properties": {
-            "serverKey": { "type": "string" },
-            "difyApiKey": { "type": "string" }
+            "serverKey": { "type": "string" }
           }
         },
         "persistence": {
@@ -859,6 +880,195 @@
                 "subPath": { "type": "string" }
               }
             }
+          }
+        },
+        "serviceAccount": {
+          "type": "object",
+          "properties": {
+            "create": { "type": "boolean" },
+            "name": { "type": "string" },
+            "automountServiceAccountToken": { "type": "boolean" },
+            "annotations": { "type": "object" }
+          }
+        }
+      }
+    },
+    "agentBackend": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "replicas": { "type": "integer" },
+        "resources": { "type": "object" },
+        "nodeSelector": { "type": "object" },
+        "affinity": { "type": "object" },
+        "tolerations": { "type": "array" },
+        "priorityClassName": { "type": "string" },
+        "shareProcessNamespace": {
+          "type": "boolean",
+          "description": "Share a single process namespace between all of the containers in Dify agent backend pods.",
+          "default": false
+        },
+        "livenessProbe": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "initialDelaySeconds": { "type": "integer" },
+            "periodSeconds": { "type": "integer" },
+            "timeoutSeconds": { "type": "integer" },
+            "failureThreshold": { "type": "integer" },
+            "successThreshold": { "type": "integer" }
+          }
+        },
+        "readinessProbe": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "initialDelaySeconds": { "type": "integer" },
+            "periodSeconds": { "type": "integer" },
+            "timeoutSeconds": { "type": "integer" },
+            "failureThreshold": { "type": "integer" },
+            "successThreshold": { "type": "integer" }
+          }
+        },
+        "startupProbe": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "initialDelaySeconds": { "type": "integer" },
+            "periodSeconds": { "type": "integer" },
+            "timeoutSeconds": { "type": "integer" },
+            "failureThreshold": { "type": "integer" },
+            "successThreshold": { "type": "integer" }
+          }
+        },
+        "updateStrategy": { "type": "object" },
+        "customLivenessProbe": { "type": "object" },
+        "customReadinessProbe": { "type": "object" },
+        "customStartupProbe": { "type": "object" },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
+        "podSecurityContext": { "type": "object" },
+        "containerSecurityContext": { "type": "object" },
+        "extraEnv": { "type": "array" },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
+        "service": {
+          "type": "object",
+          "properties": {
+            "port": { "type": "integer" },
+            "annotations": { "type": "object" },
+            "labels": { "type": "object" },
+            "clusterIP": { "type": "string" }
+          }
+        },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "apiToken": { "type": "string" },
+            "serverSecretKey": { "type": "string" },
+            "shellctlAuthToken": { "type": "string" }
+          }
+        },
+        "serviceAccount": {
+          "type": "object",
+          "properties": {
+            "create": { "type": "boolean" },
+            "name": { "type": "string" },
+            "automountServiceAccountToken": { "type": "boolean" },
+            "annotations": { "type": "object" }
+          }
+        }
+      }
+    },
+    "localSandbox": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "resources": { "type": "object" },
+        "nodeSelector": { "type": "object" },
+        "affinity": { "type": "object" },
+        "tolerations": { "type": "array" },
+        "priorityClassName": { "type": "string" },
+        "shareProcessNamespace": {
+          "type": "boolean",
+          "description": "Share a single process namespace between all of the containers in Dify local sandbox pods.",
+          "default": false
+        },
+        "livenessProbe": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "initialDelaySeconds": { "type": "integer" },
+            "periodSeconds": { "type": "integer" },
+            "timeoutSeconds": { "type": "integer" },
+            "failureThreshold": { "type": "integer" },
+            "successThreshold": { "type": "integer" }
+          }
+        },
+        "readinessProbe": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "initialDelaySeconds": { "type": "integer" },
+            "periodSeconds": { "type": "integer" },
+            "timeoutSeconds": { "type": "integer" },
+            "failureThreshold": { "type": "integer" },
+            "successThreshold": { "type": "integer" }
+          }
+        },
+        "startupProbe": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "initialDelaySeconds": { "type": "integer" },
+            "periodSeconds": { "type": "integer" },
+            "timeoutSeconds": { "type": "integer" },
+            "failureThreshold": { "type": "integer" },
+            "successThreshold": { "type": "integer" }
+          }
+        },
+        "customLivenessProbe": { "type": "object" },
+        "customReadinessProbe": { "type": "object" },
+        "customStartupProbe": { "type": "object" },
+        "updateStrategy": { "type": "object" },
+        "hostAliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "ip": { "type": "string" },
+              "hostnames": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["ip", "hostnames"]
+          }
+        },
+        "podSecurityContext": { "type": "object" },
+        "containerSecurityContext": { "type": "object" },
+        "extraEnv": { "type": "array" },
+        "extraVolumes": { "type": "array" },
+        "extraVolumeMounts": { "type": "array" },
+        "service": {
+          "type": "object",
+          "properties": {
+            "port": { "type": "integer" },
+            "annotations": { "type": "object" },
+            "labels": { "type": "object" },
+            "clusterIP": { "type": "string" }
           }
         },
         "serviceAccount": {
@@ -936,7 +1146,8 @@
           "type": "object",
           "properties": {
             "app": { "type": "integer" },
-            "celery": { "type": "integer" }
+            "celery": { "type": "integer" },
+            "agent": { "type": "integer" }
           }
         },
         "useSSL": { "type": "boolean" },

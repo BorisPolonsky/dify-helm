@@ -28,7 +28,7 @@ TRIGGER_URL: {{ .Values.global.triggerDomain | quote }}
 {{- define "dify.api.config" -}}
 # Startup mode, 'api' starts the API server.
 MODE: api
-{{- include "dify.common.config" . }}
+{{ include "dify.common.config" . }}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 # SECRET_KEY: {{ .Values.global.appSecretKey }}
 
@@ -85,6 +85,10 @@ SSRF_PROXY_HTTPS_URL: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Value
 PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.ports.daemon }}
 {{- end }}
 
+{{- if .Values.agentBackend.enabled }}
+AGENT_BACKEND_BASE_URL: http://{{ template "dify.agentBackend.fullname" .}}:{{ .Values.agentBackend.service.port }}
+{{- end }}
+
 {{- if .Values.api.otel.enabled }}
 # OpenTelemetry configuration
 ENABLE_OTEL: {{ .Values.api.otel.enabled | toString | quote }}
@@ -119,7 +123,7 @@ MODE: worker
 # The Celery worker for processing the queue.
 
 # --- All the configurations below are the same as those in the 'api' service. ---
-{{- include "dify.common.config" . }}
+{{ include "dify.common.config" . }}
 # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
 # same as the API service
 # SECRET_KEY: {{ .Values.global.appSecretKey }}
@@ -139,6 +143,9 @@ CELERY_BACKEND: redis
 {{ include "dify.mail.config" . }}
 {{- if .Values.pluginDaemon.enabled }}
 PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.ports.daemon }}
+{{- end }}
+{{- if .Values.agentBackend.enabled }}
+AGENT_BACKEND_BASE_URL: http://{{ template "dify.agentBackend.fullname" .}}:{{ .Values.agentBackend.service.port }}
 {{- end }}
 {{- include "dify.marketplace.config" . }}
 
@@ -180,6 +187,8 @@ EDITION: {{ .Values.global.edition | quote }}
 # different from api or web app domain.
 # example: http://cloud.dify.ai
 CONSOLE_API_URL: {{ .Values.global.consoleApiDomain | quote }}
+# internal URL used by the web service for server-side console API requests, change it only if your web service must reach the API through a different internal address.
+SERVER_CONSOLE_API_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }}
 # The URL for Web APP api server, refers to the Web App base URL of WEB service if web app domain is different from
 # console or api domain.
 # example: http://udify.app
@@ -533,6 +542,20 @@ HTTPS_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfPro
 {{- end }}
 {{- end }}
 
+{{- define "dify.agentBackend.config" -}}
+{{- if .Values.pluginDaemon.enabled }}
+DIFY_AGENT_PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.ports.daemon }}
+{{- end }}
+DIFY_AGENT_INNER_API_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }}
+{{- if .Values.localSandbox.enabled }}
+DIFY_AGENT_SHELLCTL_ENTRYPOINT: http://{{ template "dify.localSandbox.fullname" .}}:{{ .Values.localSandbox.service.port }}
+{{- end }}
+DIFY_AGENT_STUB_API_BASE_URL: http://{{ template "dify.agentBackend.fullname" .}}:{{ .Values.agentBackend.service.port }}/agent-stub
+{{- end }}
+
+{{- define "dify.localSandbox.config" -}}
+{{- end }}
+
 {{- define "dify.nginx.config.proxy" }}
 proxy_set_header Host $host;
 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -609,6 +632,11 @@ server {
     }
 
     location /files {
+      proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
+      include proxy.conf;
+    }
+
+    location /openapi {
       proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
       include proxy.conf;
     }

@@ -15,7 +15,10 @@ CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | default .Values.global.
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
 PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.internalApiKey | b64enc | quote }}
-INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.internalApiKey | b64enc | quote }}
+INNER_API_KEY_FOR_PLUGIN: {{ .Values.api.auth.internalApiKey | default .Values.global.internalApiKey | b64enc | quote }}
+{{- end }}
+{{- if .Values.agentBackend.enabled }}
+AGENT_BACKEND_API_TOKEN: {{ .Values.agentBackend.auth.apiToken | default .Values.global.internalApiKey | b64enc | quote }}
 {{- end }}
 {{- if and .Values.api.otel.enabled (not .Values.externalSecret.enabled) }}
 OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
@@ -24,6 +27,9 @@ OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
 
 {{- define "dify.worker.credentials" -}}
 SECRET_KEY: {{ .Values.global.appSecretKey | b64enc | quote }}
+{{- if .Values.sandbox.enabled }}
+CODE_EXECUTION_API_KEY: {{ .Values.sandbox.auth.apiKey | default .Values.global.internalApiKey | b64enc | quote }}
+{{- end }}
 # The configurations of postgres database connection.
 # It is consistent with the configuration in the 'db' service below.
 {{ include "dify.db.credentials" . }}
@@ -39,7 +45,10 @@ SECRET_KEY: {{ .Values.global.appSecretKey | b64enc | quote }}
 {{ include "dify.mail.credentials" . }}
 {{- if .Values.pluginDaemon.enabled }}
 PLUGIN_DAEMON_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.internalApiKey | b64enc | quote }}
-INNER_API_KEY_FOR_PLUGIN: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.internalApiKey | b64enc | quote }}
+INNER_API_KEY_FOR_PLUGIN: {{ .Values.api.auth.internalApiKey | default .Values.global.internalApiKey | b64enc | quote }}
+{{- end }}
+{{- if .Values.agentBackend.enabled }}
+AGENT_BACKEND_API_TOKEN: {{ .Values.agentBackend.auth.apiToken | default .Values.global.internalApiKey | b64enc | quote }}
 {{- end }}
 {{- if and .Values.api.otel.enabled (not .Values.externalSecret.enabled) }}
 OTLP_API_KEY: {{ .Values.api.otel.apiKey | b64enc | quote }}
@@ -216,12 +225,64 @@ SMTP_PASSWORD: {{ .Values.api.mail.smtp.password | b64enc | quote }}
 API_KEY: {{ .Values.sandbox.auth.apiKey | default .Values.global.internalApiKey | b64enc | quote }}
 {{- end }}
 
+{{- define "dify.agentBackend.credentials" -}}
+# Use redis db 2 for agent backend (avoids collision with app REDIS_DB=0 and Celery /1).
+{{- if .Values.externalRedis.enabled }}
+  {{- with .Values.externalRedis }}
+    {{- if .sentinel.enabled }}
+      {{- $redisPassword := .password }}
+      {{- $redisAgentDB := .db.agent}}
+      {{- $sentinelUrls := list }}
+      {{- range $sentinel := .sentinel.sentinels }}
+      {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s/%v" $redisPassword $sentinel $redisAgentDB) }}
+      {{- end }}
+DIFY_AGENT_REDIS_URL: {{ join ";" $sentinelUrls | b64enc | quote }}
+    {{- else }}
+      {{- $scheme := "redis" }}
+      {{- if .useSSL }}
+        {{- $scheme = "rediss" }}
+      {{- end }}
+DIFY_AGENT_REDIS_URL: {{ printf "%s://%s:%s@%s:%v/%v" $scheme .username .password .host .port .db.agent | b64enc | quote }}
+    {{- end }}
+  {{- end }}
+{{- else if .Values.redis.enabled }}
+{{- $namespace := .Release.Namespace -}}
+{{- with .Values.redis }}
+  {{- $redisFullname := include "dify.redis.fullname" $ }}
+  {{- if .sentinel.enabled }}
+    {{- $sentinelPort := .sentinel.service.ports.sentinel | int -}}
+    {{- $password := .auth.password -}}
+    {{- $sentinelUrls := list }}
+    {{- range $i, $e := until (.replica.replicaCount | int) }}
+    {{- $sentinelUrls = append $sentinelUrls (printf "sentinel://:%s@%s-node-%d.%s-headless.%s.svc.cluster.local:%d/2" $password $redisFullname $i $redisFullname $namespace $sentinelPort) }}
+    {{- end }}
+DIFY_AGENT_REDIS_URL: {{ join ";" $sentinelUrls | b64enc | quote }}
+  {{- else }}
+    {{- $redisHost := printf "%s-master" $redisFullname }}
+    {{- $redisPort := .master.service.ports.redis }}
+DIFY_AGENT_REDIS_URL: {{ printf "redis://:%s@%s:%v/2" .auth.password $redisHost $redisPort | b64enc | quote }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- if .Values.pluginDaemon.enabled }}
+DIFY_AGENT_PLUGIN_DAEMON_API_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.internalApiKey | b64enc | quote }}
+DIFY_AGENT_INNER_API_KEY: {{ .Values.api.auth.internalApiKey | default .Values.global.internalApiKey | b64enc | quote }}
+{{- end }}
+DIFY_AGENT_SHELLCTL_AUTH_TOKEN: {{ .Values.agentBackend.auth.shellctlAuthToken | b64enc | quote }}
+DIFY_AGENT_SERVER_SECRET_KEY: {{ .Values.agentBackend.auth.serverSecretKey | b64enc | quote }}
+DIFY_AGENT_API_TOKEN: {{ .Values.agentBackend.auth.apiToken | default .Values.global.internalApiKey | b64enc | quote }}
+{{- end }}
+
+{{- define "dify.localSandbox.credentials" -}}
+SHELLCTL_AUTH_TOKEN: {{ .Values.agentBackend.auth.shellctlAuthToken | b64enc | quote }}
+{{- end }}
+
 {{- define "dify.pluginDaemon.credentials" -}}
 {{ include "dify.db.credentials" . }}
 {{ include "dify.redis.credentials" . }}
 {{ include "dify.pluginDaemon.storage.credentials" . }}
 SERVER_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.internalApiKey | b64enc | quote }}
-DIFY_INNER_API_KEY: {{ .Values.pluginDaemon.auth.difyApiKey | default .Values.global.internalApiKey | b64enc | quote }}
+DIFY_INNER_API_KEY: {{ .Values.api.auth.internalApiKey | default .Values.global.internalApiKey | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.pluginDaemon.storage.credentials" -}}

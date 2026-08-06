@@ -1,0 +1,29 @@
+{{- if .Values.agentBackend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "dify.agentBackend.fullname" . }}
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    {{- if .Values.agentBackend.service.labels }}
+    {{- toYaml .Values.agentBackend.service.labels | nindent 4 }}
+    {{- end }}
+    component: "agent-backend"
+  {{- with .Values.agentBackend.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  {{- if .Values.agentBackend.service.clusterIP }}
+  clusterIP: {{ .Values.agentBackend.service.clusterIP }}
+  {{- end }}
+  ports:
+    - name: http-agent-backend
+      port: {{ .Values.agentBackend.service.port }}
+      protocol: TCP
+      targetPort: agent-backend
+  selector:
+    {{- include "dify.selectorLabels" . | nindent 4 }}
+    component: "agent-backend"
+{{- end }}
