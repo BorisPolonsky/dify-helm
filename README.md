@@ -26,11 +26,13 @@ The following diagram illustrates the complete network architecture and service 
 ```mermaid
 graph TB
     %% External Traffic Entry Points
-    Internet[🌐 Internet] --> Ingress[🚪 Ingress / HTTPRoute (Gateway API)]
-    Internet --> LB[⚖️ LoadBalancer Service]
+    Internet[🌐 Internet] --> Ingress[🚪 Ingress]
+    Internet --> Gateway["🚪 Gateway API"]
+    Internet --> LB[⚖️ LoadBalancer]
 
     %% Main Traffic Flow
     Ingress --> ProxyService[🔄 Proxy Service<br/>Port: 80]
+    Gateway --> ProxyService
     LB --> ProxyService
 
     %% Proxy Pod and Routing
