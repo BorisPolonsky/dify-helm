@@ -496,6 +496,7 @@ apiWebsocket:
   # Public WebSocket URL for browser clients (NEXT_PUBLIC_SOCKET_URL).
   # Example: wss://your-domain
   socketUrl: ""
+  replicas: 1
   resources: {}
   nodeSelector: {}
   affinity: {}
@@ -508,8 +509,8 @@ apiWebsocket:
   customReadinessProbe: {}
   customStartupProbe: {}
   ## @param apiWebsocket.updateStrategy Update strategy type and configuration parameters
-  updateStrategy:
-    type: Recreate
+  ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  updateStrategy: {}
   hostAliases: []
   podSecurityContext:
     enabled: true

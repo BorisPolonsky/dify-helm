@@ -12,7 +12,7 @@ metadata:
     {{- include "dify.ud.labels" . | nindent 4 }}
   name: {{ template "dify.apiWebsocket.fullname" . }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.apiWebsocket.replicas }}
   selector:
     matchLabels:
       {{- include "dify.selectorLabels" . | nindent 6 }}

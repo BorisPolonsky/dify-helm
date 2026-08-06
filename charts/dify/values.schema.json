@@ -386,6 +386,7 @@
       "properties": {
         "enabled": { "type": "boolean" },
         "socketUrl": { "type": "string" },
+        "replicas": { "type": "integer" },
         "resources": { "type": "object" },
         "nodeSelector": { "type": "object" },
         "affinity": { "type": "object" },
