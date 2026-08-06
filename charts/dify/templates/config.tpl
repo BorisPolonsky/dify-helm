@@ -111,6 +111,7 @@ OTEL_METRIC_EXPORT_INTERVAL: {{ .Values.api.otel.metricExportInterval | toString
 OTEL_BATCH_EXPORT_TIMEOUT: {{ .Values.api.otel.batchExportTimeout | toString | quote }}
 OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.api.otel.metricExportTimeout | toString | quote }}
 {{- end }}
+ENABLE_COLLABORATION_MODE: {{ .Values.apiWebsocket.enabled | quote }}
 {{- end }}
 
 {{- define "dify.worker.config" -}}
@@ -198,6 +199,9 @@ MARKETPLACE_API_URL: "/marketplace"
 {{- include "dify.marketplace.config" . }}
 {{- end }}
 MARKETPLACE_URL: {{ .Values.global.marketplace.url | quote }}
+{{- if .Values.apiWebsocket.enabled }}
+NEXT_PUBLIC_SOCKET_URL: {{ .Values.apiWebsocket.socketUrl | quote }}
+{{- end }}
 {{- end }}
 
 {{- define "dify.db.config" -}}
@@ -667,6 +671,16 @@ server {
       proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
       include proxy.conf;
     }
+
+    {{- if .Values.apiWebsocket.enabled }}
+    location /socket.io/ {
+      proxy_pass http://{{ template "dify.apiWebsocket.fullname" . }}:{{ .Values.apiWebsocket.service.port }};
+      include proxy.conf;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_cache_bypass $http_upgrade;
+    }
+    {{- end }}
 
     location / {
       proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};

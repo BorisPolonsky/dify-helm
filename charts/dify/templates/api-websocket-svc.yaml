@@ -1,0 +1,29 @@
+{{- if and .Values.apiWebsocket.enabled .Values.api.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "dify.apiWebsocket.fullname" . }}
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+    {{- if .Values.apiWebsocket.service.labels }}
+    {{- toYaml .Values.apiWebsocket.service.labels | nindent 4 }}
+    {{- end }}
+    component: "api-websocket"
+  {{- with .Values.apiWebsocket.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  {{- if .Values.apiWebsocket.service.clusterIP }}
+  clusterIP: {{ .Values.apiWebsocket.service.clusterIP }}
+  {{- end }}
+  ports:
+    - name: http-api
+      port: {{ .Values.apiWebsocket.service.port }}
+      protocol: TCP
+      targetPort: api
+  selector:
+    {{- include "dify.selectorLabels" . | nindent 4 }}
+    component: "api-websocket"
+{{- end }}
