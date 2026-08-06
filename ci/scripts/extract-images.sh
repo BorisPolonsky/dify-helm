@@ -55,7 +55,7 @@ DIFY_IMAGES=(
     "$LOCAL_SANDBOX_IMAGE"
 )
 
-# Common dependency images (redis tag matches charts/dify/values.yaml default)
+# Common dependency images
 DEPENDENCY_IMAGES=(
     "bitnamilegacy/postgresql:15.3.0-debian-11-r7"
     "bitnamilegacy/redis:7.0.11-debian-11-r12"
