@@ -50,6 +50,14 @@ image:
     repository: your-registry/dify-plugin-daemon
     tag: "your-tag"
     pullPolicy: IfNotPresent
+  agentBackend:
+    repository: your-registry/dify-agent-backend
+    tag: "your-tag"
+    pullPolicy: IfNotPresent
+  localSandbox:
+    repository: your-registry/dify-agent-local-sandbox
+    tag: "your-tag"
+    pullPolicy: IfNotPresent
 ```
 
 ### 2. Customize Dify Components
@@ -107,7 +115,7 @@ Section | Document | Enabled by Default
 `postgresql` |[bitnami/postgresql](https://github.com/bitnami/charts/tree/main/bitnami/postgresql) | `true`
 `weaviate`| [weaviate](https://github.com/weaviate/weaviate-helm) | `true`
 
-**Notice:** Built-in dependencies may not keep up to the versions in Dify's `docker-compose.yml` and will remain as is unless absolultely necessary. For more advanced, production-oriented setups, you may opt in external services instead. Refer to the next section for more details.
+**Notice:** Built-in dependencies may not keep up to the versions in Dify's `docker-compose.yml` and will remain as is unless absolutely necessary. For more advanced, production-oriented setups, you may opt in external services instead. Refer to the next section for more details.
 
 ### 4. Opt in External Services
 It's advised to use Redis, PostgreSQL and Weaviate from external providers over the built-in middlewares for production use regarding:
