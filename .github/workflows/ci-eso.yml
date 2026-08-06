@@ -39,7 +39,7 @@ jobs:
       image-cache-key: ${{ steps.cache-key.outputs.key }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Generate unified cache key
       - name: Generate cache key
@@ -52,7 +52,7 @@ jobs:
       # Check image cache with optimized restore strategy
       - name: Check Docker images cache
         id: cache-check
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.minikube/cache/images
           key: ${{ steps.cache-key.outputs.key }}
@@ -199,11 +199,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Restore all caches with optimized restore strategies
       - name: Restore Docker images cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.minikube/cache/images
           key: ${{ needs.prepare-images.outputs.image-cache-key }}
@@ -213,7 +213,7 @@ jobs:
             ${{ runner.os }}-minikube-images-
 
       - name: Restore Helm repositories cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/helm/repository
           key: ${{ runner.os }}-helm-repos-${{ hashFiles('charts/dify/Chart.yaml') }}
@@ -221,7 +221,7 @@ jobs:
             ${{ runner.os }}-helm-repos-
 
       - name: Restore Helm chart dependencies cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: charts/dify/charts
           key: ${{ runner.os }}-helm-deps-${{ hashFiles('charts/dify/Chart.lock', 'charts/dify/Chart.yaml') }}
@@ -407,23 +407,29 @@ jobs:
         run: |
           echo "Installing minimal OpenTelemetry Collector for testing..."
 
-          # Install minimal OTEL Collector using official configuration
+          # Install minimal OTEL Collector using official configuration.
+          # Use nop exporters (not debug) and higher memory limits: with Dify 1.16+
+          # (api/worker + agent-backend/local-sandbox on the same node), the previous
+          # 128Mi + debug exporter setup OOM/crash-looped before the metrics check.
+          # Metrics endpoint uses the chart default readers on :8888 (do not set the
+          # deprecated service.telemetry.metrics.address — it is ignored/removed in
+          # newer collector/chart versions and can conflict with readers).
           helm install otel-collector open-telemetry/opentelemetry-collector \
             --version 0.136.1 \
             --set mode=deployment \
             --set image.repository="ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-k8s" \
             --set command.name="otelcol-k8s" \
             --set fullnameOverride=otel-collector \
-            --set resources.limits.cpu=100m \
-            --set resources.limits.memory=128Mi \
-            --set resources.requests.cpu=50m \
-            --set resources.requests.memory=64Mi \
-            --set config.service.telemetry.metrics.address="0.0.0.0:8888" \
-            --set config.exporters.debug.verbosity=basic \
+            --set resources.limits.cpu=250m \
+            --set resources.limits.memory=512Mi \
+            --set resources.requests.cpu=100m \
+            --set resources.requests.memory=128Mi \
+            --set-json 'config.exporters={"nop":{}}' \
             --set config.service.pipelines.logs=null \
             --set config.service.pipelines.metrics.receivers="{otlp,prometheus}" \
             --set config.service.pipelines.metrics.processors="{memory_limiter,batch}" \
-            --set config.service.pipelines.metrics.exporters="{debug}" \
+            --set config.service.pipelines.metrics.exporters="{nop}" \
+            --set config.service.pipelines.traces.exporters="{nop}" \
             --set ports.metrics.enabled=true \
             --set ports.metrics.containerPort=8888 \
             --set ports.metrics.servicePort=8888 \

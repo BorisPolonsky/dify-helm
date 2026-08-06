@@ -481,18 +481,63 @@ test_connectivity_batch() {
     return 0
 }
 
+# Dump OTEL Collector diagnostics for CI failures
+dump_otel_collector_diagnostics() {
+    echo ""
+    echo "INFO: OTEL Collector diagnostics:"
+    echo "--------------------------------"
+    kubectl get pods -l app.kubernetes.io/name=opentelemetry-collector -o wide 2>/dev/null \
+        || echo "No OTEL Collector pods found with standard labels"
+    echo ""
+    kubectl get svc -l app.kubernetes.io/name=opentelemetry-collector -o wide 2>/dev/null || true
+    echo ""
+    local otel_pod
+    otel_pod=$(kubectl get pods -l app.kubernetes.io/name=opentelemetry-collector -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+    if [[ -n "$otel_pod" ]]; then
+        echo "INFO: Describe pod $otel_pod:"
+        kubectl describe pod "$otel_pod" 2>/dev/null || true
+        echo ""
+        echo "INFO: Current logs for $otel_pod:"
+        kubectl logs "$otel_pod" --tail=80 2>/dev/null || true
+        echo ""
+        echo "INFO: Previous logs for $otel_pod (if restarted):"
+        kubectl logs "$otel_pod" --previous --tail=80 2>/dev/null || echo "No previous container logs"
+    fi
+    echo ""
+    echo "INFO: Recent cluster events mentioning otel:"
+    kubectl get events --sort-by='.lastTimestamp' 2>/dev/null | grep -i otel | tail -20 || true
+}
+
 # Function to test OTEL Collector metrics
 test_otel_collector() {
     echo "INFO: Testing OpenTelemetry Collector..."
     echo "======================================="
 
+    # Collector can briefly restart under load after Dify starts sending telemetry;
+    # wait for Ready, then retry the metrics scrape a few times.
+    echo "INFO: Waiting for OTEL Collector pod to be Ready..."
+    if ! kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=opentelemetry-collector --timeout=120s 2>/dev/null; then
+        echo "ERROR: OTEL Collector pod did not become Ready"
+        dump_otel_collector_diagnostics
+        log_failure "OTEL Collector metrics test failed"
+        return 1
+    fi
+
     set +e  # Temporarily disable exit on error
 
-    # Execute curl directly in API pod to test OTEL metrics
     echo "INFO: Testing OTEL Collector metrics endpoint via API pod..."
-    local test_output
-    test_output=$(kubectl exec "$API_POD" -n "$NAMESPACE" -- curl -s --connect-timeout 10 --max-time 30 'http://otel-collector:8888/metrics' 2>&1)
-    local curl_exit_code=$?
+    local test_output=""
+    local curl_exit_code=1
+    local attempt
+    for attempt in 1 2 3 4 5; do
+        test_output=$(kubectl exec "$API_POD" -n "$NAMESPACE" -- curl -s --connect-timeout 10 --max-time 30 'http://otel-collector:8888/metrics' 2>&1)
+        curl_exit_code=$?
+        if [[ $curl_exit_code -eq 0 ]]; then
+            break
+        fi
+        echo "WARNING: Metrics scrape attempt $attempt failed (exit $curl_exit_code); retrying in 5s..."
+        sleep 5
+    done
 
     set -e
 
@@ -506,12 +551,7 @@ test_otel_collector() {
         echo "  - OTEL Collector service is not responding"
         echo "  - Network connectivity issues"
         echo "  - OTEL Collector is not properly configured"
-
-        # Show additional OTEL Collector status for debugging
-        echo ""
-        echo "INFO: OTEL Collector pod status:"
-        kubectl get pods -l app.kubernetes.io/name=opentelemetry-collector -o wide 2>/dev/null || echo "No OTEL Collector pods found with standard labels"
-
+        dump_otel_collector_diagnostics
         log_failure "OTEL Collector metrics test failed"
         return 1
     fi
@@ -575,11 +615,7 @@ test_otel_collector() {
             echo "$test_output" | grep "otelcol_" | head -5
         fi
 
-        # Show additional OTEL Collector status for debugging
-        echo ""
-        echo "INFO: OTEL Collector pod status:"
-        kubectl get pods -l app.kubernetes.io/name=opentelemetry-collector -o wide 2>/dev/null || echo "No OTEL Collector pods found with standard labels"
-
+        dump_otel_collector_diagnostics
         log_failure "OTEL Collector metrics test failed"
         return 1
     fi
