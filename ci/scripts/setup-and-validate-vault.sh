@@ -65,6 +65,9 @@ vault kv get -field="secret_key" "secret/dify/s3" >/dev/null 2>&1 && echo "SUCCE
 vault kv get -field="elasticsearch_username" "secret/dify/elasticsearch" >/dev/null 2>&1 && echo "SUCCESS:dify/elasticsearch:elasticsearch_username" || echo "ERROR:dify/elasticsearch:elasticsearch_username"
 vault kv get -field="elasticsearch_password" "secret/dify/elasticsearch" >/dev/null 2>&1 && echo "SUCCESS:dify/elasticsearch:elasticsearch_password" || echo "ERROR:dify/elasticsearch:elasticsearch_password"
 vault kv get -field="api_key" "secret/dify/otel" >/dev/null 2>&1 && echo "SUCCESS:dify/otel:api_key" || echo "ERROR:dify/otel:api_key"
+vault kv get -field="api_token" "secret/dify/agent-backend" >/dev/null 2>&1 && echo "SUCCESS:dify/agent-backend:api_token" || echo "ERROR:dify/agent-backend:api_token"
+vault kv get -field="server_secret_key" "secret/dify/agent-backend" >/dev/null 2>&1 && echo "SUCCESS:dify/agent-backend:server_secret_key" || echo "ERROR:dify/agent-backend:server_secret_key"
+vault kv get -field="shellctl_auth_token" "secret/dify/agent-backend" >/dev/null 2>&1 && echo "SUCCESS:dify/agent-backend:shellctl_auth_token" || echo "ERROR:dify/agent-backend:shellctl_auth_token"
 
 echo "=== BATCH_VALIDATION_END ==="
 EOF
@@ -148,6 +151,8 @@ echo "Setting up Elasticsearch secrets..."
 vault kv put secret/dify/elasticsearch elasticsearch_username="elastic" elasticsearch_password="elasticsearch123456"
 echo "Setting up OTEL secrets..."
 vault kv put secret/dify/otel api_key="test-otel-api-key"
+echo "Setting up agent backend secrets..."
+vault kv put secret/dify/agent-backend api_token="test-agent-api-token" server_secret_key="MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY" shellctl_auth_token="test-shellctl-auth-token"
 echo "All secrets setup completed successfully"
 EOF'
 
