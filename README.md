@@ -26,7 +26,7 @@ The following diagram illustrates the complete network architecture and service 
 ```mermaid
 graph TB
     %% External Traffic Entry Points
-    Internet[🌐 Internet] --> Ingress[🚪 Ingress Controller]
+    Internet[🌐 Internet] --> Ingress[🚪 Ingress / HTTPRoute (Gateway API)]
     Internet --> LB[⚖️ LoadBalancer Service]
 
     %% Main Traffic Flow
@@ -169,6 +169,7 @@ The Nginx proxy handles traffic routing with the following rules:
 /files       → API Service (5001)
 /openapi     → API Service (5001)
 /mcp         → API Service (5001)
+/socket.io/  → API WebSocket Service (5001)
 /e/          → Plugin Daemon (5002)
 /explore     → Web Service (3000)
 /marketplace → External Marketplace API
@@ -181,6 +182,7 @@ The Nginx proxy handles traffic routing with the following rules:
 | Component | Image | Port | Role |
 |-----------|-------|------|------|
 | **API** | `langgenius/dify-api:1.16.1` | 5001 | RESTful API server, business logic processing |
+| **API WebSocket** | `langgenius/dify-api:1.16.1` | 5001 | Socket.IO process for workflow collaboration |
 | **Web** | `langgenius/dify-web:1.16.1` | 3000 | Web UI frontend |
 | **Worker** | `langgenius/dify-api:1.16.1` | - | Background task processing (Celery) |
 | **Beat** | `langgenius/dify-api:1.16.1` | - | Periodic task scheduler (Celery Beat) |

@@ -7,7 +7,7 @@ global:
   edition: "SELF_HOSTED"
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
   appSecretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
-  # A global secret key for all inter-component API calls among Dify containers (e.g. `api`, `sandbox` and `pluginDaemon`). You can generate a strong key using `openssl rand -base64 42`.
+  # A global secret key for all inter-component API calls among Dify containers (e.g. `api`, `sandbox`, `pluginDaemon` and `agentBackend`). You can generate a strong key using `openssl rand -base64 42`.
   # Takes no effect when left empty. Can be overridden by component-specific values.
   internalApiKey: ""
   # The backend domain of the console API, used to concatenate the authorization callback.
@@ -491,10 +491,15 @@ beat:
     ##
     annotations: {}
 
+## Dedicated Socket.IO API process for workflow collaboration mode.
+## When enabled, nginx proxies `/socket.io/` to this Deployment.
+##
 apiWebsocket:
   enabled: false
-  # Public WebSocket URL for browser clients (NEXT_PUBLIC_SOCKET_URL).
-  # Example: wss://your-domain
+  ## @param apiWebsocket.socketUrl Public WebSocket origin for browser clients (`NEXT_PUBLIC_SOCKET_URL`)
+  ## Required when enabled.
+  ## Use the same host nginx serves `/socket.io/` on (scheme `wss`/`ws`, no path). Example: wss://console.dify.ai
+  ##
   socketUrl: ""
   replicas: 1
   resources: {}
@@ -502,26 +507,51 @@ apiWebsocket:
   affinity: {}
   tolerations: []
   priorityClassName: ""
-  ## @param apiWebsocket.shareProcessNamespace Share a single process namespace between all containers in api-websocket pods
+  ## @param apiWebsocket.shareProcessNamespace Share a single process namespace between all of the containers in Dify API WebSocket pods
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
+  ##
   shareProcessNamespace: false
-  ## Configure extra options for api-websocket containers' liveness, readiness, and startup probes
+  ## @param apiWebsocket.customLivenessProbe Custom livenessProbe that overrides the default one
   customLivenessProbe: {}
+  ## @param apiWebsocket.customReadinessProbe Custom readinessProbe that overrides the default one
   customReadinessProbe: {}
+  ## @param apiWebsocket.customStartupProbe Custom startupProbe that overrides the default one
   customStartupProbe: {}
   ## @param apiWebsocket.updateStrategy Update strategy type and configuration parameters
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   updateStrategy: {}
+  ## @param apiWebsocket.hostAliases Add deployment host aliases
+  ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
+  ##
   hostAliases: []
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param apiWebsocket.podSecurityContext.enabled Enabled Dify api-websocket pod's Security Context
+  ## @param apiWebsocket.podSecurityContext.fsGroup Set Dify api-websocket pod's Security Context fsGroup
+  ##
   podSecurityContext:
     enabled: true
     fsGroup: 1001
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param apiWebsocket.containerSecurityContext.enabled Dify api-websocket containers' Security Context
+  ## @param apiWebsocket.containerSecurityContext.runAsUser Set Dify api-websocket containers' Security Context runAsUser
+  ##
   containerSecurityContext:
     enabled: true
     runAsUser: 1001
   extraEnv: []
+  # The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
   logLevel: INFO
+  ## @param apiWebsocket.extraVolumes Optionally specify extra list of additional volumes for the API WebSocket pod(s)
+  ##
   extraVolumes: []
+  ## @param apiWebsocket.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the API WebSocket container(s)
+  ##
   extraVolumeMounts: []
+  ## Configure extra options for API WebSocket containers' liveness, readiness, and startup probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+  ## @param apiWebsocket.livenessProbe.enabled Enable livenessProbe on API WebSocket nodes
   livenessProbe:
     enabled: true
     initialDelaySeconds: 30
@@ -529,6 +559,7 @@ apiWebsocket:
     timeoutSeconds: 5
     failureThreshold: 5
     successThreshold: 1
+  ## @param apiWebsocket.readinessProbe.enabled Enable readinessProbe on API WebSocket nodes
   readinessProbe:
     enabled: true
     initialDelaySeconds: 5
@@ -536,6 +567,7 @@ apiWebsocket:
     timeoutSeconds: 5
     failureThreshold: 5
     successThreshold: 1
+  ## @param apiWebsocket.startupProbe.enabled Enable startupProbe on API WebSocket containers
   startupProbe:
     enabled: false
     initialDelaySeconds: 5
@@ -548,10 +580,21 @@ apiWebsocket:
     annotations: {}
     labels: {}
     clusterIP: ""
+  ## Dify API WebSocket ServiceAccount configuration
+  ##
   serviceAccount:
+    ## @param apiWebsocket.serviceAccount.create Specifies whether a ServiceAccount should be created
+    ##
     create: false
+    ## @param apiWebsocket.serviceAccount.name The name of the ServiceAccount to use.
+    ## If not set and create is true, a name is generated using the common.names.fullname template
+    ##
     name: ""
+    ## @param apiWebsocket.serviceAccount.automountServiceAccountToken Allows auto mount of ServiceAccountToken on the serviceAccount created
+    ##
     automountServiceAccountToken: false
+    ## @param apiWebsocket.serviceAccount.annotations Additional custom annotations for the ServiceAccount
+    ##
     annotations: {}
 
 proxy:
@@ -1882,6 +1925,9 @@ service:
   type: ClusterIP
   port: 80
 
+## Expose Dify via Ingress and/or HTTPRoute (Gateway API). Both are disabled by
+## default and can be enabled independently.
+##
 ingress:
   enabled: false
   className: ""
@@ -3146,7 +3192,7 @@ externalRedis:
     password: ""
 
 
-## @Section Extenral storage backend
+## @Section External storage backend
 ##
 
 ###################################
