@@ -8,8 +8,8 @@ from pathlib import Path
 import sys
 import yaml
 
-# Keys that use Chart.AppVersion as default tag in templates (api, web, pluginDaemon)
-APPVERSION_KEYS = ("api", "web", "pluginDaemon")
+# Keys that use Chart.AppVersion as default tag in templates
+APPVERSION_KEYS = ("api", "web", "pluginDaemon", "agentBackend", "localSandbox")
 
 def main():
     repo_root = Path(__file__).resolve().parents[2]
@@ -33,7 +33,7 @@ def main():
     image_config = values.get("image") or {}
 
     images = []
-    for key in ("api", "web", "sandbox", "proxy", "ssrfProxy", "pluginDaemon"):
+    for key in ("api", "web", "sandbox", "proxy", "ssrfProxy", "pluginDaemon", "agentBackend", "localSandbox"):
         block = image_config.get(key)
         if not block:
             continue
