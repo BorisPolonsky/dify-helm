@@ -79,9 +79,11 @@ DB_PASSWORD: {{ .password | b64enc | quote }}
 {{- end }}
 
 {{- define "dify.storage.credentials" -}}
-{{- if and .Values.externalS3.enabled (not .Values.externalSecret.enabled)}}
+{{- if .Values.externalS3.enabled }}
+{{- if and (not .Values.externalSecret.enabled) (not .Values.externalS3.useIAM) }}
 S3_ACCESS_KEY: {{ .Values.externalS3.accessKey | b64enc | quote }}
 S3_SECRET_KEY: {{ .Values.externalS3.secretKey | b64enc | quote }}
+{{- end }}
 {{- else if .Values.externalAzureBlobStorage.enabled }}
 # The Azure Blob storage configurations, only available when STORAGE_TYPE is `azure-blob`.
 AZURE_BLOB_ACCOUNT_KEY: {{ .Values.externalAzureBlobStorage.key | b64enc | quote }}
@@ -287,8 +289,10 @@ DIFY_INNER_API_KEY: {{ .Values.api.auth.internalApiKey | default .Values.global.
 
 {{- define "dify.pluginDaemon.storage.credentials" -}}
 {{- if and .Values.externalS3.enabled .Values.externalS3.bucketName.pluginDaemon }}
+{{- if not .Values.externalS3.useIAM }}
 AWS_ACCESS_KEY: {{ .Values.externalS3.accessKey | b64enc | quote }}
 AWS_SECRET_KEY: {{ .Values.externalS3.secretKey | b64enc | quote }}
+{{- end }}
 {{- else if .Values.externalAzureBlobStorage.enabled }}
   {{- with .Values.externalAzureBlobStorage }}
     {{- $protocol := "" }}
