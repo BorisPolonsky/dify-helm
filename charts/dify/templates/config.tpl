@@ -111,9 +111,7 @@ OTEL_METRIC_EXPORT_INTERVAL: {{ .Values.api.otel.metricExportInterval | toString
 OTEL_BATCH_EXPORT_TIMEOUT: {{ .Values.api.otel.batchExportTimeout | toString | quote }}
 OTEL_METRIC_EXPORT_TIMEOUT: {{ .Values.api.otel.metricExportTimeout | toString | quote }}
 {{- end }}
-{{- if .Values.apiWebsocket.enabled }}
-ENABLE_COLLABORATION_MODE: "true"
-{{- end }}
+ENABLE_COLLABORATION_MODE: {{ .Values.apiWebsocket.enabled | quote }}
 {{- end }}
 
 {{- define "dify.worker.config" -}}
