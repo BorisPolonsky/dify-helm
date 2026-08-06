@@ -63,7 +63,7 @@ spec:
         {{- toYaml .Values.localSandbox.podSecurityContext | nindent 8 }}
       {{- end }}
       containers:
-        - image: "{{ .Values.image.localSandbox.repository }}:{{ .Values.image.localSandbox.tag }}"
+        - image: "{{ .Values.image.localSandbox.repository }}:{{ default .Chart.AppVersion .Values.image.localSandbox.tag }}"
           imagePullPolicy: "{{ .Values.image.localSandbox.pullPolicy }}"
           name: local-sandbox
           {{- if .Values.localSandbox.customLivenessProbe }}
