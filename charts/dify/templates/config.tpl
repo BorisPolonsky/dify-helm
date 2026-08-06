@@ -202,6 +202,9 @@ MARKETPLACE_URL: {{ .Values.global.marketplace.url | quote }}
 {{- if .Values.apiWebsocket.enabled }}
 NEXT_PUBLIC_SOCKET_URL: {{ .Values.apiWebsocket.socketUrl | quote }}
 {{- end }}
+{{- if .Values.agentBackend.enabled }}
+NEXT_PUBLIC_ENABLE_AGENT_V2: "true"
+{{- end }}
 {{- end }}
 
 {{- define "dify.db.config" -}}
