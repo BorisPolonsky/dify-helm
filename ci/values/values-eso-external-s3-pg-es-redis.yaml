@@ -470,6 +470,9 @@ externalSecret:
     enabled: true
     # Remote references for external secret store
     remoteRefs:
+      REDIS_USERNAME:
+        key: "dify/redis"
+        property: "username"
       REDIS_PASSWORD:
         key: "dify/redis"
         property: "password"
