@@ -33,6 +33,16 @@ image:
     tag: 0.6.3-local
     pullPolicy: IfNotPresent
 
+  agentBackend:
+    repository: langgenius/dify-agent-backend
+    tag: "1.16.1"
+    pullPolicy: IfNotPresent
+
+  localSandbox:
+    repository: langgenius/dify-agent-local-sandbox
+    tag: "1.16.1"
+    pullPolicy: IfNotPresent
+
 api:
   enabled: true
   replicas: 1

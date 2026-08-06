@@ -35,6 +35,14 @@ PLUGIN_DAEMON_REPO=$(grep -A1 "pluginDaemon:" "ci/values/$VALUES_FILE" | grep "r
 PLUGIN_DAEMON_TAG=$(grep -A2 "pluginDaemon:" "ci/values/$VALUES_FILE" | grep "tag:" | awk '{print $2}' | head -1 | tr -d '"')
 PLUGIN_DAEMON_IMAGE="$PLUGIN_DAEMON_REPO:$PLUGIN_DAEMON_TAG"
 
+AGENT_BACKEND_REPO=$(grep -A1 "agentBackend:" "ci/values/$VALUES_FILE" | grep "repository:" | awk '{print $2}' | head -1)
+AGENT_BACKEND_TAG=$(grep -A2 "agentBackend:" "ci/values/$VALUES_FILE" | grep "tag:" | awk '{print $2}' | head -1 | tr -d '"')
+AGENT_BACKEND_IMAGE="$AGENT_BACKEND_REPO:$AGENT_BACKEND_TAG"
+
+LOCAL_SANDBOX_REPO=$(grep -A1 "localSandbox:" "ci/values/$VALUES_FILE" | grep "repository:" | awk '{print $2}' | head -1)
+LOCAL_SANDBOX_TAG=$(grep -A2 "localSandbox:" "ci/values/$VALUES_FILE" | grep "tag:" | awk '{print $2}' | head -1 | tr -d '"')
+LOCAL_SANDBOX_IMAGE="$LOCAL_SANDBOX_REPO:$LOCAL_SANDBOX_TAG"
+
 # Collect all Dify application images
 DIFY_IMAGES=(
     "$API_IMAGE"
@@ -43,12 +51,14 @@ DIFY_IMAGES=(
     "$PROXY_IMAGE"
     "$SSRF_PROXY_IMAGE"
     "$PLUGIN_DAEMON_IMAGE"
+    "$AGENT_BACKEND_IMAGE"
+    "$LOCAL_SANDBOX_IMAGE"
 )
 
 # Common dependency images
 DEPENDENCY_IMAGES=(
     "bitnamilegacy/postgresql:15.3.0-debian-11-r7"
-    "bitnamilegacy/redis:6.2.7-debian-11-r11"
+    "bitnamilegacy/redis:7.0.11-debian-11-r12"
     "bitnamilegacy/redis-sentinel:6.2.7-debian-11-r12"
     "bitnamilegacy/redis-exporter:1.43.0-debian-11-r4"
 )
