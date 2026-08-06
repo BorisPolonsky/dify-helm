@@ -74,11 +74,8 @@ graph TB
     APIPod -.->|Agent runs| AgentBackendService
     WorkerPod -.->|Agent runs| AgentBackendService
     AgentBackendPod -.->|Shell execution| LocalSandboxService
-    LocalSandboxPod -.->|Agent Stub (/agent-stub)| AgentBackendService
-    LocalSandboxPod -.->|Signed file URLs (/files)| APIService
     AgentBackendPod -.->|Plugin invoke| PluginService
     AgentBackendPod -.->|Internal API| APIService
-    PluginPod -.->|Plugin internal API| APIService
 
     %% Data Layer - Databases
     subgraph DataLayer [🗄️ Data Layer]
