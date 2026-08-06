@@ -3202,6 +3202,10 @@ externalRedis:
 externalS3:
   enabled: false
   endpoint: "https://xxx.r2.cloudflarestorage.com"
+  # Use path-style addressing (`https://<endpoint>/<bucket>/<key>`) instead of virtual-hosted style
+  # (`https://<bucket>.<endpoint>/<key>`). Required by most S3-compatible backends (e.g. MinIO), and by
+  # AWS S3 when the bucket name is not DNS-compatible (e.g. contains dots, which breaks TLS validation).
+  # Applies to `api`/`worker` (`S3_ADDRESS_STYLE`) and to `pluginDaemon` (`S3_USE_PATH_STYLE`).
   pathStyle: false
   accessKey: "ak-difyai"
   secretKey: "sk-difyai"
