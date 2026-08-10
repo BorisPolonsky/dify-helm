@@ -249,6 +249,9 @@ S3_BUCKET_NAME: {{ .Values.externalS3.bucketName.api | quote }}
 # S3_ACCESS_KEY: {{ .Values.externalS3.accessKey | quote }}
 # S3_SECRET_KEY: {{ .Values.externalS3.secretKey | quote }}
 S3_REGION: {{ .Values.externalS3.region | quote }}
+# Addressing style used by `api`/`worker` (boto3), counterpart of `S3_USE_PATH_STYLE` in `pluginDaemon`.
+# `path` when `externalS3.pathStyle` is enabled, `auto` (boto3 default) otherwise.
+S3_ADDRESS_STYLE: {{ if .Values.externalS3.pathStyle }}"path"{{ else }}"auto"{{ end }}
 S3_USE_AWS_MANAGED_IAM: {{ .Values.externalS3.useIAM | toString | quote }}
 {{- else if .Values.externalAzureBlobStorage.enabled }}
 # The type of storage to use for storing user files. Supported values are `local`, `s3`, `azure-blob`, `aliyun-oss` and `google-storage`, Default: `local`
