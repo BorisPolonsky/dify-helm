@@ -1,3 +1,7 @@
+{{- if ((.Values.pluginDaemon).auth).difyApiKey }}
+⚠ WARNING: `pluginDaemon.auth.difyApiKey` is obsolete and no longer takes effect.
+  Set it via `api.auth.internalApiKey` instead.
+{{- end }}
 {{- if .Values.ingress.enabled }}
 1. Access the application at:
   {{- range $host := .Values.ingress.hosts }}
