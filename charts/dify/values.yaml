@@ -1980,8 +1980,7 @@ httproute:
         value: /
   # filters applied to requests that match this rule
   filters: []
-  # additionalRules (templated) prepends custom HTTPRoute rules before the
-  # default single-backend rule above
+  # Extra HTTPRoute rules inserted before the chart’s default rules
   additionalRules: []
 
 # Global node selector

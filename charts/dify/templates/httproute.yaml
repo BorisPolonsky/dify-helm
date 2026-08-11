@@ -1,7 +1,5 @@
 {{- if .Values.httproute.enabled -}}
 {{- $route := .Values.httproute -}}
-{{- $serviceName := include "dify.fullname" . -}}
-{{- $servicePort := .Values.service.port -}}
 apiVersion: {{ $route.apiVersion | default "gateway.networking.k8s.io/v1" }}
 kind: HTTPRoute
 metadata:
@@ -28,9 +26,10 @@ spec:
     {{- with $route.additionalRules }}
     {{- tpl (toYaml .) $ | nindent 4 }}
     {{- end }}
+    {{- if .Values.proxy.enabled }}
     - backendRefs:
-        - name: {{ $serviceName }}
-          port: {{ $servicePort }}
+        - name: {{ include "dify.fullname" . }}
+          port: {{ .Values.service.port }}
       {{- with $route.matches }}
       matches:
         {{- toYaml . | nindent 8 }}
@@ -39,4 +38,64 @@ spec:
       filters:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+    {{- else }}
+    {{- if .Values.api.enabled }}
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /console/api
+        - path:
+            type: PathPrefix
+            value: /api
+        - path:
+            type: PathPrefix
+            value: /v1
+        - path:
+            type: PathPrefix
+            value: /files
+        - path:
+            type: PathPrefix
+            value: /openapi
+        - path:
+            type: PathPrefix
+            value: /mcp
+        - path:
+            type: PathPrefix
+            value: /triggers
+      backendRefs:
+        - name: {{ include "dify.api.fullname" . }}
+          port: {{ .Values.api.service.port }}
+    {{- end }}
+    {{- if .Values.pluginDaemon.enabled }}
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /e/
+      backendRefs:
+        - name: {{ include "dify.pluginDaemon.fullname" . }}
+          port: {{ .Values.pluginDaemon.service.ports.daemon }}
+    {{- end }}
+    {{- if .Values.apiWebsocket.enabled }}
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /socket.io
+      backendRefs:
+        - name: {{ include "dify.apiWebsocket.fullname" . }}
+          port: {{ .Values.apiWebsocket.service.port }}
+    {{- end }}
+    {{- if .Values.web.enabled }}
+    - backendRefs:
+        - name: {{ include "dify.web.fullname" . }}
+          port: {{ .Values.web.service.port }}
+      {{- with $route.matches }}
+      matches:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $route.filters }}
+      filters:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
 {{- end -}}
