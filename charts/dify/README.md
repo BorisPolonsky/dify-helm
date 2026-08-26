@@ -454,7 +454,7 @@ When ExternalSecret is enabled, sensitive information for the following componen
 - **Code Execution Service**: API Key
 - **Plugin System**: Daemon Key, internal API Key
 - **Application Core**: Secret Key
-- **Agent Backend**: API token (shared with API/worker as `AGENT_BACKEND_API_TOKEN` / agent as `DIFY_AGENT_API_TOKEN`), server secret key, shellctl auth token, Redis URL
-- **Local Sandbox**: Shellctl auth token (shared with agent `DIFY_AGENT_SHELLCTL_AUTH_TOKEN`)
+- **Agent Backend**: API token (shared with API/worker as `AGENT_BACKEND_API_TOKEN` / agent as `DIFY_AGENT_API_TOKEN`), server secret key, local sandbox auth token (`DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN`), Redis URL
+- **Local Sandbox**: Shellctl auth token (shared with agent `DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN`)
 
 Usage: Set `externalSecret.enabled: true` in values.yaml and configure the corresponding secretStore and remoteRefs parameters.

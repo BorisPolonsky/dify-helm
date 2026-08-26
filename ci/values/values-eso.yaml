@@ -2752,7 +2752,7 @@ externalSecret:
       DIFY_AGENT_SERVER_SECRET_KEY:
         key: "dify/agent-backend"
         property: "server_secret_key"
-      DIFY_AGENT_SHELLCTL_AUTH_TOKEN:
+      DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN:
         key: "dify/agent-backend"
         property: "shellctl_auth_token"
       DIFY_AGENT_PLUGIN_DAEMON_API_KEY:

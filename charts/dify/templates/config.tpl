@@ -549,9 +549,11 @@ DIFY_AGENT_PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}
 {{- end }}
 DIFY_AGENT_INNER_API_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }}
 {{- if .Values.localSandbox.enabled }}
-DIFY_AGENT_SHELLCTL_ENTRYPOINT: http://{{ template "dify.localSandbox.fullname" .}}:{{ .Values.localSandbox.service.port }}
+DIFY_AGENT_RUNTIME_BACKEND: "local"
+DIFY_AGENT_LOCAL_SANDBOX_ENDPOINT: http://{{ template "dify.localSandbox.fullname" .}}:{{ .Values.localSandbox.service.port }}
 {{- end }}
 DIFY_AGENT_STUB_API_BASE_URL: http://{{ template "dify.agentBackend.fullname" .}}:{{ .Values.agentBackend.service.port }}/agent-stub
+DIFY_AGENT_SANDBOX_FILES_BASE_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }}
 {{- end }}
 
 {{- define "dify.localSandbox.config" -}}
