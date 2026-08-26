@@ -172,9 +172,7 @@ web:
     timeoutSeconds: 5
     failureThreshold: 5
     successThreshold: 1
-  extraEnv:
-    - name: EDITION
-      value: "SELF_HOSTED"
+  extraEnv: []
   service:
     port: 3000
     annotations: {}

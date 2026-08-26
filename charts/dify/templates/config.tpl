@@ -23,6 +23,7 @@ FILES_URL: {{ .Values.global.filesDomain | quote }}
 # used to display trigger endpoint API Base URL to the front-end.
 # Example: https://api.dify.ai
 TRIGGER_URL: {{ .Values.global.triggerDomain | quote }}
+DEPLOYMENT_EDITION: {{ .Values.global.edition | quote }}
 {{- end }}
 
 {{- define "dify.api.config" -}}
@@ -177,10 +178,6 @@ CODE_EXECUTION_ENDPOINT: http://{{ template "dify.sandbox.fullname" .}}:{{ .Valu
 {{- end }}
 
 {{- define "dify.web.config" -}}
-{{- if .Values.global.edition }}
-# The edition of the application, SELF_HOSTED or CLOUD
-EDITION: {{ .Values.global.edition | quote }}
-{{- end }}
 # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai

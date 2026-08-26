@@ -4,7 +4,7 @@
 
 global:
   # The edition of the application, SELF_HOSTED or CLOUD
-  edition: "SELF_HOSTED"
+  edition: "COMMUNITY"
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
   appSecretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
   # A global secret key for all inter-component API calls among Dify containers (e.g. `api`, `sandbox`, `pluginDaemon` and `agentBackend`). You can generate a strong key using `openssl rand -base64 42`.

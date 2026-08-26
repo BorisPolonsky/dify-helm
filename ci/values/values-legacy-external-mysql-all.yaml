@@ -389,8 +389,6 @@ web:
   containerSecurityContext: {}
   extraEnv:
     # Apply your own Environment Variables if necessary
-    - name: EDITION
-      value: "SELF_HOSTED"
   service:
     port: 3000
     annotations: {}
