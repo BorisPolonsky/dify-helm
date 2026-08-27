@@ -3550,7 +3550,7 @@ externalSecret:
       DIFY_AGENT_SERVER_SECRET_KEY:
         key: "dify/agent-backend"
         property: "server_secret_key"
-      # Shared with localSandbox SHELLCTL_AUTH_TOKEN. Vault/store property may still be shellctl_auth_token.
+      # Shared with localSandbox SHELLCTL_AUTH_TOKEN
       DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN:
         key: "dify/agent-backend"
         property: "shellctl_auth_token"
