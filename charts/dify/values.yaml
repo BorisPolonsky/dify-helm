@@ -3246,6 +3246,17 @@ externalRedis:
     password: ""
 
 
+## @section External Agent Sandbox
+##
+
+###################################
+# External E2B sandbox
+# - these configs applies only if `externalE2bSandbox.enabled` is true; takes precedence over `localSandbox`
+###################################
+externalE2bSandbox:
+  enabled: false
+  apiKey: ""
+
 ## @Section External storage backend
 ##
 
@@ -3609,6 +3620,10 @@ externalSecret:
       DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN:
         key: "dify/agent-backend"
         property: "shellctl_auth_token"
+      # E2B Cloud API key (`DIFY_AGENT_E2B_API_KEY`). Used only when `externalE2bSandbox.enabled` is true.
+      DIFY_AGENT_E2B_API_KEY:
+        key: "dify/agent-backend"
+        property: "e2b_api_key"
       DIFY_AGENT_PLUGIN_DAEMON_API_KEY:
         key: "dify/plugin-daemon"
         property: "server_key"

@@ -548,7 +548,9 @@ HTTPS_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfPro
 DIFY_AGENT_PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.ports.daemon }}
 {{- end }}
 DIFY_AGENT_INNER_API_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }}
-{{- if .Values.localSandbox.enabled }}
+{{- if .Values.externalE2bSandbox.enabled }}
+DIFY_AGENT_RUNTIME_BACKEND: "e2b"
+{{- else if .Values.localSandbox.enabled }}
 DIFY_AGENT_RUNTIME_BACKEND: "local"
 DIFY_AGENT_LOCAL_SANDBOX_ENDPOINT: http://{{ template "dify.localSandbox.fullname" .}}:{{ .Values.localSandbox.service.port }}
 {{- if .Values.localSandbox.persistence.home.enabled }}

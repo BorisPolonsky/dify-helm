@@ -2536,6 +2536,9 @@ externalSecret:
       DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN:
         key: "dify/agent-backend"
         property: "shellctl_auth_token"
+      DIFY_AGENT_E2B_API_KEY:
+        key: "dify/agent-backend"
+        property: "e2b_api_key"
       DIFY_AGENT_PLUGIN_DAEMON_API_KEY:
         key: "dify/plugin-daemon"
         property: "server_key"

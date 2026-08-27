@@ -1207,6 +1207,13 @@
         }
       }
     },
+    "externalE2bSandbox": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "apiKey": { "type": "string" }
+      }
+    },
     "externalS3": {
       "type": "object",
       "properties": {

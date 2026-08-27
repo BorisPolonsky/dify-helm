@@ -140,6 +140,22 @@ externalRedis:
 ```
 Refer to `external<Service>` sections in `values.yaml` for each component to be used.
 
+#### External E2B sandbox (Agent runtime)
+
+Default install keeps Agent runtime `local` with in-cluster `localSandbox` and does not set `DIFY_AGENT_E2B_*`. Workflow Code-node `sandbox` / `CODE_EXECUTION_*` is unrelated.
+
+To use E2B Cloud instead, set `externalE2bSandbox.enabled: true`. Agent Backend stays running; the chart sets `DIFY_AGENT_RUNTIME_BACKEND=e2b` and `DIFY_AGENT_E2B_API_KEY` (not `E2B_API_KEY` / `E2B_API_TOKEN`) and omits `DIFY_AGENT_LOCAL_SANDBOX_*` even if `localSandbox.enabled` is still true. Recommend `localSandbox.enabled: false` so the unused sandbox is not deployed. Agent Backend needs egress to E2B. With ExternalSecret, provide `DIFY_AGENT_E2B_API_KEY` under `externalSecret.agentBackend.remoteRefs`.
+
+```yaml
+# values.yaml
+localSandbox:
+  enabled: false
+
+externalE2bSandbox:
+  enabled: true
+  apiKey: "your-e2b-api-key"
+```
+
 ## Advanced Topics
 ### Migrate Built-in Redis and PostgreSQL instances as Separate Releases
 #### Intro
@@ -454,7 +470,7 @@ When ExternalSecret is enabled, sensitive information for the following componen
 - **Code Execution Service**: API Key
 - **Plugin System**: Daemon Key, internal API Key
 - **Application Core**: Secret Key
-- **Agent Backend**: API token (shared with API/worker as `AGENT_BACKEND_API_TOKEN` / agent as `DIFY_AGENT_API_TOKEN`), server secret key, local sandbox auth token (`DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN`), Redis URL
+- **Agent Backend**: API token (shared with API/worker as `AGENT_BACKEND_API_TOKEN` / agent as `DIFY_AGENT_API_TOKEN`), server secret key, local sandbox auth token (`DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN`), E2B API key (`DIFY_AGENT_E2B_API_KEY` when `externalE2bSandbox.enabled`), Redis URL
 - **Local Sandbox**: Shellctl auth token (shared with agent `DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN`)
 
 Usage: Set `externalSecret.enabled: true` in values.yaml and configure the corresponding secretStore and remoteRefs parameters.

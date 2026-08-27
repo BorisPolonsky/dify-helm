@@ -270,7 +270,9 @@ DIFY_AGENT_REDIS_URL: {{ printf "redis://:%s@%s:%v/2" .auth.password $redisHost 
 DIFY_AGENT_PLUGIN_DAEMON_API_KEY: {{ .Values.pluginDaemon.auth.serverKey | default .Values.global.internalApiKey | b64enc | quote }}
 DIFY_AGENT_INNER_API_KEY: {{ .Values.api.auth.internalApiKey | default .Values.global.internalApiKey | b64enc | quote }}
 {{- end }}
-{{- if .Values.localSandbox.enabled }}
+{{- if .Values.externalE2bSandbox.enabled }}
+DIFY_AGENT_E2B_API_KEY: {{ .Values.externalE2bSandbox.apiKey | b64enc | quote }}
+{{- else if .Values.localSandbox.enabled }}
 DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN: {{ .Values.agentBackend.auth.shellctlAuthToken | b64enc | quote }}
 {{- end }}
 DIFY_AGENT_SERVER_SECRET_KEY: {{ .Values.agentBackend.auth.serverSecretKey | b64enc | quote }}
