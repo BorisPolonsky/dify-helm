@@ -1,12 +1,12 @@
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.17.0"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
 
   web:
     repository: langgenius/dify-web
-    tag: "1.17.0"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
 
   sandbox:
@@ -26,17 +26,17 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.6.10-local
+    tag: 0.6.3-local
     pullPolicy: IfNotPresent
 
   agentBackend:
     repository: langgenius/dify-agent-backend
-    tag: "1.17.0"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
 
   localSandbox:
     repository: langgenius/dify-agent-local-sandbox
-    tag: "1.17.0"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
 
 api:
@@ -172,7 +172,9 @@ web:
     timeoutSeconds: 5
     failureThreshold: 5
     successThreshold: 1
-  extraEnv: []
+  extraEnv:
+    - name: EDITION
+      value: "SELF_HOSTED"
   service:
     port: 3000
     annotations: {}
@@ -480,7 +482,7 @@ externalSecret:
       DIFY_AGENT_SERVER_SECRET_KEY:
         key: "dify/agent-backend"
         property: "server_secret_key"
-      DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN:
+      DIFY_AGENT_SHELLCTL_AUTH_TOKEN:
         key: "dify/agent-backend"
         property: "shellctl_auth_token"
       DIFY_AGENT_PLUGIN_DAEMON_API_KEY:

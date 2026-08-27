@@ -23,7 +23,6 @@ FILES_URL: {{ .Values.global.filesDomain | quote }}
 # used to display trigger endpoint API Base URL to the front-end.
 # Example: https://api.dify.ai
 TRIGGER_URL: {{ .Values.global.triggerDomain | quote }}
-DEPLOYMENT_EDITION: {{ .Values.global.edition | quote }}
 {{- end }}
 
 {{- define "dify.api.config" -}}
@@ -178,6 +177,10 @@ CODE_EXECUTION_ENDPOINT: http://{{ template "dify.sandbox.fullname" .}}:{{ .Valu
 {{- end }}
 
 {{- define "dify.web.config" -}}
+{{- if .Values.global.edition }}
+# The edition of the application, SELF_HOSTED or CLOUD
+EDITION: {{ .Values.global.edition | quote }}
+{{- end }}
 # The base URL of console application api server, refers to the Console base URL of WEB service if console domain is
 # different from api or web app domain.
 # example: http://cloud.dify.ai
@@ -549,11 +552,9 @@ DIFY_AGENT_PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}
 {{- end }}
 DIFY_AGENT_INNER_API_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }}
 {{- if .Values.localSandbox.enabled }}
-DIFY_AGENT_RUNTIME_BACKEND: "local"
-DIFY_AGENT_LOCAL_SANDBOX_ENDPOINT: http://{{ template "dify.localSandbox.fullname" .}}:{{ .Values.localSandbox.service.port }}
+DIFY_AGENT_SHELLCTL_ENTRYPOINT: http://{{ template "dify.localSandbox.fullname" .}}:{{ .Values.localSandbox.service.port }}
 {{- end }}
 DIFY_AGENT_STUB_API_BASE_URL: http://{{ template "dify.agentBackend.fullname" .}}:{{ .Values.agentBackend.service.port }}/agent-stub
-DIFY_AGENT_SANDBOX_FILES_BASE_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }}
 {{- end }}
 
 {{- define "dify.localSandbox.config" -}}
