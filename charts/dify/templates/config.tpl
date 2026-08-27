@@ -551,6 +551,13 @@ DIFY_AGENT_INNER_API_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.
 {{- if .Values.localSandbox.enabled }}
 DIFY_AGENT_RUNTIME_BACKEND: "local"
 DIFY_AGENT_LOCAL_SANDBOX_ENDPOINT: http://{{ template "dify.localSandbox.fullname" .}}:{{ .Values.localSandbox.service.port }}
+{{- if .Values.localSandbox.persistence.home.enabled }}
+DIFY_AGENT_LOCAL_SANDBOX_MATERIALIZED_HOME_ROOT: {{ .Values.localSandbox.persistence.home.mountPath | quote }}
+DIFY_AGENT_LOCAL_SANDBOX_HOME_SNAPSHOT_ROOT: {{ printf "%s/.snapshots" .Values.localSandbox.persistence.home.mountPath | quote }}
+{{- end }}
+{{- if .Values.localSandbox.persistence.workspace.enabled }}
+DIFY_AGENT_LOCAL_SANDBOX_WORKSPACE_ROOT: {{ .Values.localSandbox.persistence.workspace.mountPath | quote }}
+{{- end }}
 {{- end }}
 DIFY_AGENT_STUB_API_BASE_URL: http://{{ template "dify.agentBackend.fullname" .}}:{{ .Values.agentBackend.service.port }}/agent-stub
 DIFY_AGENT_SANDBOX_FILES_BASE_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }}

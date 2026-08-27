@@ -137,3 +137,63 @@ spec:
       storage: {{ $pvc.size }}
 {{- end }}
 {{- end }}
+
+
+{{- if .Values.localSandbox.enabled }}
+{{- $homePvc := .Values.localSandbox.persistence.home.persistentVolumeClaim -}}
+{{- if and .Values.localSandbox.persistence.home.enabled (not $homePvc.existingClaim) }}
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ printf "%s-home" (include "dify.localSandbox.fullname" . | trunc 58) }}
+{{- with .Values.localSandbox.persistence.home.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - {{ $homePvc.accessModes | quote }}
+  {{- if $homePvc.storageClass }}
+  {{- if eq "-" $homePvc.storageClass }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ $homePvc.storageClass }}
+  {{- end }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $homePvc.size }}
+{{- end }}
+{{- $workspacePvc := .Values.localSandbox.persistence.workspace.persistentVolumeClaim -}}
+{{- if and .Values.localSandbox.persistence.workspace.enabled (not $workspacePvc.existingClaim) }}
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ printf "%s-workspace" (include "dify.localSandbox.fullname" . | trunc 53) }}
+{{- with .Values.localSandbox.persistence.workspace.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+  labels:
+    {{- include "dify.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - {{ $workspacePvc.accessModes | quote }}
+  {{- if $workspacePvc.storageClass }}
+  {{- if eq "-" $workspacePvc.storageClass }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ $workspacePvc.storageClass }}
+  {{- end }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $workspacePvc.size }}
+{{- end }}
+{{- end }}
