@@ -1218,10 +1218,28 @@ localSandbox:
   ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
   ##
   hostAliases: []
-  # Configure Pods Security Context
-  podSecurityContext: {}
-  # Configure Container Security Context
-  containerSecurityContext: {}
+  ## Configure Pods Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param localSandbox.podSecurityContext.enabled Enabled Dify local sandbox pod's Security Context
+  ## @param localSandbox.podSecurityContext.fsGroup Set Dify local sandbox pod's Security Context fsGroup
+  ## @param localSandbox.podSecurityContext.fsGroupChangePolicy Set Dify local sandbox pod's Security Context fsGroupChangePolicy
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1000
+    fsGroupChangePolicy: OnRootMismatch
+  ## Configure Container Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param localSandbox.containerSecurityContext.enabled Dify local sandbox containers' Security Context
+  ## @param localSandbox.containerSecurityContext.runAsUser Set Dify local sandbox containers' Security Context runAsUser
+  ## @param localSandbox.containerSecurityContext.runAsGroup Set Dify local sandbox containers' Security Context runAsGroup
+  ## @param localSandbox.containerSecurityContext.runAsNonRoot Set Dify local sandbox containers' Security Context runAsNonRoot
+  ##
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
   extraEnv: []
   persistence:
     home:

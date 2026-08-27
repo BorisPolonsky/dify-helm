@@ -60,9 +60,8 @@ spec:
       hostAliases:
         {{- toYaml .Values.localSandbox.hostAliases | nindent 8 }}
       {{- end }}
-      {{- if .Values.localSandbox.podSecurityContext }}
-      securityContext:
-        {{- toYaml .Values.localSandbox.podSecurityContext | nindent 8 }}
+      {{- if .Values.localSandbox.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.localSandbox.podSecurityContext "enabled" | toYaml | nindent 8 }}
       {{- end }}
       containers:
         - image: "{{ .Values.image.localSandbox.repository }}:{{ default .Chart.AppVersion .Values.image.localSandbox.tag }}"
@@ -91,9 +90,8 @@ spec:
             tcpSocket:
               port: local-sandbox
           {{- end }}
-          {{- if .Values.localSandbox.containerSecurityContext }}
-          securityContext:
-            {{- toYaml .Values.localSandbox.containerSecurityContext | nindent 12 }}
+          {{- if .Values.localSandbox.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.localSandbox.containerSecurityContext "enabled" | toYaml | nindent 12 }}
           {{- end }}
           env:
             {{- if .Values.localSandbox.extraEnv }}
