@@ -1223,6 +1223,43 @@ localSandbox:
   # Configure Container Security Context
   containerSecurityContext: {}
   extraEnv: []
+  persistence:
+    home:
+      ## @param localSandbox.persistence.home.enabled Enable persistence on home using Persistent Volume Claims
+      ##
+      enabled: true
+      mountPath: "/home/dify"
+      annotations:
+        helm.sh/resource-policy: keep
+      persistentVolumeClaim:
+        existingClaim: ""
+        ## Local sandbox home Persistent Volume Storage Class
+        ## If defined, storageClassName: <storageClass>
+        ## If set to "-", storageClassName: "", which disables dynamic provisioning
+        ## If undefined (the default) or set to null, no storageClassName spec is
+        ##   set, choosing the default provisioner.
+        storageClass:
+        accessModes: ReadWriteOnce
+        size: 5Gi
+        subPath: ""
+    workspace:
+      ## @param localSandbox.persistence.workspace.enabled Enable persistence on agent workspace using Persistent Volume Claims
+      ##
+      enabled: true
+      mountPath: "/workspace"
+      annotations:
+        helm.sh/resource-policy: keep
+      persistentVolumeClaim:
+        existingClaim: ""
+        ## Local sandbox workspace Persistent Volume Storage Class
+        ## If defined, storageClassName: <storageClass>
+        ## If set to "-", storageClassName: "", which disables dynamic provisioning
+        ## If undefined (the default) or set to null, no storageClassName spec is
+        ##   set, choosing the default provisioner.
+        storageClass:
+        accessModes: ReadWriteOnce
+        size: 5Gi
+        subPath: ""
   ## @param localSandbox.extraVolumes Optionally specify extra list of additional volumes for the local sandbox pod(s)
   ##
   extraVolumes: []

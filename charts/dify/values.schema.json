@@ -1061,6 +1061,47 @@
         "podSecurityContext": { "type": "object" },
         "containerSecurityContext": { "type": "object" },
         "extraEnv": { "type": "array" },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "home": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "mountPath": { "type": "string" },
+                "annotations": { "type": "object" },
+                "persistentVolumeClaim": {
+                  "type": "object",
+                  "properties": {
+                    "existingClaim": { "type": "string" },
+                    "storageClass": { "type": ["string", "null"] },
+                    "accessModes": { "type": "string" },
+                    "size": { "type": "string" },
+                    "subPath": { "type": "string" }
+                  }
+                }
+              }
+            },
+            "workspace": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean" },
+                "mountPath": { "type": "string" },
+                "annotations": { "type": "object" },
+                "persistentVolumeClaim": {
+                  "type": "object",
+                  "properties": {
+                    "existingClaim": { "type": "string" },
+                    "storageClass": { "type": ["string", "null"] },
+                    "accessModes": { "type": "string" },
+                    "size": { "type": "string" },
+                    "subPath": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
         "extraVolumes": { "type": "array" },
         "extraVolumeMounts": { "type": "array" },
         "service": {
