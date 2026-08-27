@@ -3,8 +3,8 @@
 # Declare variables to be passed into your templates.
 
 global:
-  # The edition of the application
-  edition: "COMMUNITY"
+  # The edition of the application, SELF_HOSTED or CLOUD
+  edition: "SELF_HOSTED"
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
   appSecretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
   # A global secret key for all inter-component API calls among Dify containers (e.g. `api`, `sandbox`, `pluginDaemon` and `agentBackend`). You can generate a strong key using `openssl rand -base64 42`.
@@ -46,7 +46,7 @@ global:
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.17.0"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -57,7 +57,7 @@ image:
 
   web:
     repository: langgenius/dify-web
-    tag: "1.17.0"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -101,7 +101,7 @@ image:
 
   pluginDaemon:
     repository: langgenius/dify-plugin-daemon
-    tag: 0.6.10-local
+    tag: 0.6.3-local
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -112,7 +112,7 @@ image:
 
   agentBackend:
     repository: langgenius/dify-agent-backend
-    tag: "1.17.0"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -123,7 +123,7 @@ image:
 
   localSandbox:
     repository: langgenius/dify-agent-local-sandbox
-    tag: "1.17.0"
+    tag: "1.16.1"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -1146,7 +1146,7 @@ agentBackend:
     ## Generate one with: python -c 'import secrets; print(secrets.token_urlsafe(32))'
     ##
     serverSecretKey: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY"
-    ## @param agentBackend.auth.shellctlAuthToken Shared as agent DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN and localSandbox SHELLCTL_AUTH_TOKEN
+    ## @param agentBackend.auth.shellctlAuthToken Shared as agent DIFY_AGENT_SHELLCTL_AUTH_TOKEN and localSandbox SHELLCTL_AUTH_TOKEN
     ##
     shellctlAuthToken: ""
 
@@ -3550,8 +3550,8 @@ externalSecret:
       DIFY_AGENT_SERVER_SECRET_KEY:
         key: "dify/agent-backend"
         property: "server_secret_key"
-      # Shared with localSandbox SHELLCTL_AUTH_TOKEN. Vault/store property may still be shellctl_auth_token.
-      DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN:
+      # Shared with localSandbox SHELLCTL_AUTH_TOKEN
+      DIFY_AGENT_SHELLCTL_AUTH_TOKEN:
         key: "dify/agent-backend"
         property: "shellctl_auth_token"
       DIFY_AGENT_PLUGIN_DAEMON_API_KEY:
@@ -3569,7 +3569,7 @@ externalSecret:
     # Whether to create ExternalSecret for local sandbox
     enabled: true
     remoteRefs:
-      # Shared with agentBackend DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN
+      # Shared with agentBackend DIFY_AGENT_SHELLCTL_AUTH_TOKEN
       SHELLCTL_AUTH_TOKEN:
         key: "dify/agent-backend"
         property: "shellctl_auth_token"
