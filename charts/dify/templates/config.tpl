@@ -548,7 +548,21 @@ HTTPS_PROXY: http://{{ template "dify.ssrfProxy.fullname" .}}:{{ .Values.ssrfPro
 DIFY_AGENT_PLUGIN_DAEMON_URL: http://{{ template "dify.pluginDaemon.fullname" .}}:{{ .Values.pluginDaemon.service.ports.daemon }}
 {{- end }}
 DIFY_AGENT_INNER_API_URL: http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }}
-{{- if .Values.localSandbox.enabled }}
+{{- if .Values.externalE2bSandbox.enabled }}
+DIFY_AGENT_RUNTIME_BACKEND: "e2b"
+{{- if .Values.externalE2bSandbox.apiUrl }}
+E2B_API_URL: {{ .Values.externalE2bSandbox.apiUrl | quote }}
+{{- end }}
+{{- if .Values.externalE2bSandbox.domain }}
+E2B_DOMAIN: {{ .Values.externalE2bSandbox.domain | quote }}
+{{- end }}
+{{- if .Values.externalE2bSandbox.template }}
+DIFY_AGENT_E2B_TEMPLATE: {{ .Values.externalE2bSandbox.template | quote }}
+{{- end }}
+{{- if .Values.externalE2bSandbox.tls.enabled }}
+SSL_CERT_FILE: {{ printf "/etc/ssl/dify/e2b/%s" .Values.externalE2bSandbox.tls.certCAFilename | quote }}
+{{- end }}
+{{- else if .Values.localSandbox.enabled }}
 DIFY_AGENT_RUNTIME_BACKEND: "local"
 DIFY_AGENT_LOCAL_SANDBOX_ENDPOINT: http://{{ template "dify.localSandbox.fullname" .}}:{{ .Values.localSandbox.service.port }}
 {{- if .Values.localSandbox.persistence.home.enabled }}
@@ -691,6 +705,13 @@ server {
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
       proxy_cache_bypass $http_upgrade;
+    }
+    {{- end }}
+
+    {{- if and .Values.externalE2bSandbox.enabled .Values.agentBackend.enabled }}
+    location /agent-stub {
+      proxy_pass http://{{ template "dify.agentBackend.fullname" .}}:{{ .Values.agentBackend.service.port }};
+      include proxy.conf;
     }
     {{- end }}
 

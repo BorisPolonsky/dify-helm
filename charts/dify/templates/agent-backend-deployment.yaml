@@ -30,6 +30,9 @@ spec:
       annotations:
         checksum/agent-backend-config: {{ include (print $.Template.BasePath "/agent-backend-config.yaml") . | sha256sum }}
         checksum/agent-backend-secret: {{ include (print $.Template.BasePath "/agent-backend-secret.yaml") . | sha256sum }}
+        {{- if and .Values.externalE2bSandbox.enabled .Values.externalE2bSandbox.tls.enabled (not .Values.externalE2bSandbox.tls.existingSecret) }}
+        checksum/e2b-tls-secret: {{ include (print $.Template.BasePath "/e2b-tls-secret.yaml") . | sha256sum }}
+        {{- end }}
         {{- include "dify.ud.annotations" . | nindent 8 }}
       labels:
         {{- include "dify.selectorLabels" . | nindent 8 }}
@@ -106,13 +109,30 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.agentBackend.resources | nindent 14 }}
-          {{- if .Values.agentBackend.extraVolumeMounts }}
+          {{- if or (and .Values.externalE2bSandbox.enabled .Values.externalE2bSandbox.tls.enabled) .Values.agentBackend.extraVolumeMounts }}
           volumeMounts:
+            {{- if and .Values.externalE2bSandbox.enabled .Values.externalE2bSandbox.tls.enabled }}
+            - name: e2b-tls-ca
+              mountPath: /etc/ssl/dify/e2b
+              readOnly: true
+            {{- end }}
+            {{- if .Values.agentBackend.extraVolumeMounts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.agentBackend.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
           {{- end }}
-      {{- if .Values.agentBackend.extraVolumes }}
+      {{- if or (and .Values.externalE2bSandbox.enabled .Values.externalE2bSandbox.tls.enabled) .Values.agentBackend.extraVolumes }}
       volumes:
+        {{- if and .Values.externalE2bSandbox.enabled .Values.externalE2bSandbox.tls.enabled }}
+        - name: e2b-tls-ca
+          secret:
+            secretName: {{ default (printf "%s-e2b-tls" (include "dify.fullname" .)) .Values.externalE2bSandbox.tls.existingSecret }}
+            items:
+              - key: {{ .Values.externalE2bSandbox.tls.certCAFilename | quote }}
+                path: {{ .Values.externalE2bSandbox.tls.certCAFilename | quote }}
+        {{- end }}
+        {{- if .Values.agentBackend.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.agentBackend.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
       {{- end }}
     {{- if and (.Values.nodeSelector) (not .Values.agentBackend.nodeSelector) }}
       nodeSelector:

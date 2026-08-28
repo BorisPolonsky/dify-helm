@@ -1207,6 +1207,25 @@
         }
       }
     },
+    "externalE2bSandbox": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "domain": { "type": "string" },
+        "apiKey": { "type": "string" },
+        "apiUrl": { "type": "string" },
+        "template": { "type": "string" },
+        "tls": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "existingSecret": { "type": "string" },
+            "certCAFilename": { "type": "string" },
+            "ca": { "type": "string" }
+          }
+        }
+      }
+    },
     "externalS3": {
       "type": "object",
       "properties": {
