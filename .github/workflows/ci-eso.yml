@@ -344,6 +344,7 @@ jobs:
             --set auth.database="dify" \
             --set primary.service.type="ClusterIP" \
             --set primary.service.ports.mysql=3306 \
+            --set primary.extraFlags="--character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci" \
             --wait \
             --timeout 300s
 
