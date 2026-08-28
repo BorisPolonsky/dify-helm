@@ -3255,7 +3255,25 @@ externalRedis:
 ###################################
 externalE2bSandbox:
   enabled: false
+  domain: "e2b.app"
   apiKey: ""
+  apiUrl: ""
+  template: ""
+  ## Optional TLS CA for self-hosted / regional E2B suppliers. Official e2b.dev does not need this.
+  ## When enabled, require `existingSecret` or `ca` (`existingSecret` wins). CA only: do not set leaf cert/key.
+  tls:
+    ## @param externalE2bSandbox.tls.enabled Verify the supplier with a custom certificate CA
+    ##
+    enabled: false
+    ## @param externalE2bSandbox.tls.existingSecret Name of a secret containing the certificate CA
+    ##
+    existingSecret: ""
+    ## @param externalE2bSandbox.tls.certCAFilename Path of the certificate CA file when mounted as a secret
+    ##
+    certCAFilename: ca.crt
+    ## @param externalE2bSandbox.tls.ca Content of the certificate CA to be added to the secret
+    ##
+    ca: ""
 
 ## @Section External storage backend
 ##

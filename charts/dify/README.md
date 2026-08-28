@@ -19,7 +19,7 @@ Fear not its extensive content as it is arranged in sections below:
 1. Image: Adjust images of all Dify components
 2. Dify Service: Customize configurations of each Dify component
 3. Middleware: Specifies the configuration of built-in middlewares
-4. External services: Substitute external services for built-in data persistence
+4. External services: Substitute external services for built-in middlewares, data persistence and agent sandboxes
  
 ### 1. Use Alternative Images
 You can specify custom images for different components:
