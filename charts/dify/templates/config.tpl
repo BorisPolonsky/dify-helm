@@ -708,6 +708,13 @@ server {
     }
     {{- end }}
 
+    {{- if and .Values.externalE2bSandbox.enabled .Values.agentBackend.enabled }}
+    location /agent-stub {
+      proxy_pass http://{{ template "dify.agentBackend.fullname" .}}:{{ .Values.agentBackend.service.port }};
+      include proxy.conf;
+    }
+    {{- end }}
+
     location / {
       proxy_pass http://{{ template "dify.web.fullname" .}}:{{ .Values.web.service.port }};
       include proxy.conf;

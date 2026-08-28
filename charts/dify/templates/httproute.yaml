@@ -84,6 +84,15 @@ spec:
         - name: {{ include "dify.apiWebsocket.fullname" . }}
           port: {{ .Values.apiWebsocket.service.port }}
     {{- end }}
+    {{- if and .Values.externalE2bSandbox.enabled .Values.agentBackend.enabled }}
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /agent-stub
+      backendRefs:
+        - name: {{ include "dify.agentBackend.fullname" . }}
+          port: {{ .Values.agentBackend.service.port }}
+    {{- end }}
     {{- if .Values.web.enabled }}
     - backendRefs:
         - name: {{ include "dify.web.fullname" . }}
