@@ -25,15 +25,15 @@ The following diagram illustrates the complete network architecture and service 
 
 ```mermaid
 graph TB
-    %% External Traffic Entry Points
-    Internet[🌐 Internet] --> Ingress[🚪 Ingress]
-    Internet --> Gateway["🚪 Gateway API"]
-    Internet --> LB[⚖️ LoadBalancer]
+    subgraph ClusterIngress [Cluster Ingress]
+        Ingress[🚪 Ingress]
+        Gateway["🚪 Gateway API"]
+        LB[⚖️ LoadBalancer]
+    end
+    Internet[🌐 Internet] --> ClusterIngress
 
     %% Main Traffic Flow
-    Ingress --> ProxyService[🔄 Proxy Service<br/>Port: 80]
-    Gateway --> ProxyService
-    LB --> ProxyService
+    ClusterIngress --> ProxyService[🔄 Proxy Service<br/>Port: 80]
 
     %% Proxy Pod and Routing
     ProxyService --> ProxyPod[📦 Proxy Pod<br/>nginx:latest<br/>Port: 80]
@@ -43,6 +43,7 @@ graph TB
     ProxyPod -->|Web Pages| WebService[🌐 Web Service<br/>Port: 3000]
     ProxyPod -->|Plugin Routes| PluginService[🔌 Plugin Daemon Service<br/>Port: 5002]
     ProxyPod -->|Marketplace| MarketplaceAPI[🛒 Marketplace API<br/>External]
+    ProxyPod -->|Agent Stub| AgentBackendService[🤖 Agent Backend Service<br/>Port: 5050]
 
     %% Backend Pods
     APIService --> APIPod[📦 API Pod<br/>langgenius/dify-api:1.17.0<br/>Port: 5001]
@@ -140,6 +141,7 @@ graph TB
         ExternalRedis[(🔴 External Redis)]
         ExternalVector[(🧮 External Vector DB)]
         ExternalStorage[(💾 External Object Storage)]
+        ExternalE2B[(☁️ External E2B Sandbox)]
     end
 
     %% External Service Connections (Alternative)
@@ -147,6 +149,10 @@ graph TB
     APIPod -.->|Alternative| ExternalRedis
     APIPod -.->|Alternative| ExternalVector
     APIPod -.->|Alternative| ExternalStorage
+    AgentBackendPod -.->|Alternative| ExternalE2B
+    ExternalE2B -.->|"Agent Stub, signed /files"| ClusterIngress
+    ExternalE2B -.->|"Alternative (Agent Stub)"| AgentBackendService
+    ExternalE2B -.->|"Alternative (signed /files)"| APIService
 
     %% Styling
     classDef podClass fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
@@ -157,7 +163,7 @@ graph TB
     class APIPod,WebPod,WorkerPod,BeatPod,SandboxPod,SSRFPod,PluginPod,AgentBackendPod,LocalSandboxPod podClass
     class APIService,WebService,SandboxService,SSRFService,PluginService,ProxyService,AgentBackendService,LocalSandboxService serviceClass
     class PostgresService,RedisService,VectorDBService,WeaviateDB,QdrantDB,MilvusDB,PGVectorDB storageClass
-    class ExternalDB,ExternalRedis,ExternalVector,ExternalStorage,S3Storage,AzureStorage,GCSStorage externalClass
+    class ExternalDB,ExternalRedis,ExternalVector,ExternalStorage,ExternalE2B,S3Storage,AzureStorage,GCSStorage,MarketplaceAPI externalClass
 ```
 
 ### Traffic Routing Rules
