@@ -19,6 +19,123 @@ helm install my-release dify/dify
 ```
 For customized installation, please refer to the [README.md](https://github.com/BorisPolonsky/dify-helm/blob/master/charts/dify/README.md) file.
 
+## Production Setup
+
+The default installation is intended for evaluation. Before running production workloads, apply the following changes in order of priority. Each item links to the corresponding section of the [chart README](https://github.com/BorisPolonsky/dify-helm/blob/master/charts/dify/README.md) for details.
+
+### 1. Change Default Credentials (P0)
+
+The chart ships with placeholder secrets. Replace them with strong random values (`openssl rand -base64 42`):
+
+```yaml
+# values.yaml
+global:
+  appSecretKey: "<openssl rand -base64 42>"     # session signing and DB encryption
+  internalApiKey: "<openssl rand -base64 42>""   # inter-component auth: sandbox, plugin daemon
+```
+
+If you keep the built-in middlewares, their credentials are set at:
+
+```yaml
+# values.yaml
+postgresql:
+  global:
+    postgresql:
+      auth:
+        postgresPassword: "your-credentials"
+
+redis:
+  auth:
+    password: "your-credentials"
+```
+
+### 2. Use External Data Services (P1)
+
+Built-in Redis, PostgreSQL and Weaviate are single-node subcharts suited for evaluation. For production, disable them and point to managed or independently operated instances:
+
+```yaml
+# values.yaml
+redis:
+  enabled: false
+
+externalRedis:
+  enabled: true
+  host: "redis.example"
+  port: 6379
+  password: "<your-redis-password>"
+
+# vector DB: disable built-in Weaviate, point to an external one
+weaviate:
+  enabled: false
+
+externalWeaviate:
+  enabled: true
+  endpoint:
+    http: "http://weaviate.example:8080"
+    grpc: "grpc://weaviate.example:50051"
+  apiKey: "<your-weaviate-api-key>"
+```
+
+The same pattern applies to `externalPostgres`, `externalMysql`, and other external vector DBs (`externalQdrant`, `externalMilvus`, ...). See [Opt in External Services](https://github.com/BorisPolonsky/dify-helm/blob/master/charts/dify/README.md#4-opt-in-external-services).
+
+### 3. Enable HA (P1)
+
+All Dify components default to a single replica. Scale the stateless components:
+
+```yaml
+# values.yaml
+api:
+  replicas: 2      # or autoscaling.enabled: true
+worker:
+  replicas: 2
+web:
+  replicas: 2
+```
+
+Notes:
+- `beat` must remain a single replica (Celery Beat is a singleton scheduler).
+- When scaling beyond one API replica, use external object storage (or a `ReadWriteMany` PVC) for file uploads, since the default local volume is `ReadWriteOnce`.
+
+### 4. Cluster Entry (P1)
+
+Exposure is disabled by default. Use Gateway API by attaching an `httproute` to your Gateway (Ingress stays disabled):
+
+```yaml
+# values.yaml
+ingress:
+  enabled: false
+
+httproute:
+  enabled: true
+  parentRefs:
+    - name: my-gateway
+  hostnames:
+    - dify.example.com
+```
+
+TLS is terminated at the referenced Gateway.
+
+### 5. Set Resource Requests and Limits (P2)
+
+All components default to unset resources. Set requests/limits per component:
+
+```yaml
+# values.yaml
+api:
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      memory: 2Gi
+```
+
+### 6. Pin Image Tags (P2)
+
+Most images are pinned by the chart, but `proxy` (nginx) and `ssrfProxy` (squid) default to `latest`. Pin them explicitly in `image.proxy.tag` and `image.ssrfProxy.tag` for reproducible deployments.
+
+For secret management with External Secrets Operator, see [ExternalSecret Support](https://github.com/BorisPolonsky/dify-helm/blob/master/charts/dify/README.md#externalsecret-support).
+
 ## Network Architecture
 
 The following diagram illustrates the complete network architecture and service topology of the Dify Helm deployment:
