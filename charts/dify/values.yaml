@@ -1147,6 +1147,7 @@ agentBackend:
     ##
     serverSecretKey: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY"
     ## @param agentBackend.auth.shellctlAuthToken Shared as agent DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN and localSandbox SHELLCTL_AUTH_TOKEN
+    ## If not set, uses global.internalApiKey
     ##
     shellctlAuthToken: ""
 
