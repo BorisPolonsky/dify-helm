@@ -1395,7 +1395,7 @@ weaviate:
     # of weaviate. In accordance with Infra-as-code, you should pin this value
     # down and only change it if you explicitly want to upgrade the Weaviate
     # version.
-    tag: 1.39.2
+    tag: 1.39.13
     repo: semitechnologies/weaviate
     # Image pull policy: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
     pullPolicy: IfNotPresent
