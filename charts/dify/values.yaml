@@ -1395,7 +1395,7 @@ weaviate:
     # of weaviate. In accordance with Infra-as-code, you should pin this value
     # down and only change it if you explicitly want to upgrade the Weaviate
     # version.
-    tag: 1.27.27
+    tag: 1.39.2
     repo: semitechnologies/weaviate
     # Image pull policy: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
     pullPolicy: IfNotPresent
@@ -1505,10 +1505,10 @@ weaviate:
   # See https://github.com/weaviate/weaviate-helm/issues/175 for details.
   clusterDomain: cluster.local.
 
-  # The Persistent Volume Claim settings for Weaviate. If there's a
-  # storage.fullnameOverride field set, then the default pvc will not be
-  # created, instead the one defined in fullnameOverride will be used
+  # The Persistent Volume Claim settings for Weaviate. The given name will be used as the
+  # prefix for the volumes (e.g. first replica will use {{ .Values.storage.name }}-weaviate-0)
   storage:
+    name: "weaviate-data"
     size: 32Gi
     storageClassName: ""
 
@@ -1623,8 +1623,15 @@ weaviate:
       # username_claim: ''
       # groups_claim: ''
       # client_id: ''
-
+      # skip_client_id_check: false
+      # namespace_claim: ''
+      # global_principal_claim: ''
   authorization:
+    rbac:
+      enabled: false
+      # admins:
+      # - admin_user1
+      # - admin_user2
     admin_list:
       enabled: true
       users:
