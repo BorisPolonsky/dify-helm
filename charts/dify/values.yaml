@@ -1175,6 +1175,9 @@ localSandbox:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param localSandbox.command Default startup command for the local sandbox container
+  ##
+  command: ["shellctl", "serve", "--listen", "0.0.0.0:5004", "--require-auth-token"]
   ## @param localSandbox.shareProcessNamespace Share a single process namespace between all of the containers in Dify local sandbox pods
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
   ##

@@ -67,6 +67,10 @@ spec:
         - image: "{{ .Values.image.localSandbox.repository }}:{{ default .Chart.AppVersion .Values.image.localSandbox.tag }}"
           imagePullPolicy: "{{ .Values.image.localSandbox.pullPolicy }}"
           name: local-sandbox
+          {{- if .Values.localSandbox.command }}
+          command:
+            {{- toYaml .Values.localSandbox.command | nindent 12 }}
+          {{- end }}
           {{- if .Values.localSandbox.customLivenessProbe }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.localSandbox.customLivenessProbe "context" $) | nindent 12 }}
           {{- else if .Values.localSandbox.livenessProbe.enabled }}
