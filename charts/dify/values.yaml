@@ -7,9 +7,9 @@ global:
   edition: "COMMUNITY"
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
   appSecretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
-  # A global secret key for all inter-component API calls among Dify containers (e.g. `api`, `sandbox`, `pluginDaemon` and `agentBackend`). You can generate a strong key using `openssl rand -base64 42`.
+  # A global secret key for all inter-component API calls among Dify containers (e.g. `api`, `sandbox`, `pluginDaemon`, `agentBackend` and `localSandbox`). You can generate a strong key using `openssl rand -base64 42`.
   # Takes no effect when left empty. Can be overridden by component-specific values.
-  internalApiKey: ""
+  internalApiKey: "YOUR-INTERNAL-API-KEY"
   # The backend domain of the console API, used to concatenate the authorization callback.
   # If empty, it is the same domain. Example: console.dify.ai
   consoleApiDomain: ""
@@ -46,7 +46,7 @@ global:
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.17.0"
+    tag: "1.18.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -57,7 +57,7 @@ image:
 
   web:
     repository: langgenius/dify-web
-    tag: "1.17.0"
+    tag: "1.18.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -112,7 +112,7 @@ image:
 
   agentBackend:
     repository: langgenius/dify-agent-backend
-    tag: "1.17.0"
+    tag: "1.18.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -123,7 +123,7 @@ image:
 
   localSandbox:
     repository: langgenius/dify-agent-local-sandbox
-    tag: "1.17.0"
+    tag: "1.18.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -1147,6 +1147,7 @@ agentBackend:
     ##
     serverSecretKey: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY"
     ## @param agentBackend.auth.shellctlAuthToken Shared as agent DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN and localSandbox SHELLCTL_AUTH_TOKEN
+    ## If not set, uses global.internalApiKey
     ##
     shellctlAuthToken: ""
 
@@ -1174,6 +1175,9 @@ localSandbox:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param localSandbox.command Default startup command for the local sandbox container
+  ##
+  command: ["shellctl", "serve", "--listen", "0.0.0.0:5004", "--require-auth-token"]
   ## @param localSandbox.shareProcessNamespace Share a single process namespace between all of the containers in Dify local sandbox pods
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
   ##
