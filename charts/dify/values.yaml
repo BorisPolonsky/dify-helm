@@ -7,9 +7,9 @@ global:
   edition: "COMMUNITY"
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
   appSecretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
-  # A global secret key for all inter-component API calls among Dify containers (e.g. `api`, `sandbox`, `pluginDaemon` and `agentBackend`). You can generate a strong key using `openssl rand -base64 42`.
+  # A global secret key for all inter-component API calls among Dify containers (e.g. `api`, `sandbox`, `pluginDaemon`, `agentBackend` and `localSandbox`). You can generate a strong key using `openssl rand -base64 42`.
   # Takes no effect when left empty. Can be overridden by component-specific values.
-  internalApiKey: ""
+  internalApiKey: "YOUR-INTERNAL-API-KEY"
   # The backend domain of the console API, used to concatenate the authorization callback.
   # If empty, it is the same domain. Example: console.dify.ai
   consoleApiDomain: ""
