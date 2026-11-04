@@ -25,14 +25,16 @@ The default installation is intended for evaluation. Before running production w
 
 ### 1. Change Default Credentials (P0)
 
-The chart ships with placeholder secrets. Replace them with strong random values (`openssl rand -base64 42`):
+The chart ships with placeholder secrets. Replace every default key that actually takes effect — including `global.internalApiKey` (`YOUR-INTERNAL-API-KEY`) and other shipped credentials — with strong random values (`openssl rand -base64 42`):
 
 ```yaml
 # values.yaml
 global:
   appSecretKey: "<openssl rand -base64 42>"     # session signing and DB encryption
-  internalApiKey: "<openssl rand -base64 42>""   # inter-component auth: sandbox, plugin daemon
+  internalApiKey: "<openssl rand -base64 42>"   # inter-component auth: sandbox, plugin daemon, local sandbox
 ```
+
+`global.internalApiKey` is shared by sandbox, plugin daemon, and local sandbox. Leave `agentBackend.auth.shellctlAuthToken` unset to reuse that key, or set it to override only the local-sandbox token.
 
 If you keep the built-in middlewares, their credentials are set at:
 

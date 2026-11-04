@@ -29,9 +29,10 @@ The default installation targets evaluation. For production, apply the following
 # values.yaml (production skeleton, ordered as in values.yaml)
 global:                                        # replace default credentials (P0)
   appSecretKey: "<openssl rand -base64 42>"    #   session signing / DB encryption
-  internalApiKey: "<openssl rand -base64 42>"  #   covers sandbox / plugin daemon
+  internalApiKey: "<openssl rand -base64 42>"  #   sandbox / plugin daemon / local sandbox
 # if keeping built-in middlewares: postgresql.global.postgresql.auth.postgresPassword,
 # redis.auth.password — otherwise set credentials on the external services below
+# leave agentBackend.auth.shellctlAuthToken unset to reuse internalApiKey for local sandbox
 
 image:                                         # pin proxy/ssrfProxy tags (P2)
   proxy:
@@ -82,6 +83,7 @@ externalWeaviate:
 ```
 
 Notes:
+- Replace every default key that actually takes effect (including `YOUR-INTERNAL-API-KEY` and other shipped credentials) before production use.
 - `beat` must remain a single replica (Celery Beat singleton).
 - Multiple API replicas require external object storage or a `ReadWriteMany` PVC for file uploads.
 - TLS for the `httproute` entry is terminated at the referenced Gateway.
