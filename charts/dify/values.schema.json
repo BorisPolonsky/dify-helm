@@ -1002,6 +1002,11 @@
         "affinity": { "type": "object" },
         "tolerations": { "type": "array" },
         "priorityClassName": { "type": "string" },
+        "command": {
+          "type": "array",
+          "description": "Default startup command for the local sandbox container.",
+          "default": ["shellctl", "serve", "--listen", "0.0.0.0:5004", "--require-auth-token"]
+        },
         "shareProcessNamespace": {
           "type": "boolean",
           "description": "Share a single process namespace between all of the containers in Dify local sandbox pods.",

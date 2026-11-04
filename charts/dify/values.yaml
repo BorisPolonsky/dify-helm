@@ -7,9 +7,9 @@ global:
   edition: "COMMUNITY"
   # A secret key that is used for securely signing the session cookie and encrypting sensitive information on the database. You can generate a strong key using `openssl rand -base64 42`.
   appSecretKey: "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U"
-  # A global secret key for all inter-component API calls among Dify containers (e.g. `api`, `sandbox`, `pluginDaemon` and `agentBackend`). You can generate a strong key using `openssl rand -base64 42`.
+  # A global secret key for all inter-component API calls among Dify containers (e.g. `api`, `sandbox`, `pluginDaemon`, `agentBackend` and `localSandbox`). You can generate a strong key using `openssl rand -base64 42`.
   # Takes no effect when left empty. Can be overridden by component-specific values.
-  internalApiKey: ""
+  internalApiKey: "YOUR-INTERNAL-API-KEY"
   # The backend domain of the console API, used to concatenate the authorization callback.
   # If empty, it is the same domain. Example: console.dify.ai
   consoleApiDomain: ""
@@ -46,7 +46,7 @@ global:
 image:
   api:
     repository: langgenius/dify-api
-    tag: "1.17.0"
+    tag: "1.18.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -57,7 +57,7 @@ image:
 
   web:
     repository: langgenius/dify-web
-    tag: "1.17.0"
+    tag: "1.18.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -112,7 +112,7 @@ image:
 
   agentBackend:
     repository: langgenius/dify-agent-backend
-    tag: "1.17.0"
+    tag: "1.18.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -123,7 +123,7 @@ image:
 
   localSandbox:
     repository: langgenius/dify-agent-local-sandbox
-    tag: "1.17.0"
+    tag: "1.18.0"
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
@@ -1147,6 +1147,7 @@ agentBackend:
     ##
     serverSecretKey: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY"
     ## @param agentBackend.auth.shellctlAuthToken Shared as agent DIFY_AGENT_LOCAL_SANDBOX_AUTH_TOKEN and localSandbox SHELLCTL_AUTH_TOKEN
+    ## If not set, uses global.internalApiKey
     ##
     shellctlAuthToken: ""
 
@@ -1174,6 +1175,9 @@ localSandbox:
   affinity: {}
   tolerations: []
   priorityClassName: ""
+  ## @param localSandbox.command Default startup command for the local sandbox container
+  ##
+  command: ["shellctl", "serve", "--listen", "0.0.0.0:5004", "--require-auth-token"]
   ## @param localSandbox.shareProcessNamespace Share a single process namespace between all of the containers in Dify local sandbox pods
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
   ##
@@ -1395,7 +1399,7 @@ weaviate:
     # of weaviate. In accordance with Infra-as-code, you should pin this value
     # down and only change it if you explicitly want to upgrade the Weaviate
     # version.
-    tag: 1.27.27
+    tag: 1.39.13
     repo: semitechnologies/weaviate
     # Image pull policy: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
     pullPolicy: IfNotPresent
@@ -1505,10 +1509,10 @@ weaviate:
   # See https://github.com/weaviate/weaviate-helm/issues/175 for details.
   clusterDomain: cluster.local.
 
-  # The Persistent Volume Claim settings for Weaviate. If there's a
-  # storage.fullnameOverride field set, then the default pvc will not be
-  # created, instead the one defined in fullnameOverride will be used
+  # The Persistent Volume Claim settings for Weaviate. The given name will be used as the
+  # prefix for the volumes (e.g. first replica will use {{ .Values.storage.name }}-weaviate-0)
   storage:
+    name: "weaviate-data"
     size: 32Gi
     storageClassName: ""
 
@@ -1623,8 +1627,16 @@ weaviate:
       # username_claim: ''
       # groups_claim: ''
       # client_id: ''
+      # skip_client_id_check: false
+      # namespace_claim: ''
+      # global_principal_claim: ''
 
   authorization:
+    rbac:
+      enabled: false
+      # admins:
+      # - admin_user1
+      # - admin_user2
     admin_list:
       enabled: true
       users:

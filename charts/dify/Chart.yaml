@@ -38,7 +38,7 @@ dependencies:
   tags:
     - redis
 - name: weaviate
-  version: 17.3.3
+  version: 17.8.3
   repository: https://weaviate.github.io/weaviate-helm
   condition: weaviate.enabled
   tags:
