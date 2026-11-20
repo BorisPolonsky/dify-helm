@@ -181,6 +181,7 @@ The Nginx proxy handles traffic routing with the following rules:
 /marketplace → External Marketplace API
 /mcp         → API Service (5001)
 /triggers    → API Service (5001)
+/callbacks/human-input/v2/im/ → API Service (5001)
 /socket.io/  → API WebSocket Service (5001)
 /agent-stub  → Agent Backend Service (5050)
 /            → Web Service (3000) [Default Route]
