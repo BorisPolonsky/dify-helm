@@ -62,6 +62,9 @@ spec:
         - path:
             type: PathPrefix
             value: /triggers
+        - path:
+            type: PathPrefix
+            value: /callbacks/human-input/v2/im
       backendRefs:
         - name: {{ include "dify.api.fullname" . }}
           port: {{ .Values.api.service.port }}
