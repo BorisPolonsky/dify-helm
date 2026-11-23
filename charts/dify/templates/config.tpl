@@ -698,6 +698,11 @@ server {
       include proxy.conf;
     }
 
+    location /callbacks/human-input/v2/im/ {
+      proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
+      include proxy.conf;
+    }
+
     {{- if .Values.apiWebsocket.enabled }}
     location /socket.io/ {
       proxy_pass http://{{ template "dify.apiWebsocket.fullname" . }}:{{ .Values.apiWebsocket.service.port }};
