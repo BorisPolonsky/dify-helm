@@ -581,9 +581,10 @@ DIFY_AGENT_SANDBOX_FILES_BASE_URL: http://{{ template "dify.api.fullname" .}}:{{
 {{- end }}
 
 {{- define "dify.nginx.config.proxy" }}
-proxy_set_header Host $host;
+proxy_set_header Host $dify_request_host;
 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header X-Forwarded-Port $dify_request_port;
 proxy_http_version 1.1;
 proxy_set_header Connection "";
 proxy_buffering off;
@@ -614,6 +615,18 @@ events {
 http {
     include       /etc/nginx/mime.types;
     default_type  application/octet-stream;
+
+    # Keep Host and X-Forwarded-Port consistent so ProxyFix preserves the external port.
+    map $http_host $dify_request_host {
+        default $http_host;
+        ""      $host;
+    }
+
+    map $http_host $dify_request_port {
+        default "";
+        ""      $server_port;
+        ~^(?:\[[^]]+\]|[^:]+):(?<dify_host_port>[0-9]+)$ $dify_host_port;
+    }
 
     log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
                       '$status $body_bytes_sent "$http_referer" '
@@ -694,6 +707,11 @@ server {
     }
 
     location /triggers {
+      proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
+      include proxy.conf;
+    }
+
+    location /callbacks/human-input/v2/im/ {
       proxy_pass http://{{ template "dify.api.fullname" .}}:{{ .Values.api.service.port }};
       include proxy.conf;
     }
