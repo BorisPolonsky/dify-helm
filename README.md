@@ -17,11 +17,7 @@ helm repo add dify https://borispolonsky.github.io/dify-helm
 helm repo update
 helm install my-release dify/dify
 ```
-For customized installation, please refer to the [README.md](https://github.com/BorisPolonsky/dify-helm/blob/master/charts/dify/README.md) file.
-
-## Production
-
-The default installation is for evaluation. Before production, replace every shipped credential, point Redis, PostgreSQL, and Weaviate at external services, and set replicas, cluster entry, resources, and image tags. The values skeleton is in the chart README: [Production Setup](charts/dify/README.md#production-setup).
+For customized installation and production setup, please refer to the [README.md](https://github.com/BorisPolonsky/dify-helm/blob/master/charts/dify/README.md) file.
 
 ## Network Architecture
 
