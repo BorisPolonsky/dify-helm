@@ -36,9 +36,9 @@ global:                                        # replace default credentials (P0
 
 image:                                         # pin proxy/ssrfProxy tags (P2)
   proxy:
-    tag: "<nginx-image-tag>"
+    tag: "your-tag"
   ssrfProxy:
-    tag: "<squid-image-tag>"
+    tag: "your-tag"
 
 api:                                           # HA (P1) / resources (P2)
   replicas: 2
