@@ -246,7 +246,7 @@ Wait until Weaviate pods to terminate:
 kubectl get pods -n $NAMESPACE -w
 ```
 
-Extract the whole `.Values.weaviate` section and save as `weaviate-values.yaml` to keep your current configurations. The `.Values.weavaiate` should be un-nested as `.Values`. Re-deploy Weaviate with the following command:
+Extract the whole `.Values.weaviate` section and save as `weaviate-values.yaml` to keep your current configurations. The `.Values.weaviate` should be un-nested as `.Values`. Re-deploy Weaviate with the following command:
 
 ```bash
 # Install standalone Weaviate
