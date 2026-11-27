@@ -22,7 +22,9 @@ Set the following environment variables according to your deployment:
 ```bash
 export RELEASE_NAME="your-release-name"    # Helm release name (e.g., 'my-dify' from 'helm install my-dify dify/dify')
 export NAMESPACE="your-namespace"          # Deployment namespace
-export CHART_VERSION=$(helm list -n $NAMESPACE | grep $RELEASE_NAME | awk '{print $9}')  # Chart version of dify-helm
+export CHART_VERSION=$(helm get metadata "$RELEASE_NAME" -n "$NAMESPACE" | awk -F': ' '$1=="VERSION"{print $2}')  # Deployed dify-helm chart version
+export REDIS_CHART_VERSION="16.13.2"        # Check the Chart.yaml for the exact version of the Bitnami Redis chart
+export POSTGRESQL_CHART_VERSION="12.5.6"    # Check the Chart.yaml for the exact version of the Bitnami PostgreSQL chart
 ```
 
 ### Backup Configuration and Data
@@ -134,13 +136,13 @@ Once the built-in databases are fully shut down, re-deploy Redis and PostgreSQL 
 ```bash
 # Install standalone Redis
 helm install my-redis bitnami/redis \
-  --version 16.13.2 \
+  --version $REDIS_CHART_VERSION \
   -n $NAMESPACE \
   -f redis-values.yaml
 
 # Install standalone PostgreSQL  
 helm install my-postgresql bitnami/postgresql \
-  --version 12.5.6 \
+  --version $POSTGRESQL_CHART_VERSION \
   -n $NAMESPACE \
   -f postgresql-values.yaml
 ```
@@ -186,7 +188,7 @@ externalPostgres:
 ```
 
 ```bash
-helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-db-values.yaml
+helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE --version $CHART_VERSION -f dify-external-db-values.yaml
 ```
 
 ### Important Notes
@@ -213,7 +215,7 @@ Set the following environment variables according to your deployment:
 ```bash
 export RELEASE_NAME="your-release-name"    # Helm release name (e.g., 'my-dify' from 'helm install my-dify dify/dify')
 export NAMESPACE="your-namespace"          # Deployment namespace
-export CHART_VERSION=$(helm list -n $NAMESPACE | grep $RELEASE_NAME | awk '{print $9}')  # Chart version of dify-helm
+export CHART_VERSION=$(helm get metadata "$RELEASE_NAME" -n "$NAMESPACE" | awk -F': ' '$1=="VERSION"{print $2}')  # Deployed dify-helm chart version
 export WEAVIATE_CHART_VERSION="17.8.3"     # Check the Chart.yaml for the exact version of the Weaviate Helm chart
 ```
 
@@ -282,5 +284,5 @@ externalWeaviate:
 ```
 
 ```bash
-helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE -f dify-external-weaviate-values.yaml
+helm upgrade $RELEASE_NAME dify/dify -n $NAMESPACE --version $CHART_VERSION -f dify-external-weaviate-values.yaml
 ```
