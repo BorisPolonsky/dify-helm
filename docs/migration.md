@@ -173,12 +173,11 @@ externalRedis:
   enabled: true
   host: "my-redis-master"  # Service name of the new Redis deployment
   port: 6379
-  password: "🔒env_secret_1🔓"  # Use the same password as your previous deployment
-
+  password: "difyai123456"  # Use the same password as your previous deployment
 externalPostgres:
   enabled: true
   username: "postgres"
-  password: "🔒env_secret_1🔓"  # Use the same password as your previous deployment
+  password: "difyai123456"  # Use the same password as your previous deployment
   address: "my-postgresql"  # Service name of the new PostgreSQL deployment
   port: 5432
   database:
@@ -247,11 +246,7 @@ Wait until Weaviate pods to terminate:
 kubectl get pods -n $NAMESPACE -w
 ```
 
-Extract the whole `.Values.weaviate` section and save as `weaviate-values.yaml` to keep your current configurations. The `.Values.weaviate` should be un-nested as `.Values`.
-
-PVC names come from `storage.name` (default `weaviate-data`), so the first replica uses `weaviate-data-weaviate-0`. `storage.fullnameOverride` is no longer used. Keep `storage.name` in the extracted values so the standalone release reuses the existing volume.
-
-Re-deploy Weaviate with the following command:
+Extract the whole `.Values.weaviate` section and save as `weaviate-values.yaml` to keep your current configurations. The `.Values.weavaiate` should be un-nested as `.Values`. Re-deploy Weaviate with the following command:
 
 ```bash
 # Install standalone Weaviate
