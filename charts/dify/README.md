@@ -21,7 +21,7 @@ Fear not its extensive content as it is arranged in sections below:
 3. Middleware: Specifies the configuration of built-in middlewares
 4. External services: Substitute external services for built-in middlewares, data persistence and agent sandboxes
 
-### Production Quick Reference
+### Production Setup
 
 The default installation targets evaluation. For production, apply the following settings — shown in the same order as `values.yaml`, with priority (P0–P2) noted inline:
 
