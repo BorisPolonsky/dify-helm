@@ -21,74 +21,6 @@ Fear not its extensive content as it is arranged in sections below:
 3. Middleware: Specifies the configuration of built-in middlewares
 4. External services: Substitute external services for built-in middlewares, data persistence and agent sandboxes
 
-### Production Setup
-
-The default installation targets evaluation. For production, apply the following settings — shown in the same order as `values.yaml`, with priority (P0–P2) noted inline:
-
-```yaml
-# values.yaml (production skeleton, ordered as in values.yaml)
-global:                                        # replace default credentials (P0)
-  appSecretKey: "<openssl rand -base64 42>"    #   session signing / DB encryption
-  internalApiKey: "<openssl rand -base64 42>"  #   sandbox / plugin daemon / local sandbox
-# if keeping built-in middlewares: postgresql.global.postgresql.auth.postgresPassword,
-# redis.auth.password — otherwise set credentials on the external services below
-# leave agentBackend.auth.shellctlAuthToken unset to reuse internalApiKey for local sandbox
-
-image:                                         # pin proxy/ssrfProxy tags (P2)
-  proxy:
-    tag: "your-tag"
-  ssrfProxy:
-    tag: "your-tag"
-
-api:                                           # HA (P1) / resources (P2)
-  replicas: 2
-  resources:
-    requests:
-      cpu: 500m
-      memory: 1Gi
-    limits:
-      memory: 2Gi
-worker:
-  replicas: 2
-web:
-  replicas: 2
-
-weaviate:                                      # external data services (P1)
-  enabled: false
-
-ingress:                                       # cluster entry (P1)
-  enabled: false
-httproute:                                     #   Gateway API instead of Ingress
-  enabled: true
-  parentRefs:
-    - name: my-gateway
-  hostnames:
-    - dify.example.com
-
-redis:
-  enabled: false
-externalRedis:
-  enabled: true
-  host: "redis.example"
-  port: 6379
-  password: "<your-redis-password>"
-
-externalWeaviate:
-  enabled: true
-  endpoint:
-    http: "http://weaviate.example:8080"
-    grpc: "grpc://weaviate.example:50051"
-  apiKey: "<your-weaviate-api-key>"
-# same pattern: externalPostgres / externalMysql / externalQdrant / externalMilvus ...
-```
-
-Notes:
-- Replace every default key that actually takes effect (including `YOUR-INTERNAL-API-KEY` and other shipped credentials) before production use.
-- `beat` must remain a single replica (Celery Beat singleton).
-- Multiple API replicas require external object storage or a `ReadWriteMany` PVC for file uploads.
-- TLS for the `httproute` entry is terminated at the referenced Gateway.
-- For secrets via External Secrets Operator, see [ExternalSecret Support](#externalsecret-support) (advanced).
-
 ### 1. Use Alternative Images
 You can specify custom images for different components:
 ```yaml
@@ -206,13 +138,8 @@ externalRedis:
   password: "difyai123456"
   useSSL: false
 ```
-Refer to `external<Service>` sections in `values.yaml` for each component to be used.
 
-#### External E2B sandbox (Agent runtime)
-
-Default install keeps Agent runtime `local` with in-cluster `localSandbox` and does not set `DIFY_AGENT_E2B_*`. Workflow Code-node `sandbox` / `CODE_EXECUTION_*` is unrelated.
-
-To use E2B Cloud instead, set `externalE2bSandbox.enabled: true`. Agent Backend stays running; the chart sets `DIFY_AGENT_RUNTIME_BACKEND=e2b` and `DIFY_AGENT_E2B_API_KEY` (not `E2B_API_KEY` / `E2B_API_TOKEN`) and omits `DIFY_AGENT_LOCAL_SANDBOX_*` even if `localSandbox.enabled` is still true. Recommend `localSandbox.enabled: false` so the unused sandbox is not deployed. Agent Backend needs egress to E2B. With ExternalSecret, provide `DIFY_AGENT_E2B_API_KEY` under `externalSecret.agentBackend.remoteRefs`.
+To opt in E2B Cloud as substitution for local sandbox:
 
 ```yaml
 # values.yaml
@@ -223,6 +150,73 @@ externalE2bSandbox:
   enabled: true
   apiKey: "your-e2b-api-key"
 ```
+
+Refer to `external<Service>` sections in `values.yaml` for each component to be used.
+
+## Production Setup
+
+For production, apply the following settings (shown in the same layout as `values.yaml`), with priority (P0–P2) noted inline:
+
+```yaml
+# values.yaml (production skeleton, ordered as in values.yaml)
+global:                                        # replace default credentials (P0)
+  appSecretKey: "<openssl rand -base64 42>"    #   session signing / DB encryption
+  internalApiKey: "<openssl rand -base64 42>"  #   sandbox / plugin daemon / local sandbox
+# if keeping built-in middlewares: postgresql.global.postgresql.auth.postgresPassword,
+# redis.auth.password — otherwise set credentials on the external services below
+# leave agentBackend.auth.shellctlAuthToken unset to reuse internalApiKey for local sandbox
+
+image:                                         # pin proxy/ssrfProxy tags (P2)
+  proxy:
+    tag: "your-tag"
+  ssrfProxy:
+    tag: "your-tag"
+
+api:                                           # HA (P1) / resources (P2)
+  replicas: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      memory: 2Gi
+worker:
+  replicas: 2
+web:
+  replicas: 2
+
+weaviate:                                      # external data services (P1)
+  enabled: false
+
+ingress:                                       # cluster entry (P1)
+  enabled: false
+httproute:                                     #   Gateway API instead of Ingress
+  enabled: true
+  parentRefs:
+    - name: my-gateway
+  hostnames:
+    - dify.example.com
+
+redis:
+  enabled: false
+externalRedis:
+  enabled: true
+  host: "redis.example"
+  port: 6379
+  password: "<your-redis-password>"
+
+externalWeaviate:
+  enabled: true
+  endpoint:
+    http: "http://weaviate.example:8080"
+    grpc: "grpc://weaviate.example:50051"
+  apiKey: "<your-weaviate-api-key>"
+# same pattern: externalPostgres / externalMysql / externalQdrant / externalMilvus ...
+```
+
+Notes:
+- Replace every default key that actually takes effect (including `YOUR-INTERNAL-API-KEY` and other shipped credentials) for production use.
+- `beat` is a single replica workload by design (Celery Beat singleton).
 
 ## Advanced Topics
 ### Migrate Built-in Redis, PostgreSQL and Weaviate to Separate Releases
