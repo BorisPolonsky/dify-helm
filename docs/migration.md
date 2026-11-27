@@ -72,14 +72,14 @@ replica:
     existingClaim: ""  # Replicas will sync data from master
 ```
 
-Or use the following approach as altnernative:
+Or use the following approach as alternative:
 
 ```yaml
 # redis-values.yaml
 # Inherit all original settings from your backup, modify fullnameOverride to re-use the previously created PVCs
 ## @param fullnameOverride String to fully override common.names.fullname
 ##
-fullnameOverride: "my-release-redis" # Override as ${RELEASE_NAME}-redis to match exisiting PVCs by name.
+fullnameOverride: "my-release-redis" # Override as ${RELEASE_NAME}-redis to match existing PVCs by name.
 ```
 
 For PostgreSQL:
@@ -94,7 +94,7 @@ primary:
 readReplicas:
   replicaCount: 1
   persistence:
-    existingClaim: "data-my-release-postgresql-read-0"  # Applies only if only 1 read replica is configured. Leave it empty to allow read replicas to sync from priamry if more than 1 read replica is configured.
+    existingClaim: "data-my-release-postgresql-read-0"  # Applies only if only 1 read replica is configured. Leave it empty to allow read replicas to sync from primary if more than 1 read replica is configured.
 ```
 
 Or use the following approach:
@@ -104,10 +104,10 @@ Or use the following approach:
 # Inherit all original settings from your backup, add/modify fullnameOverride to re-use the previously created PVCs
 ## @param fullnameOverride String to fully override common.names.fullname
 ##
-fullnameOverride: "my-release-postgresql" # Override as ${RELEASE_NAME}-postgresql to match exisiting PVCs by name.
+fullnameOverride: "my-release-postgresql" # Override as ${RELEASE_NAME}-postgresql to match existing PVCs by name.
 ```
 
-**Noteice:** When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. Store your credentials in a secure vault rather than relying on the Secret created in the new release.
+**Notice:** When reusing existing PVCs, the configured password in the new release will be ignored as the database retains the password from the original installation. Store your credentials in a secure vault rather than relying on the Secret created in the new release.
 
 ### Disable built-in Redis and PostgreSQL
 
@@ -127,7 +127,7 @@ Wait until Redis and PostgreSQL pods terminate:
 kubectl get pods -n $NAMESPACE -w
 ```
 
-### Deploy Redis and PostgreSQL with exisiting PVCs
+### Deploy Redis and PostgreSQL with existing PVCs
 
 Once the built-in databases are fully shut down, re-deploy Redis and PostgreSQL as separate releases:
 
@@ -266,7 +266,7 @@ kubectl get pods -n $NAMESPACE | grep weaviate
 
 ### Update Dify Service
 
-Update Dify configurartions to use external Weaviate service instead of the built-in one:
+Update Dify configurations to use external Weaviate service instead of the built-in one:
 
 ```yaml
 # dify-external-weaviate-values.yaml
