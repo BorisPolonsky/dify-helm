@@ -215,8 +215,8 @@ externalWeaviate:
 ```
 
 Notes:
-- Replace every default key that actually takes effect (including `YOUR-INTERNAL-API-KEY` and other shipped credentials) for production use.
-- `beat` is a single replica workload by design (Celery Beat singleton).
+- Replace default credentials shipped with this chart (e.g. `YOUR-INTERNAL-API-KEY`)
+- `beat` is a single-replica workload by design (Celery Beat singleton).
 
 ## Advanced Topics
 ### Migrate Built-in Redis, PostgreSQL and Weaviate to Separate Releases
