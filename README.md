@@ -17,7 +17,7 @@ helm repo add dify https://borispolonsky.github.io/dify-helm
 helm repo update
 helm install my-release dify/dify
 ```
-For customized installation, please refer to the [README.md](https://github.com/BorisPolonsky/dify-helm/blob/master/charts/dify/README.md) file.
+For customized installation and production setup, please refer to the [README.md](https://github.com/BorisPolonsky/dify-helm/blob/master/charts/dify/README.md) file.
 
 ## Network Architecture
 
